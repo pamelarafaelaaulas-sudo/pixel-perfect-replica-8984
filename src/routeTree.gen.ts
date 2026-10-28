@@ -17,6 +17,7 @@ import { Route as AuthenticatedAlunoRouteRouteImport } from './routes/_authentic
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedProfessoraRouteRouteImport } from './routes/_authenticated/professora/route'
 import { Route as AuthenticatedProfessoraIndexRouteImport } from './routes/_authenticated/professora/index'
+import { Route as AuthenticatedProfessoraGrupoGroupIdRouteImport } from './routes/_authenticated/professora/grupo.$groupId'
 import { Route as AuthenticatedProfessoraTurmaClassIdRouteImport } from './routes/_authenticated/professora/turma.$classId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -60,6 +61,12 @@ const AuthenticatedProfessoraIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedProfessoraRouteRoute,
   } as any)
+const AuthenticatedProfessoraGrupoGroupIdRoute =
+  AuthenticatedProfessoraGrupoGroupIdRouteImport.update({
+    id: '/grupo/$groupId',
+    path: '/grupo/$groupId',
+    getParentRoute: () => AuthenticatedProfessoraRouteRoute,
+  } as any)
 const AuthenticatedProfessoraTurmaClassIdRoute =
   AuthenticatedProfessoraTurmaClassIdRouteImport.update({
     id: '/turma/$classId',
@@ -75,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/professora': typeof AuthenticatedProfessoraRouteRouteWithChildren
   '/painel': typeof AuthenticatedPainelRoute
   '/professora/': typeof AuthenticatedProfessoraIndexRoute
+  '/professora/grupo/$groupId': typeof AuthenticatedProfessoraGrupoGroupIdRoute
   '/professora/turma/$classId': typeof AuthenticatedProfessoraTurmaClassIdRoute
 }
 export interface FileRoutesByTo {
@@ -84,6 +92,7 @@ export interface FileRoutesByTo {
   '/aluno': typeof AuthenticatedAlunoRouteRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/professora': typeof AuthenticatedProfessoraIndexRoute
+  '/professora/grupo/$groupId': typeof AuthenticatedProfessoraGrupoGroupIdRoute
   '/professora/turma/$classId': typeof AuthenticatedProfessoraTurmaClassIdRoute
 }
 export interface FileRoutesById {
@@ -96,6 +105,7 @@ export interface FileRoutesById {
   '/_authenticated/professora': typeof AuthenticatedProfessoraRouteRouteWithChildren
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/professora/': typeof AuthenticatedProfessoraIndexRoute
+  '/_authenticated/professora/grupo/$groupId': typeof AuthenticatedProfessoraGrupoGroupIdRoute
   '/_authenticated/professora/turma/$classId': typeof AuthenticatedProfessoraTurmaClassIdRoute
 }
 export interface FileRouteTypes {
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/professora'
     | '/painel'
     | '/professora/'
+    | '/professora/grupo/$groupId'
     | '/professora/turma/$classId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/aluno'
     | '/painel'
     | '/professora'
+    | '/professora/grupo/$groupId'
     | '/professora/turma/$classId'
   id:
     | '__root__'
@@ -128,6 +140,7 @@ export interface FileRouteTypes {
     | '/_authenticated/professora'
     | '/_authenticated/painel'
     | '/_authenticated/professora/'
+    | '/_authenticated/professora/grupo/$groupId'
     | '/_authenticated/professora/turma/$classId'
   fileRoutesById: FileRoutesById
 }
@@ -196,6 +209,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfessoraIndexRouteImport
       parentRoute: typeof AuthenticatedProfessoraRouteRoute
     }
+    '/_authenticated/professora/grupo/$groupId': {
+      id: '/_authenticated/professora/grupo/$groupId'
+      path: '/grupo/$groupId'
+      fullPath: '/professora/grupo/$groupId'
+      preLoaderRoute: typeof AuthenticatedProfessoraGrupoGroupIdRouteImport
+      parentRoute: typeof AuthenticatedProfessoraRouteRoute
+    }
     '/_authenticated/professora/turma/$classId': {
       id: '/_authenticated/professora/turma/$classId'
       path: '/turma/$classId'
@@ -208,12 +228,15 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedProfessoraRouteRouteChildren {
   AuthenticatedProfessoraIndexRoute: typeof AuthenticatedProfessoraIndexRoute
+  AuthenticatedProfessoraGrupoGroupIdRoute: typeof AuthenticatedProfessoraGrupoGroupIdRoute
   AuthenticatedProfessoraTurmaClassIdRoute: typeof AuthenticatedProfessoraTurmaClassIdRoute
 }
 
 const AuthenticatedProfessoraRouteRouteChildren: AuthenticatedProfessoraRouteRouteChildren =
   {
     AuthenticatedProfessoraIndexRoute: AuthenticatedProfessoraIndexRoute,
+    AuthenticatedProfessoraGrupoGroupIdRoute:
+      AuthenticatedProfessoraGrupoGroupIdRoute,
     AuthenticatedProfessoraTurmaClassIdRoute:
       AuthenticatedProfessoraTurmaClassIdRoute,
   }
