@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { countWords, isCanvaUrl, keywordsInTitle, phaseProblems } from "./phase-rules";
+import { TEMPLATE_LINK_PROBLEM, countWords, isCanvaUrl, isTemplateLink, keywordsInTitle, phaseProblems } from "./phase-rules";
 import { PHASES } from "./phases";
 
 const words = (n: number) => Array.from({ length: n }, (_, i) => `palavra${i}`).join(" ");
