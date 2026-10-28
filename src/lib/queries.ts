@@ -261,3 +261,26 @@ export const teacherRosterQuery = queryOptions({
     return data ?? [];
   },
 });
+
+/* ---------------- Teacher: trimester grades across classes ---------------- */
+
+export const teacherTrimesterQuery = queryOptions({
+  queryKey: ["teacher", "trimester"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("classes")
+      .select(
+        `id, name, late_penalty_per_day,
+        schedules(phase_number, due_date),
+        groups!groups_class_id_fkey(
+          id, group_name,
+          group_members(profiles(name)),
+          projects(current_phase, phase_submissions(phase_number, submitted_at)),
+          grades(trimester, score, feedback, is_reference_ten)
+        )`,
+      )
+      .order("created_at", { ascending: false });
+    fail(error);
+    return data ?? [];
+  },
+});
