@@ -14,6 +14,70 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_evaluations: {
+        Row: {
+          created_at: string
+          criteria: Json
+          evaluated_text: string
+          group_id: string
+          id: string
+          overall: number
+          phase_number: number
+          project_id: string
+          requested_by: string | null
+          summary: string
+          tips: Json
+        }
+        Insert: {
+          created_at?: string
+          criteria?: Json
+          evaluated_text?: string
+          group_id: string
+          id?: string
+          overall: number
+          phase_number: number
+          project_id: string
+          requested_by?: string | null
+          summary?: string
+          tips?: Json
+        }
+        Update: {
+          created_at?: string
+          criteria?: Json
+          evaluated_text?: string
+          group_id?: string
+          id?: string
+          overall?: number
+          phase_number?: number
+          project_id?: string
+          requested_by?: string | null
+          summary?: string
+          tips?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_evaluations_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_evaluations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_evaluations_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       classes: {
         Row: {
           class_code: string
