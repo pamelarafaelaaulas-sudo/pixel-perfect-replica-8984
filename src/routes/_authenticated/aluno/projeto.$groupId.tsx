@@ -25,7 +25,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
-import { groupDetailQuery, meQuery } from "@/lib/queries";
+import { aiEvaluationsForGroupQuery, groupDetailQuery, meQuery } from "@/lib/queries";
+import { latestPerPhase } from "@/lib/ai-score";
 import { SOURCE_TYPES, TRIMESTERS, WRITTEN_SECTIONS, parseArticles, type Article, phaseMeta } from "@/lib/phases";
 import { fmtDateTime, whatsappLink } from "@/lib/format";
 import { formatPoints, projectLateness } from "@/lib/penalty";
@@ -42,7 +43,10 @@ export const Route = createFileRoute("/_authenticated/aluno/projeto/$groupId")({
     ],
   }),
   loader: async ({ context, params }) => {
-    const g = await context.queryClient.ensureQueryData(groupDetailQuery(params.groupId));
+    const [g] = await Promise.all([
+      context.queryClient.ensureQueryData(groupDetailQuery(params.groupId)),
+      context.queryClient.ensureQueryData(aiEvaluationsForGroupQuery(params.groupId)),
+    ]);
     if (!g) throw notFound();
   },
   component: StudentProjectPage,
@@ -90,6 +94,8 @@ function StudentProjectPage() {
   const { groupId } = Route.useParams();
   const { data: me } = useSuspenseQuery(meQuery);
   const { data: group } = useSuspenseQuery(groupDetailQuery(groupId));
+  const { data: aiEvaluations } = useSuspenseQuery(aiEvaluationsForGroupQuery(groupId));
+  const aiByPhase = useMemo(() => latestPerPhase(aiEvaluations), [aiEvaluations]);
   const qc = useQueryClient();
   const project = group?.projects ?? null;
 
@@ -303,7 +309,18 @@ function StudentProjectPage() {
             </div>
           )}
 
-          <AiFeedback phaseName={phaseMeta(selected).name} text={phaseText(draft, selected)} />
+          <AiFeedback
+            key={selected}
+            projectId={project.id}
+            groupId={groupId}
+            phaseNumber={selected}
+            text={phaseText(draft, selected)}
+            saved={
+              aiByPhase[selected]
+                ? { evaluation: aiByPhase[selected].latest, createdAt: aiByPhase[selected].latest.createdAt }
+                : null
+            }
+          />
         </section>
 
         <aside className="space-y-4">

@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getPhaseEvaluation } from "@/lib/ai-feedback.functions";
 import { formatPoints } from "@/lib/penalty";
+import { fmtDateTime } from "@/lib/format";
 import type { AiEvaluation } from "@/lib/ai-score";
 
-function scoreTone(n: number) {
+export function scoreTone(n: number) {
   if (n >= 7) return "text-success";
   if (n >= 5) return "text-warning";
   return "text-destructive";
@@ -35,10 +37,62 @@ function TipList({ title, tips }: { title: string; tips: string[] }) {
   );
 }
 
-export function AiFeedback({ phaseName, text }: { phaseName: string; text: string }) {
+export function AiEvaluationView({ evaluation, showTips = true }: { evaluation: AiEvaluation; showTips?: boolean }) {
+  return (
+    <div className="space-y-5 text-sm">
+      <div className="flex flex-wrap items-center gap-5">
+        <div className="card-paper grid min-w-28 place-items-center px-5 py-3 text-center">
+          <span className="text-xs uppercase tracking-wide text-muted-foreground">Nota da IA</span>
+          <span className={cn("font-mono text-4xl font-semibold", scoreTone(evaluation.overall))}>
+            {formatPoints(evaluation.overall)}
+          </span>
+          <span className="text-xs text-muted-foreground">de 10</span>
+        </div>
+        {evaluation.summary && <p className="max-w-xl flex-1 text-foreground">{evaluation.summary}</p>}
+      </div>
+
+      <ul className="grid gap-3 sm:grid-cols-2">
+        {evaluation.criteria.map((c) => (
+          <li key={c.key} className="card-paper p-3">
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="font-medium text-foreground">{c.label}</span>
+              <span className={cn("font-mono font-semibold", scoreTone(c.score))}>{formatPoints(c.score)}</span>
+            </div>
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
+              <div className={cn("h-full rounded-full", barTone(c.score))} style={{ width: `${c.score * 10}%` }} />
+            </div>
+            {c.comment && <p className="mt-2 text-xs text-muted-foreground">{c.comment}</p>}
+          </li>
+        ))}
+      </ul>
+
+      {showTips && (
+        <div className="space-y-4">
+          <TipList title="Dicas de clareza" tips={evaluation.tips.clarity} />
+          <TipList title="Dicas de organização" tips={evaluation.tips.organization} />
+          <TipList title="Dicas de citações" tips={evaluation.tips.citations} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function AiFeedback({
+  projectId,
+  groupId,
+  phaseNumber,
+  text,
+  saved,
+}: {
+  projectId: string;
+  groupId: string;
+  phaseNumber: number;
+  text: string;
+  saved?: { evaluation: AiEvaluation; createdAt: string } | null;
+}) {
   const fn = useServerFn(getPhaseEvaluation);
+  const qc = useQueryClient();
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<AiEvaluation | null>(null);
   const [error, setError] = useState<string | null>(null);
   const tooShort = text.trim().length < 20;
 
@@ -46,8 +100,8 @@ export function AiFeedback({ phaseName, text }: { phaseName: string; text: strin
     setLoading(true);
     setError(null);
     try {
-      const r = await fn({ data: { phaseName, text } });
-      setResult(r.evaluation);
+      await fn({ data: { projectId, phaseNumber, text } });
+      await qc.invalidateQueries({ queryKey: ["ai", "group", groupId] });
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -61,50 +115,22 @@ export function AiFeedback({ phaseName, text }: { phaseName: string; text: strin
         <div>
           <p className="font-medium">Avaliação da IA</p>
           <p className="text-sm text-muted-foreground">
-            Nota estimada por critério e dicas de clareza, organização e citações. Não substitui a nota da professora.
+            Nota estimada por critério e dicas de clareza, organização e citações. Fica salva para a professora ver e
+            não substitui a nota dela.
           </p>
         </div>
         <Button variant="secondary" onClick={run} disabled={loading || tooShort}>
           {loading ? <Loader2 className="animate-spin" /> : <Sparkles />}
-          {loading ? "Avaliando…" : result ? "Avaliar de novo" : "Avaliar com IA"}
+          {loading ? "Avaliando…" : saved ? "Avaliar de novo" : "Avaliar com IA"}
         </Button>
       </div>
       {tooShort && <p className="mt-2 text-xs text-muted-foreground">Escreva um pouco mais para pedir a avaliação.</p>}
       {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
 
-      {result && (
-        <div className="mt-5 space-y-5 text-sm">
-          <div className="flex flex-wrap items-center gap-5">
-            <div className="card-paper grid min-w-28 place-items-center px-5 py-3 text-center">
-              <span className="text-xs uppercase tracking-wide text-muted-foreground">Nota estimada</span>
-              <span className={cn("font-mono text-4xl font-semibold", scoreTone(result.overall))}>
-                {formatPoints(result.overall)}
-              </span>
-              <span className="text-xs text-muted-foreground">de 10</span>
-            </div>
-            {result.summary && <p className="max-w-xl flex-1 text-foreground">{result.summary}</p>}
-          </div>
-
-          <ul className="grid gap-3 sm:grid-cols-2">
-            {result.criteria.map((c) => (
-              <li key={c.key} className="card-paper p-3">
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="font-medium text-foreground">{c.label}</span>
-                  <span className={cn("font-mono font-semibold", scoreTone(c.score))}>{formatPoints(c.score)}</span>
-                </div>
-                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
-                  <div className={cn("h-full rounded-full", barTone(c.score))} style={{ width: `${c.score * 10}%` }} />
-                </div>
-                {c.comment && <p className="mt-2 text-xs text-muted-foreground">{c.comment}</p>}
-              </li>
-            ))}
-          </ul>
-
-          <div className="space-y-4">
-            <TipList title="Dicas de clareza" tips={result.tips.clarity} />
-            <TipList title="Dicas de organização" tips={result.tips.organization} />
-            <TipList title="Dicas de citações" tips={result.tips.citations} />
-          </div>
+      {saved && (
+        <div className="mt-5">
+          <p className="mb-3 text-xs text-muted-foreground">Última avaliação: {fmtDateTime(saved.createdAt)}</p>
+          <AiEvaluationView evaluation={saved.evaluation} />
         </div>
       )}
     </div>

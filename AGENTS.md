@@ -15,4 +15,5 @@
 - Students cannot change `projects.current_phase` directly; a trigger blocks it except inside `submit_phase` or for the teacher.
 - Client reads use the browser Supabase client with RLS via `src/lib/queries.ts` queryOptions; routes load with `ensureQueryData` and render with `useSuspenseQuery`.
 - Late-penalty math lives in `src/lib/penalty.ts` (pure, unit-tested) so teacher and student screens show the same numbers.
-- AI phase evaluation returns per-criterion scores via a strict schema; the overall grade is computed in `src/lib/ai-score.ts` (pure, unit-tested), never taken from the model, so it stays consistent and bounded 0–10.
+- AI phase evaluation returns per-criterion scores via a strict schema; the overall grade is computed in `src/lib/ai-score.ts` (pure, unit-tested), never taken from the model. Results are saved to `ai_evaluations` only by the server function (admin insert after a membership check; no client insert policy) so students cannot forge scores.
+- Per-student review math (final trimester grade = teacher score − project late penalty, AI/peer averages) lives in `src/lib/student-review.ts` (pure, unit-tested); the screen only renders it.

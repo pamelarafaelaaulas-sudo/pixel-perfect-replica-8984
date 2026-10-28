@@ -46,6 +46,13 @@ function DeadlinesPage() {
     })),
   });
 
+  const memberLinks: Record<string, { id: string; name: string }[]> = Object.fromEntries(
+    (cls.groups ?? []).map((g) => [
+      g.id,
+      (g.group_members ?? []).map((m) => ({ id: m.student_id, name: m.profiles?.name ?? "Aluno" })),
+    ]),
+  );
+
   return (
     <>
       <Link
@@ -103,7 +110,22 @@ function DeadlinesPage() {
                     >
                       {row.name}
                     </Link>
-                    <p className="max-w-48 text-xs text-muted-foreground">{row.members.join(", ") || "Sem integrantes"}</p>
+                    <p className="max-w-48 text-xs text-muted-foreground">
+                      {(memberLinks[row.id] ?? []).length === 0
+                        ? "Sem integrantes"
+                        : (memberLinks[row.id] ?? []).map((m, i) => (
+                            <span key={m.id}>
+                              {i > 0 && ", "}
+                              <Link
+                                to="/professora/aluno/$studentId"
+                                params={{ studentId: m.id }}
+                                className="hover:text-primary hover:underline"
+                              >
+                                {m.name}
+                              </Link>
+                            </span>
+                          ))}
+                    </p>
                   </td>
                   {row.phases.map((p) => (
                     <td key={p.phase} className="px-3 py-4">

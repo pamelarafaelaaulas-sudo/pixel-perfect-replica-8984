@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { ArrowLeft, MessageCircle, RotateCcw, Star, UserMinus, Award } from "lucide-react";
+import { ArrowLeft, MessageCircle, RotateCcw, Star, UserMinus, Award, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { PhaseTimeline } from "@/components/phase-timeline";
@@ -26,10 +26,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { groupDetailQuery, peerEvaluationsForGroupQuery } from "@/lib/queries";
+import { aiEvaluationsForGroupQuery, groupDetailQuery, peerEvaluationsForGroupQuery } from "@/lib/queries";
 import { PHASES, SECTION_LABELS, TRIMESTERS } from "@/lib/phases";
 import { fmtAgo, fmtDateTime, whatsappLink } from "@/lib/format";
 import { formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
+import { latestPerPhase, overallScore, type SavedAiEvaluation } from "@/lib/ai-score";
+import { AiEvaluationView, scoreTone } from "@/components/ai-feedback";
 
 export const Route = createFileRoute("/_authenticated/professora/grupo/$groupId")({
   head: () => ({
@@ -46,6 +48,7 @@ export const Route = createFileRoute("/_authenticated/professora/grupo/$groupId"
     const [g] = await Promise.all([
       context.queryClient.ensureQueryData(groupDetailQuery(params.groupId)),
       context.queryClient.ensureQueryData(peerEvaluationsForGroupQuery(params.groupId)),
+      context.queryClient.ensureQueryData(aiEvaluationsForGroupQuery(params.groupId)),
     ]);
     if (!g) throw notFound();
   },
@@ -56,9 +59,14 @@ function TeacherGroupPage() {
   const { groupId } = Route.useParams();
   const { data: group } = useSuspenseQuery(groupDetailQuery(groupId));
   const { data: peers } = useSuspenseQuery(peerEvaluationsForGroupQuery(groupId));
+  const { data: aiEvaluations } = useSuspenseQuery(aiEvaluationsForGroupQuery(groupId));
+  const aiByPhase = latestPerPhase(aiEvaluations);
+  const aiLatest = Object.values(aiByPhase).map((x) => x.latest.overall);
+  const aiAverage = aiLatest.length ? overallScore(aiLatest) : null;
   const qc = useQueryClient();
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["group", groupId] });
+    qc.invalidateQueries({ queryKey: ["teacher", "student"] });
     if (group?.classes) qc.invalidateQueries({ queryKey: ["class", group.classes.id] });
   };
 
@@ -127,7 +135,14 @@ function TeacherGroupPage() {
         {members.map((m) => (
           <div key={m.id} className="card-paper flex items-center justify-between gap-3 p-4">
             <div className="min-w-0">
-              <p className="truncate font-medium">{m.profiles?.name}</p>
+              <Link
+                to="/professora/aluno/$studentId"
+                params={{ studentId: m.student_id }}
+                className="block truncate font-medium hover:text-primary hover:underline"
+                title="Ver revisão do aluno"
+              >
+                {m.profiles?.name}
+              </Link>
               <a
                 href={whatsappLink(m.whatsapp)}
                 target="_blank"
@@ -196,6 +211,7 @@ function TeacherGroupPage() {
           <TabsTrigger value="contrib">Quem escreveu</TabsTrigger>
           <TabsTrigger value="pares">Avaliação dos colegas</TabsTrigger>
           <TabsTrigger value="notas">Notas</TabsTrigger>
+          <TabsTrigger value="ia">Avaliação da IA</TabsTrigger>
         </TabsList>
 
         <TabsContent value="projeto" className="card-paper p-6 md:p-8">
@@ -243,6 +259,13 @@ function TeacherGroupPage() {
         </TabsContent>
 
         <TabsContent value="notas">
+          {aiAverage !== null && (
+            <p className="mb-4 text-sm text-muted-foreground">
+              Para comparar: a média da IA nas etapas avaliadas é{" "}
+              <strong className={scoreTone(aiAverage)}>{formatPoints(aiAverage)}</strong> (detalhes na aba Avaliação da
+              IA).
+            </p>
+          )}
           <div className="grid gap-5 md:grid-cols-3">
             {TRIMESTERS.map((t) => (
               <GradeForm
@@ -255,6 +278,16 @@ function TeacherGroupPage() {
               />
             ))}
           </div>
+        </TabsContent>
+
+        <TabsContent value="ia">
+          <AiTab
+            byPhase={aiByPhase}
+            history={aiEvaluations}
+            aiAverage={aiAverage}
+            grades={group.grades ?? []}
+            nameOf={nameOf}
+          />
         </TabsContent>
       </Tabs>
     </>
@@ -394,6 +427,90 @@ function GradeForm({
         Salvar nota
       </Button>
       {existing && <p className="text-center text-xs text-muted-foreground">Lançada em {fmtDateTime(existing.created_at)}</p>}
+    </div>
+  );
+}
+
+function AiTab({
+  byPhase,
+  history,
+  aiAverage,
+  grades,
+  nameOf,
+}: {
+  byPhase: Record<number, { latest: SavedAiEvaluation; count: number }>;
+  history: SavedAiEvaluation[];
+  aiAverage: number | null;
+  grades: { trimester: number; score: number }[];
+  nameOf: (id: string) => string;
+}) {
+  return (
+    <div className="space-y-5">
+      <section className="card-paper flex flex-wrap items-center gap-6 p-5">
+        <div>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Média da IA (etapas avaliadas)</p>
+          <p className={`font-mono text-3xl font-semibold ${aiAverage === null ? "text-muted-foreground" : scoreTone(aiAverage)}`}>
+            {aiAverage === null ? "—" : formatPoints(aiAverage)}
+          </p>
+        </div>
+        <div className="h-10 w-px bg-border" />
+        <div>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Suas notas</p>
+          <div className="mt-1 flex gap-2">
+            {TRIMESTERS.map((t) => {
+              const g = grades.find((x) => x.trimester === t);
+              return (
+                <span key={t} className="rounded-md border border-border px-2 py-1 font-mono text-sm">
+                  {t}º tri: <strong>{g ? formatPoints(Number(g.score)) : "—"}</strong>
+                </span>
+              );
+            })}
+          </div>
+        </div>
+        <p className="basis-full text-xs text-muted-foreground">
+          A nota da IA é só uma referência pedida pelos alunos; ela não entra na nota final.
+        </p>
+      </section>
+
+      {PHASES.map((p) => {
+        const entry = byPhase[p.number];
+        const older = history.filter((h) => h.phaseNumber === p.number && h.id !== entry?.latest.id);
+        return (
+          <section key={p.number} className="card-paper p-6">
+            <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+              <h3 className="text-lg font-semibold">
+                <span className="font-mono text-xs text-muted-foreground">ETAPA {p.number}</span> {p.name}
+              </h3>
+              {entry && (
+                <p className="text-xs text-muted-foreground">
+                  {fmtDateTime(entry.latest.createdAt)}
+                  {entry.latest.requestedBy && ` · pedida por ${nameOf(entry.latest.requestedBy)}`}
+                  {entry.count > 1 && ` · ${entry.count} avaliações`}
+                </p>
+              )}
+            </div>
+            {!entry ? (
+              <p className="flex items-center gap-2 text-sm italic text-muted-foreground">
+                <Sparkles className="size-4" /> O grupo ainda não pediu avaliação da IA nesta etapa.
+              </p>
+            ) : (
+              <>
+                <AiEvaluationView evaluation={entry.latest} />
+                <details className="mt-5 rounded-lg border border-border p-3 text-sm">
+                  <summary className="cursor-pointer font-medium">Texto que a IA avaliou</summary>
+                  <p className="mt-2 whitespace-pre-wrap text-muted-foreground">{entry.latest.evaluatedText}</p>
+                </details>
+                {older.length > 0 && (
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    Avaliações anteriores:{" "}
+                    {older.map((o) => `${formatPoints(o.overall)} (${fmtDateTime(o.createdAt)})`).join(" · ")}
+                  </p>
+                )}
+              </>
+            )}
+          </section>
+        );
+      })}
     </div>
   );
 }
