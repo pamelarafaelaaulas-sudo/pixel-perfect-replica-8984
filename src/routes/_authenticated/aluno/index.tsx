@@ -135,7 +135,7 @@ function JoinClass({ defaultWhatsapp }: { defaultWhatsapp: string }) {
       return;
     }
     }
-    setFound(c.data[0]);
+    setFound(c.data[0] ?? null);
     setGroups(g.data ?? []);
   }
 

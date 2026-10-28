@@ -23,7 +23,7 @@ export function toDateInput(d: string | Date) {
 
 /** Local end-of-day ISO string from yyyy-MM-dd */
 export function endOfDayFromInput(value: string) {
-  const [y, m, day] = value.split("-").map(Number);
+  const [y = 1970, m = 1, day = 1] = value.split("-").map(Number);
   return new Date(y, m - 1, day, 23, 59, 0).toISOString();
 }
 
