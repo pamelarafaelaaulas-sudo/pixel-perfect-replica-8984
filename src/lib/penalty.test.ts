@@ -48,3 +48,32 @@ describe("project lateness across the 4 phases", () => {
     expect(totalPenalty).toBe(1.5);
   });
 });
+
+import { classLateness } from "./penalty";
+
+describe("class deadlines overview", () => {
+  const schedules = [
+    { phase_number: 1, due_date: "2026-10-10T12:00:00Z" },
+    { phase_number: 2, due_date: "2026-10-24T12:00:00Z" },
+    { phase_number: 3, due_date: "2026-11-07T12:00:00Z" },
+    { phase_number: 4, due_date: "2026-11-21T12:00:00Z" },
+  ];
+
+  it("sums each group's lost points at the class rate per day and counts late groups", () => {
+    const { rows, totalPenalty, lateGroups } = classLateness({
+      perDay: 0.5,
+      now: new Date("2026-10-20T12:00:00Z"),
+      schedules,
+      groups: [
+        { id: "a", name: "Alfa", members: [], currentPhase: 2, submissions: [{ phase_number: 1, submitted_at: "2026-10-09T12:00:00Z" }] },
+        { id: "b", name: "Beta", members: [], currentPhase: 2, submissions: [{ phase_number: 1, submitted_at: "2026-10-13T12:00:00Z" }] },
+      ],
+    });
+    expect(rows.map((r) => [r.id, r.totalDays, r.totalPenalty])).toEqual([
+      ["b", 3, 1.5],
+      ["a", 0, 0],
+    ]);
+    expect(totalPenalty).toBe(1.5);
+    expect(lateGroups).toBe(1);
+  });
+});

@@ -22,6 +22,7 @@ import { Route as AuthenticatedAlunoAvaliacaoGroupIdRouteImport } from './routes
 import { Route as AuthenticatedAlunoProjetoGroupIdRouteImport } from './routes/_authenticated/aluno/projeto.$groupId'
 import { Route as AuthenticatedProfessoraGrupoGroupIdRouteImport } from './routes/_authenticated/professora/grupo.$groupId'
 import { Route as AuthenticatedProfessoraTurmaClassIdRouteImport } from './routes/_authenticated/professora/turma.$classId'
+import { Route as AuthenticatedProfessoraTurmaClassIdPrazosRouteImport } from './routes/_authenticated/professora/turma.$classId_.prazos'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -93,6 +94,12 @@ const AuthenticatedProfessoraTurmaClassIdRoute =
     path: '/turma/$classId',
     getParentRoute: () => AuthenticatedProfessoraRouteRoute,
   } as any)
+const AuthenticatedProfessoraTurmaClassIdPrazosRoute =
+  AuthenticatedProfessoraTurmaClassIdPrazosRouteImport.update({
+    id: '/turma/$classId_/prazos',
+    path: '/turma/$classId/prazos',
+    getParentRoute: () => AuthenticatedProfessoraRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/aluno/projeto/$groupId': typeof AuthenticatedAlunoProjetoGroupIdRoute
   '/professora/grupo/$groupId': typeof AuthenticatedProfessoraGrupoGroupIdRoute
   '/professora/turma/$classId': typeof AuthenticatedProfessoraTurmaClassIdRoute
+  '/professora/turma/$classId/prazos': typeof AuthenticatedProfessoraTurmaClassIdPrazosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -119,6 +127,7 @@ export interface FileRoutesByTo {
   '/aluno/projeto/$groupId': typeof AuthenticatedAlunoProjetoGroupIdRoute
   '/professora/grupo/$groupId': typeof AuthenticatedProfessoraGrupoGroupIdRoute
   '/professora/turma/$classId': typeof AuthenticatedProfessoraTurmaClassIdRoute
+  '/professora/turma/$classId/prazos': typeof AuthenticatedProfessoraTurmaClassIdPrazosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -135,6 +144,7 @@ export interface FileRoutesById {
   '/_authenticated/aluno/projeto/$groupId': typeof AuthenticatedAlunoProjetoGroupIdRoute
   '/_authenticated/professora/grupo/$groupId': typeof AuthenticatedProfessoraGrupoGroupIdRoute
   '/_authenticated/professora/turma/$classId': typeof AuthenticatedProfessoraTurmaClassIdRoute
+  '/_authenticated/professora/turma/$classId_/prazos': typeof AuthenticatedProfessoraTurmaClassIdPrazosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
     | '/aluno/projeto/$groupId'
     | '/professora/grupo/$groupId'
     | '/professora/turma/$classId'
+    | '/professora/turma/$classId/prazos'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -163,6 +174,7 @@ export interface FileRouteTypes {
     | '/aluno/projeto/$groupId'
     | '/professora/grupo/$groupId'
     | '/professora/turma/$classId'
+    | '/professora/turma/$classId/prazos'
   id:
     | '__root__'
     | '/'
@@ -178,6 +190,7 @@ export interface FileRouteTypes {
     | '/_authenticated/aluno/projeto/$groupId'
     | '/_authenticated/professora/grupo/$groupId'
     | '/_authenticated/professora/turma/$classId'
+    | '/_authenticated/professora/turma/$classId_/prazos'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -280,6 +293,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfessoraTurmaClassIdRouteImport
       parentRoute: typeof AuthenticatedProfessoraRouteRoute
     }
+    '/_authenticated/professora/turma/$classId_/prazos': {
+      id: '/_authenticated/professora/turma/$classId_/prazos'
+      path: '/turma/$classId/prazos'
+      fullPath: '/professora/turma/$classId/prazos'
+      preLoaderRoute: typeof AuthenticatedProfessoraTurmaClassIdPrazosRouteImport
+      parentRoute: typeof AuthenticatedProfessoraRouteRoute
+    }
   }
 }
 
@@ -307,6 +327,7 @@ interface AuthenticatedProfessoraRouteRouteChildren {
   AuthenticatedProfessoraIndexRoute: typeof AuthenticatedProfessoraIndexRoute
   AuthenticatedProfessoraGrupoGroupIdRoute: typeof AuthenticatedProfessoraGrupoGroupIdRoute
   AuthenticatedProfessoraTurmaClassIdRoute: typeof AuthenticatedProfessoraTurmaClassIdRoute
+  AuthenticatedProfessoraTurmaClassIdPrazosRoute: typeof AuthenticatedProfessoraTurmaClassIdPrazosRoute
 }
 
 const AuthenticatedProfessoraRouteRouteChildren: AuthenticatedProfessoraRouteRouteChildren =
@@ -316,6 +337,8 @@ const AuthenticatedProfessoraRouteRouteChildren: AuthenticatedProfessoraRouteRou
       AuthenticatedProfessoraGrupoGroupIdRoute,
     AuthenticatedProfessoraTurmaClassIdRoute:
       AuthenticatedProfessoraTurmaClassIdRoute,
+    AuthenticatedProfessoraTurmaClassIdPrazosRoute:
+      AuthenticatedProfessoraTurmaClassIdPrazosRoute,
   }
 
 const AuthenticatedProfessoraRouteRouteWithChildren =
