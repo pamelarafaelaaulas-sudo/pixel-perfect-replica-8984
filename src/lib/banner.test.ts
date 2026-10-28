@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { bannerBrief, DEFAULT_BANNER_SECTIONS } from "./banner";
+import { bannerBrief, bannerProgress, DEFAULT_BANNER_SECTIONS } from "./banner";
 
 describe("banner template for the group", () => {
   it("is ready for the group only with a Canva template link", () => {
@@ -19,5 +19,24 @@ describe("banner template for the group", () => {
       "Título",
       "QR code do vídeo",
     ]);
+  });
+});
+
+describe("banner progress of each group", () => {
+  const templateUrl = "https://www.canva.com/design/DAGmodelo1/view";
+  it("follows link → file → delivery", () => {
+    expect(bannerProgress({ templateUrl, canvaUrl: null, filePath: null, delivered: false })).toBe("sem_inicio");
+    expect(bannerProgress({ templateUrl, canvaUrl: "https://www.canva.com/design/DAGmodelo1/edit", filePath: null, delivered: false })).toBe(
+      "link_do_modelo",
+    );
+    expect(bannerProgress({ templateUrl, canvaUrl: "https://www.canva.com/design/DAGgrupo/edit", filePath: null, delivered: false })).toBe(
+      "editando",
+    );
+    expect(bannerProgress({ templateUrl, canvaUrl: "https://www.canva.com/design/DAGgrupo/edit", filePath: "g/b.pdf", delivered: false })).toBe(
+      "arquivo_enviado",
+    );
+    expect(bannerProgress({ templateUrl, canvaUrl: "https://www.canva.com/design/DAGgrupo/edit", filePath: "g/b.pdf", delivered: true })).toBe(
+      "entregue",
+    );
   });
 });

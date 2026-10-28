@@ -78,6 +78,45 @@ export type Database = {
           },
         ]
       }
+      banner_drive_files: {
+        Row: {
+          drive_file_id: string
+          group_id: string
+          project_id: string
+          source_path: string
+          synced_at: string
+        }
+        Insert: {
+          drive_file_id: string
+          group_id: string
+          project_id: string
+          source_path: string
+          synced_at?: string
+        }
+        Update: {
+          drive_file_id?: string
+          group_id?: string
+          project_id?: string
+          source_path?: string
+          synced_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "banner_drive_files_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banner_drive_files_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       classes: {
         Row: {
           banner_instructions: string | null
@@ -595,6 +634,7 @@ export type Database = {
     Functions: {
       banner_group: { Args: { _name: string }; Returns: string }
       can_edit_banner: { Args: { _group_id: string }; Returns: boolean }
+      canva_design_id: { Args: { _url: string }; Returns: string }
       consume_teacher_invite: {
         Args: { _code: string; _user_id: string }
         Returns: boolean
@@ -657,6 +697,13 @@ export type Database = {
         }[]
       }
       phase_rule_problem: {
+        Args: {
+          _p: Database["public"]["Tables"]["projects"]["Row"]
+          _phase: number
+        }
+        Returns: string
+      }
+      phase_rule_problem_base: {
         Args: {
           _p: Database["public"]["Tables"]["projects"]["Row"]
           _phase: number

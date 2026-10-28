@@ -1,4 +1,4 @@
-import { isCanvaUrl } from "./phase-rules";
+import { isCanvaUrl, isTemplateLink } from "./phase-rules";
 
 /** Sections suggested for a science-fair banner, in reading order. */
 export const DEFAULT_BANNER_SECTIONS = [
@@ -41,4 +41,28 @@ export function bannerBrief(c: ClassBannerFields): BannerBrief {
     instructions: c.banner_instructions?.trim() ?? "",
     ready: isCanvaUrl(url),
   };
+}
+
+export type BannerProgress = "sem_inicio" | "link_do_modelo" | "editando" | "arquivo_enviado" | "entregue";
+
+export const BANNER_PROGRESS_LABEL: Record<BannerProgress, string> = {
+  sem_inicio: "Não começou",
+  link_do_modelo: "Colou o link do modelo",
+  editando: "Montando no Canva",
+  arquivo_enviado: "Arquivo enviado",
+  entregue: "Entregue",
+};
+
+/** Where a group is on the banner, from what it saved in PamLab (Canva itself does not tell us who is editing). */
+export function bannerProgress(p: {
+  templateUrl: string | null | undefined;
+  canvaUrl: string | null | undefined;
+  filePath: string | null | undefined;
+  delivered: boolean;
+}): BannerProgress {
+  if (p.delivered) return "entregue";
+  if (p.filePath) return "arquivo_enviado";
+  if (!isCanvaUrl(p.canvaUrl)) return "sem_inicio";
+  if (isTemplateLink(p.canvaUrl, p.templateUrl)) return "link_do_modelo";
+  return "editando";
 }
