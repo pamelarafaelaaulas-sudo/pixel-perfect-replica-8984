@@ -1,5 +1,6 @@
-import { createFileRoute, Outlet, redirect, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, useNavigate, useRouter, Link } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { LogOut } from "lucide-react";
 import { Brand } from "@/components/brand";
 import { Button } from "@/components/ui/button";
@@ -23,12 +24,28 @@ function AuthenticatedLayout() {
   const { data: me } = useSuspenseQuery(meQuery);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const router = useRouter();
+
+  // The account can vanish mid-session (signed out in another tab, session
+  // expired). Re-run the route check, which sends the user to /auth, and never
+  // render child screens that assume a signed-in account.
+  useEffect(() => {
+    if (!me) router.invalidate();
+  }, [me, router]);
 
   async function signOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
+  }
+
+  if (!me) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground">
+        Sua sessão terminou. Abrindo a tela de entrada…
+      </div>
+    );
   }
 
   return (

@@ -138,10 +138,8 @@ function JoinClass({ defaultWhatsapp }: { defaultWhatsapp: string }) {
     }
     if (!c.data?.length) {
       setFound(null);
-      {
       toast.error("Nenhuma turma com esse código.");
       return;
-    }
     }
     setFound(c.data[0] ?? null);
     setGroups(g.data ?? []);
