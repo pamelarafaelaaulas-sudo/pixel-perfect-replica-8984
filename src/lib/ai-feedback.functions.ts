@@ -24,7 +24,7 @@ export const getPhaseEvaluation = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error || !project) throw new Error("Projeto não encontrado.");
     const { data: isMember } = await context.supabase.rpc("is_group_member", { _group_id: project.group_id });
-    if (!isMember) throw new Error("Só integrantes do grupo podem pedir a avaliação.");
+    if (!isMember) throw new Error("Só integrantes do grupo podem pedir sugestões.");
 
     const evaluation = await generateEvaluation(phaseMeta(data.phaseNumber).name, data.text);
 
