@@ -228,3 +228,25 @@ export const teacherInvitesQuery = queryOptions({
     return data ?? [];
   },
 });
+
+/* ---------------- Teacher: all students across classes ---------------- */
+
+export const teacherRosterQuery = queryOptions({
+  queryKey: ["teacher", "roster"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("classes")
+      .select(
+        `id, name, late_penalty_per_day,
+        schedules(phase_number, due_date),
+        groups!groups_class_id_fkey(
+          id, group_name,
+          group_members(student_id, profiles(name, email)),
+          projects(current_phase, phase_submissions(phase_number, submitted_at))
+        )`,
+      )
+      .order("created_at", { ascending: false });
+    fail(error);
+    return data ?? [];
+  },
+});
