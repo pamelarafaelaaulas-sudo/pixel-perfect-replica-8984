@@ -27,9 +27,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { aiEvaluationsForGroupQuery, groupDetailQuery, peerEvaluationsForGroupQuery } from "@/lib/queries";
-import { PHASES, SECTION_LABELS, TRIMESTERS } from "@/lib/phases";
+import { BIMESTERS, PHASES, SECTION_LABELS, bimesterMeta } from "@/lib/phases";
 import { fmtAgo, fmtDateTime, whatsappLink } from "@/lib/format";
-import { formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
+import { bimesterPenalties, formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
 import { latestPerPhase, overallScore, type SavedAiEvaluation } from "@/lib/ai-score";
 import { AiEvaluationView, scoreTone } from "@/components/ai-feedback";
 
@@ -116,6 +116,7 @@ function TeacherGroupPage() {
     submissions: project?.phase_submissions ?? [],
     perDay,
   });
+  const penalties = bimesterPenalties(lateness.phases);
 
   return (
     <>
@@ -182,7 +183,12 @@ function TeacherGroupPage() {
             <strong className={lateness.totalPenalty > 0 ? "text-destructive" : "text-foreground"}>
               {formatPoints(lateness.totalPenalty)} ponto(s)
             </strong>{" "}
-            ({formatPoints(perDay)} por dia)
+            ({formatPoints(perDay)} por dia
+            {lateness.totalPenalty > 0 &&
+              ` · ${BIMESTERS.filter((b) => (penalties[b.number] ?? 0) > 0)
+                .map((b) => `${b.number}º bim. −${formatPoints(penalties[b.number] ?? 0)}`)
+                .join(", ")}`}
+            )
           </p>
           {project && (
             <div className="flex items-center gap-2">
@@ -231,11 +237,11 @@ function TeacherGroupPage() {
           <p className="mb-4 text-sm text-muted-foreground">
             Confidencial: os alunos só veem as avaliações que eles mesmos fizeram.
           </p>
-          {TRIMESTERS.map((t) => {
+          {BIMESTERS.map(({ number: t }) => {
             const rows = peers.filter((p) => p.trimester === t);
             return (
               <div key={t} className="mb-6 last:mb-0">
-                <h3 className="mb-2 text-lg font-semibold">{t}º trimestre</h3>
+                <h3 className="mb-2 text-lg font-semibold">{t}º bimestre</h3>
                 {rows.length === 0 ? (
                   <p className="text-sm italic text-muted-foreground">Nenhuma avaliação.</p>
                 ) : (
@@ -267,14 +273,14 @@ function TeacherGroupPage() {
               IA).
             </p>
           )}
-          <div className="grid gap-5 md:grid-cols-3">
-            {TRIMESTERS.map((t) => (
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            {BIMESTERS.map(({ number: t }) => (
               <GradeForm
                 key={t}
                 groupId={groupId}
-                trimester={t}
+                bimester={t}
                 existing={(group.grades ?? []).find((g) => g.trimester === t)}
-                penalty={lateness.totalPenalty}
+                penalty={penalties[t] ?? 0}
                 onSaved={invalidate}
               />
             ))}
@@ -360,13 +366,13 @@ function Contributions({
 
 function GradeForm({
   groupId,
-  trimester,
+  bimester,
   existing,
   penalty,
   onSaved,
 }: {
   groupId: string;
-  trimester: number;
+  bimester: number;
   existing?: { score: number; feedback: string | null; is_reference_ten: boolean; created_at: string } | undefined;
   penalty: number;
   onSaved: () => void;
@@ -381,13 +387,13 @@ function GradeForm({
     mutationFn: async () => {
       if (!valid) throw new Error("A nota deve ser de 0 a 10");
       const { error } = await supabase.from("grades").upsert(
-        { group_id: groupId, trimester, score: numeric, feedback: feedback || null, is_reference_ten: reference },
+        { group_id: groupId, trimester: bimester, score: numeric, feedback: feedback || null, is_reference_ten: reference },
         { onConflict: "group_id,trimester" },
       );
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success(`Nota do ${trimester}º trimestre salva`);
+      toast.success(`Nota do ${bimester}º bimestre salva`);
       onSaved();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -395,14 +401,22 @@ function GradeForm({
 
   return (
     <div className="card-paper space-y-4 p-5">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">{trimester}º trimestre</h3>
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <h3 className="text-lg font-semibold">{bimester}º bimestre</h3>
+          <p className="text-xs text-muted-foreground">{bimesterMeta(bimester).title}</p>
+        </div>
         {existing && <Badge variant="success">Lançada</Badge>}
       </div>
+      {bimester === 4 && (
+        <p className="rounded-md bg-muted p-2 text-xs text-muted-foreground">
+          Nota da feira. Os detalhes da feira ainda serão adicionados; por enquanto, lance só a nota.
+        </p>
+      )}
       <div className="space-y-2">
-        <Label htmlFor={`score-${trimester}`}>Nota (0 a 10)</Label>
+        <Label htmlFor={`score-${bimester}`}>Nota (0 a 10)</Label>
         <Input
-          id={`score-${trimester}`}
+          id={`score-${bimester}`}
           inputMode="decimal"
           value={score}
           onChange={(e) => setScore(e.target.value)}
@@ -410,13 +424,13 @@ function GradeForm({
         />
         {valid && penalty > 0 && (
           <p className="text-xs text-muted-foreground">
-            Com o desconto de atraso ({formatPoints(penalty)}): <strong>{formatPoints(gradeAfterPenalty(numeric, penalty))}</strong>
+            Com o desconto de atraso deste bimestre ({formatPoints(penalty)}): <strong>{formatPoints(gradeAfterPenalty(numeric, penalty))}</strong>
           </p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor={`fb-${trimester}`}>Comentário para o grupo</Label>
-        <Textarea id={`fb-${trimester}`} rows={4} value={feedback} onChange={(e) => setFeedback(e.target.value)} />
+        <Label htmlFor={`fb-${bimester}`}>Comentário para o grupo</Label>
+        <Textarea id={`fb-${bimester}`} rows={4} value={feedback} onChange={(e) => setFeedback(e.target.value)} />
       </div>
       <label className="flex items-center justify-between gap-3 rounded-lg bg-muted p-3 text-sm">
         <span className="inline-flex items-center gap-2">
@@ -457,12 +471,12 @@ function AiTab({
         <div className="h-10 w-px bg-border" />
         <div>
           <p className="text-xs uppercase tracking-wide text-muted-foreground">Suas notas</p>
-          <div className="mt-1 flex gap-2">
-            {TRIMESTERS.map((t) => {
+          <div className="mt-1 flex flex-wrap gap-2">
+            {BIMESTERS.map(({ number: t }) => {
               const g = grades.find((x) => x.trimester === t);
               return (
                 <span key={t} className="rounded-md border border-border px-2 py-1 font-mono text-sm">
-                  {t}º tri: <strong>{g ? formatPoints(Number(g.score)) : "—"}</strong>
+                  {t}º bim.: <strong>{g ? formatPoints(Number(g.score)) : "—"}</strong>
                 </span>
               );
             })}
