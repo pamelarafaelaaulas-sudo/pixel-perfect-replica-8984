@@ -66,6 +66,7 @@ function TeacherGroupPage() {
   const qc = useQueryClient();
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["group", groupId] });
+    qc.invalidateQueries({ queryKey: ["teacher", "student"] });
     if (group?.classes) qc.invalidateQueries({ queryKey: ["class", group.classes.id] });
   };
 
@@ -134,7 +135,14 @@ function TeacherGroupPage() {
         {members.map((m) => (
           <div key={m.id} className="card-paper flex items-center justify-between gap-3 p-4">
             <div className="min-w-0">
-              <p className="truncate font-medium">{m.profiles?.name}</p>
+              <Link
+                to="/professora/aluno/$studentId"
+                params={{ studentId: m.student_id }}
+                className="block truncate font-medium hover:text-primary hover:underline"
+                title="Ver revisão do aluno"
+              >
+                {m.profiles?.name}
+              </Link>
               <a
                 href={whatsappLink(m.whatsapp)}
                 target="_blank"
