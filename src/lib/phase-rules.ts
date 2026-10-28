@@ -86,6 +86,11 @@ export function keywordsInTitle(keywords: string[], title: string | null | undef
   });
 }
 
+/** A Canva design link: https://www.canva.com/design/... or a canva.link short link. */
+export function isCanvaUrl(url: string | null | undefined): boolean {
+  return /^https:\/\/([a-z0-9-]+\.)*(canva\.com|canva\.link)\//i.test((url ?? "").trim());
+}
+
 export function limitLabel(w: WordLimit): string {
   if (w.max === null) return "obrigatório";
   if (w.min <= 1) return `até ${w.max} palavras`;
@@ -164,6 +169,11 @@ export function phaseProblems(
         problems.push(`Falta nas Referências: ${work.citation}, citado em ${label}.`);
       break;
     }
+    case 13:
+      if (!isCanvaUrl(str(values["banner_canva_url"])))
+        problems.push("Cole o link do banner no Canva (começa com https://www.canva.com/).");
+      if (!str(values["banner_file_path"])) problems.push("Anexe o arquivo final do banner (PDF ou imagem).");
+      break;
     case 12: {
       checkWords("abstract", "Resumo");
       const kws = splitKeywords(str(values["keywords"]));
