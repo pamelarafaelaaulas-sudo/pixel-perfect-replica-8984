@@ -12,5 +12,5 @@
 - [x] Projeto escrito dividido em partes com prazo próprio (Título → Objetivo geral → Objetivos específicos → Metodologia → Introdução → Resultados e discussão → Conclusão → Referências → Resumo), com as regras do arquivo Word e entrega bloqueada fora dos limites
 - [x] Citações ABNT obrigatórias na Introdução e em Resultados e discussão, com exemplos acima do campo e entrega bloqueada sem citação correta
 - [x] Referências conferem cada obra citada na Introdução e em Resultados e discussão (entrega bloqueada se faltar alguma)
-- [ ] 4 bimestres: 1º = Tema até Metodologia, 2º = Introdução até Resumo, 3º = Banner (Canva), 4º = Feira (detalhes depois); atraso desconta só do próprio bimestre
-- [ ] Etapa Banner: modelo do Canva da professora, link do Canva + arquivo final, com prazo e desconto
+- [x] 4 bimestres: 1º = Tema até Metodologia, 2º = Introdução até Resumo, 3º = Banner (Canva), 4º = Feira (detalhes depois); atraso desconta só do próprio bimestre
+- [x] Etapa Banner: modelo do Canva da professora, link do Canva + arquivo final, com prazo e desconto
