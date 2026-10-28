@@ -39,7 +39,7 @@ export const teacherClassesQuery = queryOptions({
   queryFn: async () => {
     const { data, error } = await supabase
       .from("classes")
-      .select("*, groups(id, group_members(id))")
+      .select("*, groups!groups_class_id_fkey(id, group_members(id))")
       .order("created_at", { ascending: false });
     fail(error);
     return data ?? [];
@@ -55,7 +55,7 @@ export const classDetailQuery = (classId: string) =>
         .select(
           `*,
           schedules(*),
-          groups(
+          groups!groups_class_id_fkey(
             id, group_name, created_at,
             group_members(id, student_id, whatsapp, profiles(name)),
             projects(id, current_phase, updated_at, phase_submissions(phase_number, submitted_at)),
@@ -77,7 +77,7 @@ export const groupDetailQuery = (groupId: string) =>
         .from("groups")
         .select(
           `*,
-          classes(id, name, class_code, late_penalty_per_day, schedules(*)),
+          classes!groups_class_id_fkey(id, name, class_code, late_penalty_per_day, schedules(*)),
           group_members(id, student_id, whatsapp, profiles(name, email)),
           projects(*, phase_submissions(*), project_contributions(*)),
           grades(*)`,
@@ -114,7 +114,7 @@ export const myGroupsQuery = (userId: string) =>
         .select(
           `id, group_id,
           groups(id, group_name,
-            classes(id, name, class_code),
+            classes!groups_class_id_fkey(id, name, class_code),
             group_members(id),
             projects(id, current_phase, updated_at)
           )`,
