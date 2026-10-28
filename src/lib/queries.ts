@@ -284,3 +284,36 @@ export const teacherBimesterQuery = queryOptions({
     return data ?? [];
   },
 });
+
+/* ---------------- Teacher: grades and feedback export ---------------- */
+
+export const teacherExportQuery = queryOptions({
+  queryKey: ["teacher", "export"],
+  queryFn: async () => {
+    const [classes, ai, peers] = await Promise.all([
+      supabase
+        .from("classes")
+        .select(
+          `id, name, late_penalty_per_day,
+          schedules(phase_number, due_date),
+          groups!groups_class_id_fkey(
+            id, group_name,
+            group_members(student_id, profiles(name)),
+            projects(current_phase, phase_submissions(phase_number, submitted_at)),
+            grades(trimester, score, feedback, is_reference_ten, created_at)
+          )`,
+        )
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("ai_evaluations")
+        .select("id, group_id, phase_number, requested_by, created_at, overall, criteria, summary, tips, evaluated_text"),
+      supabase
+        .from("peer_evaluations")
+        .select("group_id, trimester, evaluator_student_id, evaluated_student_id, score, feedback, created_at"),
+    ]);
+    fail(classes.error);
+    fail(ai.error);
+    fail(peers.error);
+    return { classes: classes.data ?? [], ai: ai.data ?? [], peers: peers.data ?? [] };
+  },
+});
