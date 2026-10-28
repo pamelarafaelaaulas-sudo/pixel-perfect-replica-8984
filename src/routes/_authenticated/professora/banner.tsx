@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 import { teacherClassesQuery } from "@/lib/queries";
 import { BANNER_SIZES, DEFAULT_BANNER_SECTIONS, bannerBrief } from "@/lib/banner";
 import { isCanvaUrl } from "@/lib/phase-rules";
@@ -35,7 +36,7 @@ export const Route = createFileRoute("/_authenticated/professora/banner")({
   component: BannerTemplatePage,
 });
 
-type ClassRow = (typeof teacherClassesQuery)["~types"] extends never ? never : Awaited<ReturnType<NonNullable<(typeof teacherClassesQuery)["queryFn"]>>>[number];
+type ClassRow = Database["public"]["Tables"]["classes"]["Row"];
 
 function BannerTemplatePage() {
   const { turma } = Route.useSearch();
@@ -84,7 +85,7 @@ function BannerTemplatePage() {
               );
             })}
           </div>
-          <TemplateEditor key={`${cls.id}-${cls.updated_at ?? ""}`} cls={cls} others={classes.filter((c) => c.id !== cls.id)} />
+          <TemplateEditor key={`${cls.id}-${JSON.stringify([cls.banner_template_url, cls.banner_size, cls.banner_sections, cls.banner_instructions])}`} cls={cls} others={classes.filter((c) => c.id !== cls.id)} />
         </>
       )}
     </>
