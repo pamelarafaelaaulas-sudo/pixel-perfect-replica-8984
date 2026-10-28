@@ -29,7 +29,7 @@ import { aiSuggestionsForGroupQuery, groupDetailQuery, meQuery } from "@/lib/que
 import { latestPerPhase } from "@/lib/ai-score";
 import { SOURCE_TYPES, TRIMESTERS, WRITTEN_SECTIONS, parseArticles, type Article, phaseMeta } from "@/lib/phases";
 import { fmtDateTime, whatsappLink } from "@/lib/format";
-import { formatPoints, projectLateness } from "@/lib/penalty";
+import { formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
 
 export const Route = createFileRoute("/_authenticated/aluno/projeto/$groupId")({
   head: () => ({
@@ -329,12 +329,21 @@ function StudentProjectPage() {
             <ul className="space-y-3">
               {TRIMESTERS.map((t) => {
                 const g = grades.find((x) => x.trimester === t);
+                const total = g ? gradeAfterPenalty(Number(g.score), lateness.totalPenalty) : null;
                 return (
                   <li key={t} className="rounded-lg bg-muted p-3">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">{t}º trimestre</span>
-                      <span className="font-display text-xl font-semibold">{g ? formatPoints(Number(g.score)) : "—"}</span>
+                      <span className="font-display text-xl font-semibold">{total !== null ? formatPoints(total) : "—"}</span>
                     </div>
+                    {g ? (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Nota {formatPoints(Number(g.score))}
+                        {lateness.totalPenalty > 0 && ` − ${formatPoints(lateness.totalPenalty)} de atraso`}
+                      </p>
+                    ) : (
+                      <p className="mt-1 text-xs text-muted-foreground">Ainda não lançada</p>
+                    )}
                     {g?.feedback && <p className="mt-1 text-sm text-muted-foreground">{g.feedback}</p>}
                   </li>
                 );

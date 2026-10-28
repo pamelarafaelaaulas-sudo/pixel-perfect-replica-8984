@@ -19,6 +19,7 @@ import { Route as AuthenticatedProfessoraRouteRouteImport } from './routes/_auth
 import { Route as AuthenticatedAlunoIndexRouteImport } from './routes/_authenticated/aluno/index'
 import { Route as AuthenticatedProfessoraIndexRouteImport } from './routes/_authenticated/professora/index'
 import { Route as AuthenticatedProfessoraAlunosRouteImport } from './routes/_authenticated/professora/alunos'
+import { Route as AuthenticatedProfessoraTrimestresRouteImport } from './routes/_authenticated/professora/trimestres'
 import { Route as AuthenticatedAlunoAvaliacaoGroupIdRouteImport } from './routes/_authenticated/aluno/avaliacao.$groupId'
 import { Route as AuthenticatedAlunoProjetoGroupIdRouteImport } from './routes/_authenticated/aluno/projeto.$groupId'
 import { Route as AuthenticatedProfessoraAlunoStudentIdRouteImport } from './routes/_authenticated/professora/aluno.$studentId'
@@ -78,6 +79,12 @@ const AuthenticatedProfessoraAlunosRoute =
     path: '/alunos',
     getParentRoute: () => AuthenticatedProfessoraRouteRoute,
   } as any)
+const AuthenticatedProfessoraTrimestresRoute =
+  AuthenticatedProfessoraTrimestresRouteImport.update({
+    id: '/trimestres',
+    path: '/trimestres',
+    getParentRoute: () => AuthenticatedProfessoraRouteRoute,
+  } as any)
 const AuthenticatedAlunoAvaliacaoGroupIdRoute =
   AuthenticatedAlunoAvaliacaoGroupIdRouteImport.update({
     id: '/avaliacao/$groupId',
@@ -123,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/professora': typeof AuthenticatedProfessoraRouteRouteWithChildren
   '/painel': typeof AuthenticatedPainelRoute
   '/professora/alunos': typeof AuthenticatedProfessoraAlunosRoute
+  '/professora/trimestres': typeof AuthenticatedProfessoraTrimestresRoute
   '/aluno/': typeof AuthenticatedAlunoIndexRoute
   '/professora/': typeof AuthenticatedProfessoraIndexRoute
   '/aluno/avaliacao/$groupId': typeof AuthenticatedAlunoAvaliacaoGroupIdRoute
@@ -138,6 +146,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/professora/alunos': typeof AuthenticatedProfessoraAlunosRoute
+  '/professora/trimestres': typeof AuthenticatedProfessoraTrimestresRoute
   '/aluno': typeof AuthenticatedAlunoIndexRoute
   '/professora': typeof AuthenticatedProfessoraIndexRoute
   '/aluno/avaliacao/$groupId': typeof AuthenticatedAlunoAvaliacaoGroupIdRoute
@@ -157,6 +166,7 @@ export interface FileRoutesById {
   '/_authenticated/professora': typeof AuthenticatedProfessoraRouteRouteWithChildren
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/professora/alunos': typeof AuthenticatedProfessoraAlunosRoute
+  '/_authenticated/professora/trimestres': typeof AuthenticatedProfessoraTrimestresRoute
   '/_authenticated/aluno/': typeof AuthenticatedAlunoIndexRoute
   '/_authenticated/professora/': typeof AuthenticatedProfessoraIndexRoute
   '/_authenticated/aluno/avaliacao/$groupId': typeof AuthenticatedAlunoAvaliacaoGroupIdRoute
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
     | '/professora'
     | '/painel'
     | '/professora/alunos'
+    | '/professora/trimestres'
     | '/aluno/'
     | '/professora/'
     | '/aluno/avaliacao/$groupId'
@@ -191,6 +202,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/painel'
     | '/professora/alunos'
+    | '/professora/trimestres'
     | '/aluno'
     | '/professora'
     | '/aluno/avaliacao/$groupId'
@@ -209,6 +221,7 @@ export interface FileRouteTypes {
     | '/_authenticated/professora'
     | '/_authenticated/painel'
     | '/_authenticated/professora/alunos'
+    | '/_authenticated/professora/trimestres'
     | '/_authenticated/aluno/'
     | '/_authenticated/professora/'
     | '/_authenticated/aluno/avaliacao/$groupId'
@@ -298,6 +311,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfessoraAlunosRouteImport
       parentRoute: typeof AuthenticatedProfessoraRouteRoute
     }
+    '/_authenticated/professora/trimestres': {
+      id: '/_authenticated/professora/trimestres'
+      path: '/trimestres'
+      fullPath: '/professora/trimestres'
+      preLoaderRoute: typeof AuthenticatedProfessoraTrimestresRouteImport
+      parentRoute: typeof AuthenticatedProfessoraRouteRoute
+    }
     '/_authenticated/aluno/avaliacao/$groupId': {
       id: '/_authenticated/aluno/avaliacao/$groupId'
       path: '/avaliacao/$groupId'
@@ -365,6 +385,7 @@ const AuthenticatedAlunoRouteRouteWithChildren =
 
 interface AuthenticatedProfessoraRouteRouteChildren {
   AuthenticatedProfessoraAlunosRoute: typeof AuthenticatedProfessoraAlunosRoute
+  AuthenticatedProfessoraTrimestresRoute: typeof AuthenticatedProfessoraTrimestresRoute
   AuthenticatedProfessoraIndexRoute: typeof AuthenticatedProfessoraIndexRoute
   AuthenticatedProfessoraAlunoStudentIdRoute: typeof AuthenticatedProfessoraAlunoStudentIdRoute
   AuthenticatedProfessoraGrupoGroupIdRoute: typeof AuthenticatedProfessoraGrupoGroupIdRoute
@@ -375,6 +396,8 @@ interface AuthenticatedProfessoraRouteRouteChildren {
 const AuthenticatedProfessoraRouteRouteChildren: AuthenticatedProfessoraRouteRouteChildren =
   {
     AuthenticatedProfessoraAlunosRoute: AuthenticatedProfessoraAlunosRoute,
+    AuthenticatedProfessoraTrimestresRoute:
+      AuthenticatedProfessoraTrimestresRoute,
     AuthenticatedProfessoraIndexRoute: AuthenticatedProfessoraIndexRoute,
     AuthenticatedProfessoraAlunoStudentIdRoute:
       AuthenticatedProfessoraAlunoStudentIdRoute,

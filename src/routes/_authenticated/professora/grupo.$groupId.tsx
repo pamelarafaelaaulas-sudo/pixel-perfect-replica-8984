@@ -67,6 +67,7 @@ function TeacherGroupPage() {
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["group", groupId] });
     qc.invalidateQueries({ queryKey: ["teacher", "student"] });
+    qc.invalidateQueries({ queryKey: ["teacher", "trimester"] });
     if (group?.classes) qc.invalidateQueries({ queryKey: ["class", group.classes.id] });
   };
 
