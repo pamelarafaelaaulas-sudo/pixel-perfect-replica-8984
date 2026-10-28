@@ -366,6 +366,7 @@ function StudentProjectPage() {
                 : null
             }
           />
+          )}
         </section>
 
         <aside className="space-y-4">
