@@ -55,7 +55,7 @@ export async function buildProjectDocx(model: AbntModel): Promise<Blob> {
     ...c.authors.map((a, i) => centered(a, { before: i === 0 ? lineHeight * 4 : 0 })),
     centered(c.title, { bold: true, before: lineHeight * 12 - c.authors.length * lineHeight }),
     ...(c.code ? [centered(c.code, { before: lineHeight * 2 })] : []),
-    centered(c.place || " ", { before: lineHeight * 14 }),
+    centered(c.place || " ", { before: lineHeight * 19 }),
     centered(c.year),
   ];
 
@@ -70,7 +70,7 @@ export async function buildProjectDocx(model: AbntModel): Promise<Blob> {
       spacing: { ...single, before: lineHeight * 3 },
       children: [run(t.nature)],
     }),
-    centered(t.place || " ", { before: lineHeight * 12 }),
+    centered(t.place || " ", { before: lineHeight * 18 }),
     centered(t.year),
   ];
 
