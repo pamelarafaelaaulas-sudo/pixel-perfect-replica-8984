@@ -80,7 +80,7 @@ describe("Referências must contain every work cited in Introdução and Resulta
   it("asks once for a work cited in both parts", () => {
     const refs = fullRefs.split("\n").filter((l) => !l.startsWith("SILVA")).join("\n");
     expect(phaseProblems(11, { ...values, references_list: refs }, 0)).toEqual([
-      "Falta nas Referências: Segundo Silva (2020), citado em Introdução.",
+      "Falta nas Referências: Silva (2020), citado em Introdução.",
     ]);
   });
 });
