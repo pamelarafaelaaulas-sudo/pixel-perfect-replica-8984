@@ -11,7 +11,7 @@ import { TRIMESTERS } from "@/lib/phases";
 import { formatPoints } from "@/lib/penalty";
 import { plural } from "@/lib/format";
 
-export const Route = createFileRoute("/_authenticated/professora/trimestres")({
+export const Route = createFileRoute("/_authenticated/professora/bimestres")({
   head: () => ({
     meta: [
       { title: "Notas do trimestre — Caderno de Projetos" },
