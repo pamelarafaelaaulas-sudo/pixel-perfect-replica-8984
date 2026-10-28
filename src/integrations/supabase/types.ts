@@ -591,6 +591,7 @@ export type Database = {
           tips: Json
         }[]
       }
+      has_author_date_citation: { Args: { _t: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

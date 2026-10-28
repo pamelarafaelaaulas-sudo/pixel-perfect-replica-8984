@@ -46,8 +46,9 @@ describe("delivery rules", () => {
   });
 
   it("requires 250–500 words in the introduction", () => {
-    expect(phaseProblems(8, { introduction: words(501) }, 0)).toHaveLength(1);
-    expect(phaseProblems(8, { introduction: words(500) }, 0)).toEqual([]);
+    const cite = " (Silva, 2020)."; // 2 words
+    expect(phaseProblems(8, { introduction: words(499) + cite }, 0)).toHaveLength(1);
+    expect(phaseProblems(8, { introduction: words(498) + cite }, 0)).toEqual([]);
   });
 
   it("limits the conclusion to 150 words", () => {

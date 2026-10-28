@@ -30,12 +30,12 @@ export const PHASES = [
   {
     number: 8,
     name: "Introdução",
-    hint: "Apresente e contextualize o projeto: o problema/pergunta observado, a hipótese (quando houver) e a justificativa da pesquisa. De 250 a 500 palavras. Sem caixa alta.",
+    hint: "Apresente e contextualize o projeto: o problema/pergunta observado, a hipótese (quando houver) e a justificativa da pesquisa, citando os autores nas normas ABNT. De 250 a 500 palavras. Sem caixa alta.",
   },
   {
     number: 9,
     name: "Resultados e discussão",
-    hint: "Os dados obtidos em cada etapa da metodologia e a discussão deles (positivos ou não), comparando com as referências. Se ainda não houver resultados, descreva os esperados e chame o tópico de \"Resultados parciais/esperados e discussão\". De 250 a 750 palavras.",
+    hint: "Os dados obtidos em cada etapa da metodologia e a discussão deles (positivos ou não), comparando com as referências (citações obrigatórias nas normas ABNT). Se ainda não houver resultados, descreva os esperados e chame o tópico de \"Resultados parciais/esperados e discussão\". De 250 a 750 palavras.",
   },
   {
     number: 10,

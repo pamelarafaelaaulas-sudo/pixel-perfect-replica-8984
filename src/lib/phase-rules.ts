@@ -3,6 +3,13 @@
  * A stage can only be delivered when every check passes.
  * The database (phase_rule_problem in submit_phase) enforces the same word limits.
  */
+import { checkCitations } from "./citations";
+
+/** Parts where ABNT in-text citations are mandatory. */
+export const CITATION_FIELDS: Record<string, string> = {
+  introduction: "Introdução",
+  results_discussion: "Resultados e discussão",
+};
 
 export type WordLimit = { min: number; max: number | null };
 
@@ -81,6 +88,16 @@ export function phaseProblems(
     if (articleCount === 0) problems.push("Adicione pelo menos um artigo.");
     return problems;
   }
+  const checkCitationsIn = (key: string) => {
+    const label = CITATION_FIELDS[key];
+    if (!label) return;
+    const text = str(values[key]);
+    if (countWords(text) === 0) return;
+    const { citations, issues } = checkCitations(text);
+    if (citations.length === 0)
+      problems.push(`${label}: cite pelo menos um autor nas normas ABNT, por exemplo (Silva, 2020) ou Silva (2020).`);
+    for (const i of issues) problems.push(`Citação fora da ABNT: “${i.text}”. ${i.fix}`);
+  };
   const checkWords = (key: string, label: string) => {
     const lim = WORD_LIMITS[key];
     if (!lim) return;
@@ -114,9 +131,11 @@ export function phaseProblems(
       break;
     case 8:
       checkWords("introduction", "Introdução");
+      checkCitationsIn("introduction");
       break;
     case 9:
       checkWords("results_discussion", "Resultados e discussão");
+      checkCitationsIn("results_discussion");
       break;
     case 10:
       checkWords("conclusion", "Conclusão");

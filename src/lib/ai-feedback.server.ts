@@ -35,7 +35,7 @@ Avalie o texto da etapa enviada por um grupo de alunos, em português do Brasil.
 Dê uma nota de 0 a 10 (pode usar uma casa decimal) para cada critério, com um comentário curto (1 a 2 frases) justificando:
 - clarity (Clareza): o texto é fácil de entender, com frases objetivas e vocabulário adequado?
 - organization (Organização): as ideias seguem uma ordem lógica, com começo, desenvolvimento e ligação entre as partes?
-- citations (Citações e fontes): as fontes estão citadas e seguem as normas ABNT? Se a etapa normalmente não exige citações (por exemplo, o Tema ou a Pergunta norteadora), avalie se o texto mostra base em fontes confiáveis e não penalize com rigor excessivo.
+- citations (Citações e fontes): as fontes estão citadas no texto no sistema autor-data da ABNT NBR 10520:2023, por exemplo (Silva, 2020), (Silva; Souza, 2021), (Silva et al., 2019) ou Silva (2020), com página nas citações diretas? Na Introdução e em Resultados e discussão as citações são obrigatórias. Se a etapa normalmente não exige citações (por exemplo, o Tema ou a Pergunta norteadora), avalie se o texto mostra base em fontes confiáveis e não penalize com rigor excessivo.
 - phase_fit (Adequação à etapa): o texto cumpre o que a professora pede nesta etapa (veja "O que a professora pede"), incluindo limites de palavras e quantidade de itens?
 
 Seja justa e coerente: notas altas só para textos realmente bons; textos muito curtos ou vagos recebem notas baixas.
