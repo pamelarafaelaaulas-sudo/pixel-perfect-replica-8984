@@ -19,7 +19,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "PamLab — Projeto científico da turma" },
       {
         property: "og:description",
-        content: "Tema, artigos, pergunta norteadora e projeto escrito — tudo num só caderno.",
+        content: "Tema, artigos, pergunta norteadora, projeto escrito, banner e feira — tudo no PamLab.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -132,9 +132,16 @@ function Index() {
               title: "Avaliação entre colegas",
               text: "Confidencial: só quem avaliou e a professora conseguem ver.",
             },
-          ].map(({ icon: Icon, title, text }) => (
+          ].map(({ icon: Icon, title, text }, i) => (
             <div key={title} className="card-paper p-6">
-              <Icon className="size-5 text-primary" />
+              <span
+                className={[
+                  "grid size-10 place-items-center rounded-full",
+                  ["bg-primary text-primary-foreground", "bg-info text-info-foreground", "bg-highlight text-highlight-foreground"][i % 3],
+                ].join(" ")}
+              >
+                <Icon className="size-5" />
+              </span>
               <h3 className="mt-3 text-xl font-semibold">{title}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{text}</p>
             </div>
