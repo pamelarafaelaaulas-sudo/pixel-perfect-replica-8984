@@ -26,10 +26,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { groupDetailQuery, peerEvaluationsForGroupQuery } from "@/lib/queries";
+import { aiEvaluationsForGroupQuery, groupDetailQuery, peerEvaluationsForGroupQuery } from "@/lib/queries";
 import { PHASES, SECTION_LABELS, TRIMESTERS } from "@/lib/phases";
 import { fmtAgo, fmtDateTime, whatsappLink } from "@/lib/format";
 import { formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
+import { latestPerPhase, overallScore, type SavedAiEvaluation } from "@/lib/ai-score";
+import { AiEvaluationView, scoreTone } from "@/components/ai-feedback";
 
 export const Route = createFileRoute("/_authenticated/professora/grupo/$groupId")({
   head: () => ({
@@ -46,6 +48,7 @@ export const Route = createFileRoute("/_authenticated/professora/grupo/$groupId"
     const [g] = await Promise.all([
       context.queryClient.ensureQueryData(groupDetailQuery(params.groupId)),
       context.queryClient.ensureQueryData(peerEvaluationsForGroupQuery(params.groupId)),
+      context.queryClient.ensureQueryData(aiEvaluationsForGroupQuery(params.groupId)),
     ]);
     if (!g) throw notFound();
   },
@@ -56,6 +59,10 @@ function TeacherGroupPage() {
   const { groupId } = Route.useParams();
   const { data: group } = useSuspenseQuery(groupDetailQuery(groupId));
   const { data: peers } = useSuspenseQuery(peerEvaluationsForGroupQuery(groupId));
+  const { data: aiEvaluations } = useSuspenseQuery(aiEvaluationsForGroupQuery(groupId));
+  const aiByPhase = latestPerPhase(aiEvaluations);
+  const aiLatest = Object.values(aiByPhase).map((x) => x.latest.overall);
+  const aiAverage = aiLatest.length ? overallScore(aiLatest) : null;
   const qc = useQueryClient();
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["group", groupId] });
@@ -196,6 +203,7 @@ function TeacherGroupPage() {
           <TabsTrigger value="contrib">Quem escreveu</TabsTrigger>
           <TabsTrigger value="pares">Avaliação dos colegas</TabsTrigger>
           <TabsTrigger value="notas">Notas</TabsTrigger>
+          <TabsTrigger value="ia">Avaliação da IA</TabsTrigger>
         </TabsList>
 
         <TabsContent value="projeto" className="card-paper p-6 md:p-8">
@@ -243,6 +251,13 @@ function TeacherGroupPage() {
         </TabsContent>
 
         <TabsContent value="notas">
+          {aiAverage !== null && (
+            <p className="mb-4 text-sm text-muted-foreground">
+              Para comparar: a média da IA nas etapas avaliadas é{" "}
+              <strong className={scoreTone(aiAverage)}>{formatPoints(aiAverage)}</strong> (detalhes na aba Avaliação da
+              IA).
+            </p>
+          )}
           <div className="grid gap-5 md:grid-cols-3">
             {TRIMESTERS.map((t) => (
               <GradeForm
@@ -255,6 +270,16 @@ function TeacherGroupPage() {
               />
             ))}
           </div>
+        </TabsContent>
+
+        <TabsContent value="ia">
+          <AiTab
+            byPhase={aiByPhase}
+            history={aiEvaluations}
+            aiAverage={aiAverage}
+            grades={group.grades ?? []}
+            nameOf={nameOf}
+          />
         </TabsContent>
       </Tabs>
     </>
