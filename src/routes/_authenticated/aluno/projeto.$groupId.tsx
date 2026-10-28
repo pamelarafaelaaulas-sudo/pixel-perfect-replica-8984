@@ -25,7 +25,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { groupDetailQuery, meQuery } from "@/lib/queries";
-import { PHASES, SOURCE_TYPES, TRIMESTERS, WRITTEN_SECTIONS, parseArticles, type Article } from "@/lib/phases";
+import { PHASES, SOURCE_TYPES, TRIMESTERS, WRITTEN_SECTIONS, parseArticles, type Article, phaseMeta } from "@/lib/phases";
 import { fmtDateTime, whatsappLink } from "@/lib/format";
 import { formatPoints, projectLateness } from "@/lib/penalty";
 
@@ -199,8 +199,8 @@ function StudentProjectPage() {
           <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Etapa {selected}</p>
-              <h2 className="text-2xl font-semibold">{PHASES[selected - 1].name}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{PHASES[selected - 1].hint}</p>
+              <h2 className="text-2xl font-semibold">{phaseMeta(selected).name}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{phaseMeta(selected).hint}</p>
             </div>
             {isSubmitted ? (
               <Badge variant={info.daysLate > 0 ? "warning" : "success"}>Entregue em {fmtDateTime(info.submittedAt)}</Badge>
@@ -274,7 +274,7 @@ function StudentProjectPage() {
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Entregar “{PHASES[selected - 1].name}”?</AlertDialogTitle>
+                        <AlertDialogTitle>Entregar “{phaseMeta(selected).name}”?</AlertDialogTitle>
                         <AlertDialogDescription>
                           Depois de entregue, a etapa não pode mais ser editada pelo grupo (só a professora pode reabrir).
                           {info.daysLate > 0 &&

@@ -67,3 +67,7 @@ export function parseArticles(value: unknown): Article[] {
 }
 
 export const TRIMESTERS = [1, 2, 3] as const;
+
+export function phaseMeta(n: number) {
+  return PHASES[n - 1] ?? PHASES[0];
+}

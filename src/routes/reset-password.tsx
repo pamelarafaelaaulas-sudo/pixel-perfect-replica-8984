@@ -29,11 +29,17 @@ function ResetPassword() {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
     const password = String(f.get("password"));
-    if (password !== String(f.get("confirm"))) return toast.error("As senhas não conferem.");
+    if (password !== String(f.get("confirm"))) {
+      toast.error("As senhas não conferem.");
+      return;
+    }
     setBusy(true);
     const { error } = await supabase.auth.updateUser({ password });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Senha atualizada!");
     navigate({ to: "/painel", replace: true });
   }

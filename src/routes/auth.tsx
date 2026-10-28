@@ -56,7 +56,10 @@ function AuthPage() {
       password: String(f.get("password")),
     });
     setBusy(false);
-    if (error) return toast.error(translateError(error.message));
+    if (error) {
+      toast.error(translateError(error.message));
+      return;
+    }
     navigate({ to: "/painel", replace: true });
   }
 
@@ -74,7 +77,10 @@ function AuthPage() {
       },
     });
     setBusy(false);
-    if (error) return toast.error(translateError(error.message));
+    if (error) {
+      toast.error(translateError(error.message));
+      return;
+    }
     if (!data.session) setSentTo(email);
   }
 
@@ -86,7 +92,10 @@ function AuthPage() {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     setBusy(false);
-    if (error) return toast.error(translateError(error.message));
+    if (error) {
+      toast.error(translateError(error.message));
+      return;
+    }
     toast.success("Enviamos um link para redefinir sua senha.");
     setMode("signin");
   }
@@ -95,7 +104,10 @@ function AuthPage() {
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin + "/auth",
     });
-    if (result.error) return toast.error("Não foi possível entrar com Google.");
+    if (result.error) {
+      toast.error("Não foi possível entrar com Google.");
+      return;
+    }
     if (result.redirected) return;
     navigate({ to: "/painel", replace: true });
   }

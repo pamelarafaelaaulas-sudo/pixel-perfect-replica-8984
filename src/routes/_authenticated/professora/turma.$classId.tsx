@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { classDetailQuery } from "@/lib/queries";
-import { PHASES } from "@/lib/phases";
+import { PHASES, phaseMeta } from "@/lib/phases";
 import { endOfDayFromInput, fmtAgo, toDateInput } from "@/lib/format";
 import { formatPoints, projectLateness } from "@/lib/penalty";
 
@@ -154,7 +154,7 @@ function ClassPage() {
                         )}
                       </div>
                       <Badge variant="secondary">
-                        Etapa {project?.current_phase ?? 1} · {PHASES[(project?.current_phase ?? 1) - 1].name}
+                        Etapa {project?.current_phase ?? 1} · {phaseMeta((project?.current_phase ?? 1)).name}
                       </Badge>
                       {totalPenalty > 0 && <Badge variant="warning">−{formatPoints(totalPenalty)} atraso</Badge>}
                       <div className="flex gap-1">

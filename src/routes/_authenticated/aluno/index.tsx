@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { meQuery, myGroupsQuery } from "@/lib/queries";
-import { PHASES } from "@/lib/phases";
+import { PHASES, phaseMeta } from "@/lib/phases";
 import { fmtAgo } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/aluno/")({
@@ -84,7 +84,7 @@ function StudentHome() {
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">
-                      Etapa {phase}: {PHASES[phase - 1].name}
+                      Etapa {phase}: {phaseMeta(phase).name}
                       {g.projects && ` · editado ${fmtAgo(g.projects.updated_at)}`}
                     </span>
                     <span className="inline-flex items-center gap-1 font-medium text-primary">
@@ -124,10 +124,16 @@ function JoinClass({ defaultWhatsapp }: { defaultWhatsapp: string }) {
       supabase.rpc("list_class_groups", { _code: code }),
     ]);
     setBusy(false);
-    if (c.error || g.error) return toast.error((c.error ?? g.error)!.message);
+    if (c.error || g.error) {
+      toast.error((c.error ?? g.error)!.message);
+      return;
+    }
     if (!c.data?.length) {
       setFound(null);
-      return toast.error("Nenhuma turma com esse código.");
+      {
+      toast.error("Nenhuma turma com esse código.");
+      return;
+    }
     }
     setFound(c.data[0]);
     setGroups(g.data ?? []);
