@@ -64,7 +64,7 @@ function DeadlinesPage() {
       <div className="mb-6 grid gap-3 sm:grid-cols-3">
         <Stat label="Desconto por dia" value={formatPoints(perDay)} />
         <Stat label="Grupos com atraso" value={`${summary.lateGroups} de ${summary.rows.length}`} />
-        <Stat label="Total descontado na turma" value={`−${formatPoints(summary.totalPenalty)}`} warn={summary.totalPenalty > 0} />
+        <Stat label="Total descontado na turma" value={summary.totalPenalty > 0 ? `−${formatPoints(summary.totalPenalty)}` : "0,0"} warn={summary.totalPenalty > 0} />
       </div>
 
       {summary.rows.length === 0 ? (
