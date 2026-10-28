@@ -1,12 +1,14 @@
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Download, ExternalLink, FileUp, Loader2, Palette, Ruler, Save } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { isCanvaUrl } from "@/lib/phase-rules";
+import { TEMPLATE_LINK_PROBLEM, isCanvaUrl, isTemplateLink } from "@/lib/phase-rules";
+import { syncBannerToDrive } from "@/lib/banner-drive.functions";
 import type { BannerBrief } from "@/lib/banner";
 
 const BUCKET = "banners";
@@ -67,7 +69,15 @@ export function BannerBriefView({ brief }: { brief: BannerBrief }) {
         <p className="font-medium text-foreground">Modelo da professora</p>
         {brief.ready ? (
           <>
-            <p className="mt-1 text-muted-foreground">Abra o modelo, use-o no Canva e monte o banner do grupo nessa cópia.</p>
+            <ol className="mt-1 ml-5 list-decimal space-y-0.5 text-muted-foreground">
+              <li>
+                Um integrante abre o modelo e clica em <strong>Usar modelo</strong>: o Canva cria uma cópia só do grupo.
+              </li>
+              <li>
+                Na cópia, clique em <strong>Compartilhar</strong> e convide os colegas do grupo para editar.
+              </li>
+              <li>Copie o link dessa cópia (não o do modelo) e cole abaixo.</li>
+            </ol>
             <Button asChild variant="secondary" size="sm" className="mt-3">
               <a href={brief.templateUrl!} target="_blank" rel="noreferrer">
                 <Palette /> Abrir modelo no Canva <ExternalLink className="size-3" />
@@ -120,12 +130,14 @@ export function BannerStage({
   editable: boolean;
 }) {
   const qc = useQueryClient();
+  const copyToDrive = useServerFn(syncBannerToDrive);
   const [link, setLink] = useState(canvaUrl ?? "");
   const [savingLink, setSavingLink] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const linkDirty = link.trim() !== (canvaUrl ?? "");
-  const linkInvalid = link.trim() !== "" && !isCanvaUrl(link);
+  const linkIsTemplate = isTemplateLink(link, brief.templateUrl);
+  const linkInvalid = link.trim() !== "" && (!isCanvaUrl(link) || linkIsTemplate);
 
   async function logContribution(section: string, chars: number) {
     await supabase
@@ -195,6 +207,8 @@ export function BannerStage({
     setUploading(false);
     toast.success("Arquivo do banner enviado");
     qc.invalidateQueries({ queryKey: ["group", groupId] });
+    // A copy also goes to the teacher's Google Drive folder; the upload already succeeded, so failures stay quiet.
+    copyToDrive({ data: { groupId } }).catch((e) => console.warn("Banner Drive copy failed", e));
   }
 
   return (
@@ -223,9 +237,11 @@ export function BannerStage({
           )}
         </div>
         <p className={linkInvalid ? "text-xs text-destructive" : "text-xs text-muted-foreground"}>
-          {linkInvalid
-            ? "O link precisa ser do Canva (começa com https://www.canva.com/)."
-            : "No Canva: Compartilhar → copiar link (deixe a professora com acesso de visualização)."}
+          {linkIsTemplate
+            ? TEMPLATE_LINK_PROBLEM
+            : linkInvalid
+              ? "O link precisa ser do Canva (começa com https://www.canva.com/)."
+              : "Na cópia do grupo: Compartilhar → copiar link (deixe a professora com acesso de visualização)."}
         </p>
       </div>
 
