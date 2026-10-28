@@ -3,13 +3,31 @@
  * A stage can only be delivered when every check passes.
  * The database (phase_rule_problem in submit_phase) enforces the same word limits.
  */
-import { checkCitations } from "./citations";
+import { checkCitations, citedWorks, missingReferences, type CitedWork } from "./citations";
 
 /** Parts where ABNT in-text citations are mandatory. */
 export const CITATION_FIELDS: Record<string, string> = {
   introduction: "Introdução",
   results_discussion: "Resultados e discussão",
 };
+
+/**
+ * Every work cited in the Introdução and Resultados e discussão, and whether the reference
+ * list has it. A work cited in both parts is listed once, under the first part.
+ */
+export function referenceCheck(
+  values: Partial<Record<string, unknown>>,
+): { work: CitedWork; label: string; found: boolean }[] {
+  const refs = typeof values["references_list"] === "string" ? values["references_list"] : "";
+  const all = Object.entries(CITATION_FIELDS).flatMap(([key, label]) =>
+    citedWorks(typeof values[key] === "string" ? (values[key] as string) : "").map((work) => ({ work, label })),
+  );
+  const unique = all.filter(
+    (a, i) => missingReferences(all.slice(0, i + 1).map((x) => x.work), "").length === missingReferences(all.slice(0, i).map((x) => x.work), "").length + 1,
+  );
+  const missing = new Set(missingReferences(unique.map((u) => u.work), refs));
+  return unique.map((u) => ({ ...u, found: !missing.has(u.work) }));
+}
 
 export type WordLimit = { min: number; max: number | null };
 
@@ -140,9 +158,13 @@ export function phaseProblems(
     case 10:
       checkWords("conclusion", "Conclusão");
       break;
-    case 11:
+    case 11: {
       checkWords("references_list", "Referências");
+      if (countWords(str(values["references_list"])) === 0) break;
+      for (const { work, label } of referenceCheck(values).filter((r) => !r.found))
+        problems.push(`Falta nas Referências: ${work.citation}, citado em ${label}.`);
       break;
+    }
     case 12: {
       checkWords("abstract", "Resumo");
       const kws = splitKeywords(str(values["keywords"]));
