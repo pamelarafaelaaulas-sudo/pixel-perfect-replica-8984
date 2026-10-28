@@ -47,7 +47,7 @@ export function AreaSelect({
   className?: string;
 }) {
   return (
-    <Select value={value ?? ""} onValueChange={onChange} disabled={disabled}>
+    <Select value={value ?? ""} onValueChange={onChange} disabled={disabled ?? false}>
       <SelectTrigger id={id} className={className} aria-label="Área do projeto">
         <SelectValue placeholder="Escolha a área" />
       </SelectTrigger>
