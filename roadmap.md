@@ -11,3 +11,4 @@
 - [x] Tela de prazos e atrasos por etapa: ajustar prazo de cada etapa e desconto, com prévia ao vivo e explicação/simulação do cálculo do atraso
 - [x] Projeto escrito dividido em partes com prazo próprio (Título → Objetivo geral → Objetivos específicos → Metodologia → Introdução → Resultados e discussão → Conclusão → Referências → Resumo), com as regras do arquivo Word e entrega bloqueada fora dos limites
 - [x] Citações ABNT obrigatórias na Introdução e em Resultados e discussão, com exemplos acima do campo e entrega bloqueada sem citação correta
+- [x] Referências conferem cada obra citada na Introdução e em Resultados e discussão (entrega bloqueada se faltar alguma)
