@@ -53,6 +53,12 @@ export const PHASES = [
     name: "Resumo",
     hint: "Linguagem objetiva e acadêmica, com introdução, área e tema, objetivo(s), metodologia e resultados alcançados ou esperados. De 150 a 250 palavras, sem caixa alta, imagens, tabelas ou gráficos. Depois, de 3 a 5 palavras-chave separadas por ponto e vírgula, diferentes das usadas no título.",
   },
+  {
+    number: 13,
+    bimester: 3,
+    name: "Banner",
+    hint: "Montem o banner do projeto no Canva a partir do modelo da professora. Entreguem o link do design no Canva e o arquivo final exportado (PDF ou imagem).",
+  },
 ] as const;
 
 export const PHASE_COUNT = PHASES.length;
