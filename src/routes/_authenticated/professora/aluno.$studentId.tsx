@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { scoreTone } from "@/components/ai-feedback";
 import { cn } from "@/lib/utils";
 import { studentReviewQuery, type StudentReview } from "@/lib/queries";
-import { phaseMeta } from "@/lib/phases";
+import { bimesterMeta, phaseMeta } from "@/lib/phases";
 import { fmtDate, fmtDateTime, plural, whatsappLink } from "@/lib/format";
 import { formatPoints, projectLateness, type PhaseInfo } from "@/lib/penalty";
 import { latestPerPhase } from "@/lib/ai-score";
