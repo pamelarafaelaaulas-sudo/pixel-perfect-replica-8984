@@ -54,7 +54,7 @@ export function GroupBanners({
   });
 
   const rows = (groups.data ?? []).map((g) => {
-    const p = g.projects[0];
+    const p = g.projects;
     const delivered = !!p?.phase_submissions.some((s) => s.phase_number === BANNER_PHASE);
     const last = (p?.project_contributions ?? [])
       .filter((c) => BANNER_SECTIONS.includes(c.section_name))
