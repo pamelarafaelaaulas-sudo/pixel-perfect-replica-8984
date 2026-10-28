@@ -1,4 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
+import { isAuthRetryableFetchError } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { parseSavedEvaluation } from "@/lib/ai-score";
 
@@ -13,7 +14,11 @@ export const meQuery = queryOptions({
   queryFn: async () => {
     const {
       data: { user },
+      error: userError,
     } = await supabase.auth.getUser();
+    // A network hiccup is not a sign-out: throw so the cached account is kept
+    // instead of being replaced by null (which blanked every signed-in screen).
+    if (!user && userError && isAuthRetryableFetchError(userError)) throw userError;
     if (!user) return null;
     const [profileRes, rolesRes] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
