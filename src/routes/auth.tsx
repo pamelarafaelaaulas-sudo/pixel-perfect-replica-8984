@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 
@@ -36,6 +37,7 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [sentTo, setSentTo] = useState<string | null>(null);
+  const [isTeacher, setIsTeacher] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -67,17 +69,22 @@ function AuthPage() {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
     const email = String(f.get("email"));
+    const invite = isTeacher ? String(f.get("invite") ?? "").trim().toUpperCase() : "";
     setBusy(true);
     const { data, error } = await supabase.auth.signUp({
       email,
       password: String(f.get("password")),
       options: {
         emailRedirectTo: window.location.origin + "/painel",
-        data: { name: String(f.get("name")).trim() },
+        data: { name: String(f.get("name")).trim(), ...(invite ? { teacher_invite: invite } : {}) },
       },
     });
     setBusy(false);
     if (error) {
+      if (invite && /database error/i.test(error.message)) {
+        toast.error("Código de professora inválido ou já usado. Peça um novo código.");
+        return;
+      }
       toast.error(translateError(error.message));
       return;
     }
@@ -195,6 +202,24 @@ function AuthPage() {
                       required
                     />
                   </div>
+                  <label className="flex cursor-pointer items-center gap-2 text-sm">
+                    <Checkbox checked={isTeacher} onCheckedChange={(v) => setIsTeacher(v === true)} />
+                    Sou professora e tenho um código de convite
+                  </label>
+                  {isTeacher && (
+                    <div className="space-y-2">
+                      <Label htmlFor="invite">Código de convite</Label>
+                      <Input
+                        id="invite"
+                        name="invite"
+                        placeholder="EX.: 1A2B3C4D"
+                        maxLength={8}
+                        className="font-mono uppercase tracking-widest"
+                        required
+                      />
+                      <p className="text-xs text-muted-foreground">Peça o código a uma professora que já usa o app.</p>
+                    </div>
+                  )}
                   <Button className="w-full" disabled={busy}>
                     Criar conta
                   </Button>
