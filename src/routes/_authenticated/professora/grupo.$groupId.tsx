@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { ArrowLeft, MessageCircle, RotateCcw, Star, UserMinus, Award } from "lucide-react";
+import { ArrowLeft, MessageCircle, RotateCcw, Star, UserMinus, Award, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { PhaseTimeline } from "@/components/phase-timeline";
@@ -419,6 +419,90 @@ function GradeForm({
         Salvar nota
       </Button>
       {existing && <p className="text-center text-xs text-muted-foreground">Lançada em {fmtDateTime(existing.created_at)}</p>}
+    </div>
+  );
+}
+
+function AiTab({
+  byPhase,
+  history,
+  aiAverage,
+  grades,
+  nameOf,
+}: {
+  byPhase: Record<number, { latest: SavedAiEvaluation; count: number }>;
+  history: SavedAiEvaluation[];
+  aiAverage: number | null;
+  grades: { trimester: number; score: number }[];
+  nameOf: (id: string) => string;
+}) {
+  return (
+    <div className="space-y-5">
+      <section className="card-paper flex flex-wrap items-center gap-6 p-5">
+        <div>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Média da IA (etapas avaliadas)</p>
+          <p className={`font-mono text-3xl font-semibold ${aiAverage === null ? "text-muted-foreground" : scoreTone(aiAverage)}`}>
+            {aiAverage === null ? "—" : formatPoints(aiAverage)}
+          </p>
+        </div>
+        <div className="h-10 w-px bg-border" />
+        <div>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Suas notas</p>
+          <div className="mt-1 flex gap-2">
+            {TRIMESTERS.map((t) => {
+              const g = grades.find((x) => x.trimester === t);
+              return (
+                <span key={t} className="rounded-md border border-border px-2 py-1 font-mono text-sm">
+                  {t}º tri: <strong>{g ? formatPoints(Number(g.score)) : "—"}</strong>
+                </span>
+              );
+            })}
+          </div>
+        </div>
+        <p className="basis-full text-xs text-muted-foreground">
+          A nota da IA é só uma referência pedida pelos alunos; ela não entra na nota final.
+        </p>
+      </section>
+
+      {PHASES.map((p) => {
+        const entry = byPhase[p.number];
+        const older = history.filter((h) => h.phaseNumber === p.number && h.id !== entry?.latest.id);
+        return (
+          <section key={p.number} className="card-paper p-6">
+            <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+              <h3 className="text-lg font-semibold">
+                <span className="font-mono text-xs text-muted-foreground">ETAPA {p.number}</span> {p.name}
+              </h3>
+              {entry && (
+                <p className="text-xs text-muted-foreground">
+                  {fmtDateTime(entry.latest.createdAt)}
+                  {entry.latest.requestedBy && ` · pedida por ${nameOf(entry.latest.requestedBy)}`}
+                  {entry.count > 1 && ` · ${entry.count} avaliações`}
+                </p>
+              )}
+            </div>
+            {!entry ? (
+              <p className="flex items-center gap-2 text-sm italic text-muted-foreground">
+                <Sparkles className="size-4" /> O grupo ainda não pediu avaliação da IA nesta etapa.
+              </p>
+            ) : (
+              <>
+                <AiEvaluationView evaluation={entry.latest} />
+                <details className="mt-5 rounded-lg border border-border p-3 text-sm">
+                  <summary className="cursor-pointer font-medium">Texto que a IA avaliou</summary>
+                  <p className="mt-2 whitespace-pre-wrap text-muted-foreground">{entry.latest.evaluatedText}</p>
+                </details>
+                {older.length > 0 && (
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    Avaliações anteriores:{" "}
+                    {older.map((o) => `${formatPoints(o.overall)} (${fmtDateTime(o.createdAt)})`).join(" · ")}
+                  </p>
+                )}
+              </>
+            )}
+          </section>
+        );
+      })}
     </div>
   );
 }
