@@ -43,6 +43,13 @@
       "when": 1793211557662,
       "tag": "0005_abnt_citation_required_intro_results",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793220004912,
+      "tag": "0006_references_must_list_cited_works",
+      "breakpoints": true
     }
   ]
 }

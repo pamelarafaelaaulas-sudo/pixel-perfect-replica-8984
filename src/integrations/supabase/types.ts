@@ -579,6 +579,11 @@ export type Database = {
           teacher_name: string
         }[]
       }
+      first_missing_reference: {
+        Args: { _cited: string; _refs: string }
+        Returns: string
+      }
+      fold_text: { Args: { _t: string }; Returns: string }
       group_ai_suggestions: {
         Args: { _group_id: string }
         Returns: {
@@ -623,6 +628,10 @@ export type Database = {
       }
       project_group: { Args: { _project_id: string }; Returns: string }
       redeem_teacher_invite: { Args: { _code: string }; Returns: undefined }
+      reference_is_missing: {
+        Args: { _authors: string; _lines: string[]; _year: string }
+        Returns: boolean
+      }
       shares_group_with: { Args: { _other: string }; Returns: boolean }
       submit_phase: { Args: { _project_id: string }; Returns: number }
       teaches_class: { Args: { _class_id: string }; Returns: boolean }
