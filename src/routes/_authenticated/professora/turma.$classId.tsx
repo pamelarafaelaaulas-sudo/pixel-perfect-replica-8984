@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { classDetailQuery } from "@/lib/queries";
-import { PHASES, phaseMeta } from "@/lib/phases";
+import { phaseMeta } from "@/lib/phases";
 import { endOfDayFromInput, fmtAgo, toDateInput } from "@/lib/format";
 import { formatPoints, projectLateness } from "@/lib/penalty";
 
@@ -204,7 +204,7 @@ function ScheduleCard({
       const perDay = Number(rate.replace(",", "."));
       if (Number.isNaN(perDay) || perDay < 0) throw new Error("Desconto inválido");
       const updates = schedules.map((s) =>
-        supabase.from("schedules").update({ due_date: endOfDayFromInput(dates[s.id]) }).eq("id", s.id),
+        supabase.from("schedules").update({ due_date: endOfDayFromInput(dates[s.id] ?? toDateInput(s.due_date)) }).eq("id", s.id),
       );
       const results = await Promise.all([
         ...updates,

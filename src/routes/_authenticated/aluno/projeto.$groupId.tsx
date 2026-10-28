@@ -140,10 +140,10 @@ function StudentProjectPage() {
     submissions,
     perDay: Number(cls.late_penalty_per_day),
   });
-  const info = lateness.phases[selected - 1];
+  const info = lateness.phases[selected - 1] ?? lateness.phases[0]!;
   const isSubmitted = info.state === "delivered";
   const editable = !isSubmitted && selected <= project.current_phase && info.state !== "skipped";
-  const phaseDirty = changedFields.some((f) => PHASE_FIELDS[selected].includes(f));
+  const phaseDirty = changedFields.some((f) => (PHASE_FIELDS[selected] ?? []).includes(f));
   const grades = [...(group.grades ?? [])].sort((a, b) => a.trimester - b.trimester);
 
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => (d ? { ...d, [k]: v } : d));

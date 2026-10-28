@@ -1,6 +1,6 @@
 import { Check, Clock, Lock, AlertTriangle, SkipForward } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { PHASES, phaseMeta } from "@/lib/phases";
+import { phaseMeta } from "@/lib/phases";
 import { fmtDate } from "@/lib/format";
 import { formatPoints, type PhaseInfo } from "@/lib/penalty";
 

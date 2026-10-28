@@ -108,7 +108,7 @@ function EvaluationCard({
   evaluatedId: string;
   name: string;
   trimester: number;
-  existing?: { score: number; feedback: string | null };
+  existing?: { score: number; feedback: string | null } | undefined;
 }) {
   const qc = useQueryClient();
   const [score, setScore] = useState<number>(existing ? Number(existing.score) : 0);

@@ -68,7 +68,7 @@ function Index() {
 
           <ol className="card-paper relative space-y-1 p-6">
             {PHASES.map((p, i) => {
-              const Icon = ICONS[i];
+              const Icon = ICONS[i] ?? Lightbulb;
               return (
                 <li key={p.number} className="flex gap-4 rounded-lg p-3 transition-colors hover:bg-muted">
                   <span className="grid size-10 shrink-0 place-items-center rounded-full border-2 border-primary/30 font-display text-lg font-semibold text-primary">
