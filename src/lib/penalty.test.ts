@@ -27,3 +27,24 @@ describe("late delivery penalty", () => {
     expect(gradeAfterPenalty(1, 3)).toBe(0);
   });
 });
+
+import { projectLateness } from "./penalty";
+
+describe("project lateness across the 4 phases", () => {
+  it("adds delivered-late days and still-open late days at the class rate", () => {
+    const { phases, totalPenalty } = projectLateness({
+      currentPhase: 2,
+      perDay: 0.5,
+      now: new Date("2026-10-20T12:00:00Z"),
+      schedules: [
+        { phase_number: 1, due_date: "2026-10-10T12:00:00Z" },
+        { phase_number: 2, due_date: "2026-10-18T12:00:00Z" },
+        { phase_number: 3, due_date: "2026-11-01T12:00:00Z" },
+        { phase_number: 4, due_date: "2026-12-01T12:00:00Z" },
+      ],
+      submissions: [{ phase_number: 1, submitted_at: "2026-10-11T12:00:00Z" }],
+    });
+    expect(phases.map((p) => p.daysLate)).toEqual([1, 2, 0, 0]);
+    expect(totalPenalty).toBe(1.5);
+  });
+});
