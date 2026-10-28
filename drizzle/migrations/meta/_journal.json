@@ -50,6 +50,13 @@
       "when": 1793220004912,
       "tag": "0006_references_must_list_cited_works",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793220453194,
+      "tag": "0007_bimesters_and_banner_stage",
+      "breakpoints": true
     }
   ]
 }
