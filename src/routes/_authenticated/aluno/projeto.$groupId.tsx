@@ -5,6 +5,7 @@ import { ArrowLeft, Lock, MessageCircle, Plus, Save, Send, Star, Trash2 } from "
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { PhaseTimeline } from "@/components/phase-timeline";
+import { AiFeedback } from "@/components/ai-feedback";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -68,6 +69,16 @@ function toDraft(p: Project): Draft {
       string
     >),
   };
+}
+
+function phaseText(d: Draft, phase: number) {
+  if (phase === 1) return d.theme;
+  if (phase === 2)
+    return d.scientific_articles
+      .map((a, i) => `${i + 1}. ${a.title}\n${a.url}\nCitação ABNT: ${a.abnt_citation}`)
+      .join("\n\n");
+  if (phase === 3) return d.guiding_question;
+  return WRITTEN_SECTIONS.map((s) => `### ${s.label}\n${d[s.key]}`).join("\n\n");
 }
 
 function size(v: string | Article[]) {
