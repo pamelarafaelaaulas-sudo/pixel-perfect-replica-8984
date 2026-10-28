@@ -214,3 +214,17 @@ export const studentReviewQuery = (studentId: string) =>
     queryKey: ["teacher", "student", studentId],
     queryFn: () => fetchStudentReview(studentId),
   });
+
+/* ---------------- Teacher: invites for other teachers ---------------- */
+
+export const teacherInvitesQuery = queryOptions({
+  queryKey: ["teacher", "invites"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("teacher_invites")
+      .select("id, code, used_by_name, used_at, created_at")
+      .order("created_at", { ascending: false });
+    fail(error);
+    return data ?? [];
+  },
+});
