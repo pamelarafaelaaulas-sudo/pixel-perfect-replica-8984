@@ -564,6 +564,18 @@ export type Database = {
           teacher_name: string
         }[]
       }
+      group_ai_suggestions: {
+        Args: { _group_id: string }
+        Returns: {
+          created_at: string
+          criteria: Json
+          id: string
+          phase_number: number
+          requested_by: string
+          summary: string
+          tips: Json
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

@@ -4,3 +4,6 @@
 - [x] Avaliação automática da IA por etapa: nota geral + pontuação por critério, junto com dicas de clareza, organização e citações
 - [x] Guardar a avaliação da IA de cada etapa e mostrar na página do grupo para a professora comparar com a nota dela
 - [x] Tela por aluno (professora): notas de cada etapa, total e histórico de atrasos, para revisar antes de lançar o trimestre
+- [x] Outras professoras podem se cadastrar com código de convite (cada uma vê só as próprias turmas)
+- [x] Tela de alunos (professora): lista completa com turma, grupo, etapas entregues e atrasos, sem abrir cada grupo
+- [x] Aluno não vê a nota da IA, só as sugestões (a professora continua vendo a nota)

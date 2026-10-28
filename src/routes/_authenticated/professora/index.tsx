@@ -41,6 +41,11 @@ function TeacherHome() {
         description="Crie uma turma, compartilhe o código com os alunos e acompanhe cada grupo pelas 4 etapas."
         actions={
           <div className="flex flex-wrap gap-2">
+            <Button variant="outline" asChild>
+              <Link to="/professora/alunos">
+                <Users /> Alunos
+              </Link>
+            </Button>
             <TeacherInvitesDialog />
             <NewClassDialog />
           </div>

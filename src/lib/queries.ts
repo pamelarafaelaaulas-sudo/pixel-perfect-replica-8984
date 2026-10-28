@@ -159,6 +159,17 @@ export const aiEvaluationsForGroupQuery = (groupId: string) =>
     },
   });
 
+/** Student view: AI suggestions only — scores are never sent to students. */
+export const aiSuggestionsForGroupQuery = (groupId: string) =>
+  queryOptions({
+    queryKey: ["ai", "group", groupId, "suggestions"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("group_ai_suggestions", { _group_id: groupId });
+      fail(error);
+      return (data ?? []).map((r) => parseSavedEvaluation({ ...r, overall: 0, evaluated_text: "" }));
+    },
+  });
+
 /* ---------------- Teacher: per-student review ---------------- */
 
 async function fetchStudentReview(studentId: string) {
@@ -223,6 +234,28 @@ export const teacherInvitesQuery = queryOptions({
     const { data, error } = await supabase
       .from("teacher_invites")
       .select("id, code, used_by_name, used_at, created_at")
+      .order("created_at", { ascending: false });
+    fail(error);
+    return data ?? [];
+  },
+});
+
+/* ---------------- Teacher: all students across classes ---------------- */
+
+export const teacherRosterQuery = queryOptions({
+  queryKey: ["teacher", "roster"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("classes")
+      .select(
+        `id, name, late_penalty_per_day,
+        schedules(phase_number, due_date),
+        groups!groups_class_id_fkey(
+          id, group_name,
+          group_members(student_id, profiles(name, email)),
+          projects(current_phase, phase_submissions(phase_number, submitted_at))
+        )`,
+      )
       .order("created_at", { ascending: false });
     fail(error);
     return data ?? [];
