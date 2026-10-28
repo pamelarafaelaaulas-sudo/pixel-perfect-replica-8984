@@ -2,33 +2,43 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getPhaseFeedback } from "@/lib/ai-feedback.functions";
+import { cn } from "@/lib/utils";
+import { getPhaseEvaluation } from "@/lib/ai-feedback.functions";
+import { formatPoints } from "@/lib/penalty";
+import type { AiEvaluation } from "@/lib/ai-score";
 
-function renderLine(line: string, i: number) {
-  const bold = (s: string) =>
-    s.split(/(\*\*[^*]+\*\*)/g).map((p, j) =>
-      p.startsWith("**") && p.endsWith("**") ? <strong key={j}>{p.slice(2, -2)}</strong> : p,
-    );
-  if (line.startsWith("## ") || line.startsWith("### "))
-    return (
-      <h4 key={i} className="mt-4 font-semibold text-foreground first:mt-0">
-        {line.replace(/^#+\s*/, "")}
-      </h4>
-    );
-  if (/^\s*[-*]\s+/.test(line))
-    return (
-      <li key={i} className="ml-5 list-disc">
-        {bold(line.replace(/^\s*[-*]\s+/, ""))}
-      </li>
-    );
-  if (!line.trim()) return null;
-  return <p key={i}>{bold(line)}</p>;
+function scoreTone(n: number) {
+  if (n >= 7) return "text-success";
+  if (n >= 5) return "text-warning";
+  return "text-destructive";
+}
+
+function barTone(n: number) {
+  if (n >= 7) return "bg-success";
+  if (n >= 5) return "bg-warning";
+  return "bg-destructive";
+}
+
+function TipList({ title, tips }: { title: string; tips: string[] }) {
+  if (tips.length === 0) return null;
+  return (
+    <div>
+      <h4 className="font-semibold text-foreground">{title}</h4>
+      <ul className="mt-1 space-y-1">
+        {tips.map((t, i) => (
+          <li key={i} className="ml-5 list-disc">
+            {t}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
 export function AiFeedback({ phaseName, text }: { phaseName: string; text: string }) {
-  const fn = useServerFn(getPhaseFeedback);
+  const fn = useServerFn(getPhaseEvaluation);
   const [loading, setLoading] = useState(false);
-  const [feedback, setFeedback] = useState<string | null>(null);
+  const [result, setResult] = useState<AiEvaluation | null>(null);
   const [error, setError] = useState<string | null>(null);
   const tooShort = text.trim().length < 20;
 
@@ -37,7 +47,7 @@ export function AiFeedback({ phaseName, text }: { phaseName: string; text: strin
     setError(null);
     try {
       const r = await fn({ data: { phaseName, text } });
-      setFeedback(r.feedback);
+      setResult(r.evaluation);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -49,19 +59,54 @@ export function AiFeedback({ phaseName, text }: { phaseName: string; text: strin
     <div className="mt-6 rounded-lg border border-border bg-muted/40 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="font-medium">Sugestões da IA</p>
+          <p className="font-medium">Avaliação da IA</p>
           <p className="text-sm text-muted-foreground">
-            Receba dicas sobre clareza, organização e citações do texto desta etapa.
+            Nota estimada por critério e dicas de clareza, organização e citações. Não substitui a nota da professora.
           </p>
         </div>
         <Button variant="secondary" onClick={run} disabled={loading || tooShort}>
           {loading ? <Loader2 className="animate-spin" /> : <Sparkles />}
-          {loading ? "Analisando…" : feedback ? "Analisar de novo" : "Pedir sugestões"}
+          {loading ? "Avaliando…" : result ? "Avaliar de novo" : "Avaliar com IA"}
         </Button>
       </div>
-      {tooShort && <p className="mt-2 text-xs text-muted-foreground">Escreva um pouco mais para pedir sugestões.</p>}
+      {tooShort && <p className="mt-2 text-xs text-muted-foreground">Escreva um pouco mais para pedir a avaliação.</p>}
       {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
-      {feedback && <div className="mt-4 space-y-1 text-sm">{feedback.split("\n").map(renderLine)}</div>}
+
+      {result && (
+        <div className="mt-5 space-y-5 text-sm">
+          <div className="flex flex-wrap items-center gap-5">
+            <div className="card-paper grid min-w-28 place-items-center px-5 py-3 text-center">
+              <span className="text-xs uppercase tracking-wide text-muted-foreground">Nota estimada</span>
+              <span className={cn("font-mono text-4xl font-semibold", scoreTone(result.overall))}>
+                {formatPoints(result.overall)}
+              </span>
+              <span className="text-xs text-muted-foreground">de 10</span>
+            </div>
+            {result.summary && <p className="max-w-xl flex-1 text-foreground">{result.summary}</p>}
+          </div>
+
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {result.criteria.map((c) => (
+              <li key={c.key} className="card-paper p-3">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="font-medium text-foreground">{c.label}</span>
+                  <span className={cn("font-mono font-semibold", scoreTone(c.score))}>{formatPoints(c.score)}</span>
+                </div>
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
+                  <div className={cn("h-full rounded-full", barTone(c.score))} style={{ width: `${c.score * 10}%` }} />
+                </div>
+                {c.comment && <p className="mt-2 text-xs text-muted-foreground">{c.comment}</p>}
+              </li>
+            ))}
+          </ul>
+
+          <div className="space-y-4">
+            <TipList title="Dicas de clareza" tips={result.tips.clarity} />
+            <TipList title="Dicas de organização" tips={result.tips.organization} />
+            <TipList title="Dicas de citações" tips={result.tips.citations} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
