@@ -31,6 +31,20 @@ describe("banner delivery", () => {
     expect(phaseProblems(13, { banner_canva_url: "https://www.canva.com/design/abc/view", banner_file_path: "g/b.pdf" }, 0)).toEqual([]);
   });
 
+  it("blocks delivery when the group pasted the teacher's template link instead of its own copy", () => {
+    const template = "https://www.canva.com/design/DAGmodelo1/abc/view?mode=preview";
+    const sameDesign = "https://www.canva.com/design/DAGMODELO1/xyz/edit";
+    const ownCopy = "https://www.canva.com/design/DAGcopia22/xyz/edit";
+    expect(isTemplateLink(sameDesign, template)).toBe(true);
+    expect(isTemplateLink(ownCopy, template)).toBe(false);
+    expect(
+      phaseProblems(13, { banner_canva_url: sameDesign, banner_template_url: template, banner_file_path: "g/b.pdf" }, 0),
+    ).toEqual([TEMPLATE_LINK_PROBLEM]);
+    expect(
+      phaseProblems(13, { banner_canva_url: ownCopy, banner_template_url: template, banner_file_path: "g/b.pdf" }, 0),
+    ).toEqual([]);
+  });
+
   it("rejects links that are not from Canva", () => {
     expect(isCanvaUrl("https://drive.google.com/file/x")).toBe(false);
     expect(isCanvaUrl("http://www.canva.com/design/x")).toBe(false);

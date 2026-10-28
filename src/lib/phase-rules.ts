@@ -91,6 +91,20 @@ export function isCanvaUrl(url: string | null | undefined): boolean {
   return /^https:\/\/([a-z0-9-]+\.)*(canva\.com|canva\.link)\//i.test((url ?? "").trim());
 }
 
+/** The design id in a canva.com/design/<id>/... link; null for short links or other URLs. Mirrored by SQL canva_design_id. */
+export function canvaDesignId(url: string | null | undefined): string | null {
+  return (url ?? "").match(/canva\.com\/design\/([A-Za-z0-9_-]+)/i)?.[1]?.toLowerCase() ?? null;
+}
+
+/** True when the group pasted the teacher's template link instead of the link to its own copy. */
+export function isTemplateLink(groupUrl: string | null | undefined, templateUrl: string | null | undefined): boolean {
+  const g = canvaDesignId(groupUrl);
+  return g !== null && g === canvaDesignId(templateUrl);
+}
+
+export const TEMPLATE_LINK_PROBLEM =
+  "Esse é o link do modelo da professora. Use o modelo no Canva e cole o link da cópia do grupo.";
+
 export function limitLabel(w: WordLimit): string {
   if (w.max === null) return "obrigatório";
   if (w.min <= 1) return `até ${w.max} palavras`;
@@ -172,6 +186,8 @@ export function phaseProblems(
     case 13:
       if (!isCanvaUrl(str(values["banner_canva_url"])))
         problems.push("Cole o link do banner no Canva (começa com https://www.canva.com/).");
+      else if (isTemplateLink(str(values["banner_canva_url"]), str(values["banner_template_url"])))
+        problems.push(TEMPLATE_LINK_PROBLEM);
       if (!str(values["banner_file_path"])) problems.push("Anexe o arquivo final do banner (PDF ou imagem).");
       break;
     case 12: {
