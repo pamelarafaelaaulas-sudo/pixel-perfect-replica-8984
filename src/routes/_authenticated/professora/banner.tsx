@@ -5,6 +5,7 @@ import { ArrowDown, ArrowLeft, ArrowUp, Check, Copy, ExternalLink, Plus, RotateC
 import { toast } from "sonner";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { BannerBriefView } from "@/components/banner-stage";
+import { GroupBanners } from "@/components/group-banners";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -86,6 +87,7 @@ function BannerTemplatePage() {
             })}
           </div>
           <TemplateEditor key={`${cls.id}-${JSON.stringify([cls.banner_template_url, cls.banner_size, cls.banner_sections, cls.banner_instructions])}`} cls={cls} others={classes.filter((c) => c.id !== cls.id)} />
+          <GroupBanners classId={cls.id} templateUrl={cls.banner_template_url} codeLabel={cls.code_label} />
         </>
       )}
     </>
@@ -170,8 +172,8 @@ function TemplateEditor({ cls, others }: { cls: ClassRow; others: ClassRow[] }) 
             <li>No Canva, crie um design personalizado no tamanho {size}.</li>
             <li>Coloque os blocos das seções abaixo, as cores e o logo da escola.</li>
             <li>
-              Clique em <strong>Compartilhar</strong> → <strong>Link do modelo</strong> (ou “Somente visualização”) e copie o
-              link.
+              Clique em <strong>Compartilhar</strong> → <strong>Link do modelo</strong> e copie o link. Com esse link, cada grupo
+              que abrir ganha uma cópia só dele, e o seu modelo nunca é alterado.
             </li>
           </ol>
           <Button asChild variant="secondary" size="sm" className="mt-3">
