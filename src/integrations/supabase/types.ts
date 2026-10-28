@@ -391,12 +391,17 @@ export type Database = {
       }
       projects: {
         Row: {
+          abstract: string | null
+          area_subarea: string | null
+          conclusion: string | null
           current_phase: number
           general_objective: string | null
           group_id: string
           guiding_question: string | null
           id: string
+          institution: string | null
           introduction: string | null
+          keywords: string | null
           methodology: string | null
           references_list: string | null
           results_discussion: string | null
@@ -407,12 +412,17 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          abstract?: string | null
+          area_subarea?: string | null
+          conclusion?: string | null
           current_phase?: number
           general_objective?: string | null
           group_id: string
           guiding_question?: string | null
           id?: string
+          institution?: string | null
           introduction?: string | null
+          keywords?: string | null
           methodology?: string | null
           references_list?: string | null
           results_discussion?: string | null
@@ -423,12 +433,17 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          abstract?: string | null
+          area_subarea?: string | null
+          conclusion?: string | null
           current_phase?: number
           general_objective?: string | null
           group_id?: string
           guiding_question?: string | null
           id?: string
+          institution?: string | null
           introduction?: string | null
+          keywords?: string | null
           methodology?: string | null
           references_list?: string | null
           results_discussion?: string | null
@@ -598,6 +613,13 @@ export type Database = {
           member_count: number
         }[]
       }
+      phase_rule_problem: {
+        Args: {
+          _p: Database["public"]["Tables"]["projects"]["Row"]
+          _phase: number
+        }
+        Returns: string
+      }
       project_group: { Args: { _project_id: string }; Returns: string }
       redeem_teacher_invite: { Args: { _code: string }; Returns: undefined }
       shares_group_with: { Args: { _other: string }; Returns: boolean }
@@ -605,6 +627,7 @@ export type Database = {
       teaches_class: { Args: { _class_id: string }; Returns: boolean }
       teaches_group: { Args: { _group_id: string }; Returns: boolean }
       teaches_student: { Args: { _student_id: string }; Returns: boolean }
+      word_count: { Args: { _t: string }; Returns: number }
     }
     Enums: {
       app_role: "teacher" | "student"
