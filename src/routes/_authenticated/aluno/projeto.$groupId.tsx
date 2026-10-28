@@ -41,7 +41,8 @@ import {
   type Article,
   type TextFieldKey,
 } from "@/lib/phases";
-import { WORD_LIMITS, countWords, limitLabel, objectiveLines, phaseProblems, splitKeywords } from "@/lib/phase-rules";
+import { CITATION_FIELDS, WORD_LIMITS, countWords, limitLabel, objectiveLines, phaseProblems, splitKeywords } from "@/lib/phase-rules";
+import { CITATION_EXAMPLES, checkCitations } from "@/lib/citations";
 import { fmtDateTime, whatsappLink } from "@/lib/format";
 import { formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
 
@@ -243,7 +244,13 @@ function StudentProjectPage() {
               <ArticlesEditor value={draft.scientific_articles} onChange={(v) => set("scientific_articles", v)} editable={editable} />
             ) : (
               (PHASE_FORM[selected] ?? []).map((f) => (
-                <Field key={f.key} label={f.label} id={f.key} meter={<FieldMeter field={f.key} value={draft[f.key]} />}>
+                <Field
+                  key={f.key}
+                  label={f.label}
+                  id={f.key}
+                  meter={<FieldMeter field={f.key} value={draft[f.key]} />}
+                  before={CITATION_FIELDS[f.key] ? <CitationGuide /> : null}
+                >
                   {f.rows === 1 ? (
                     <Input id={f.key} value={draft[f.key]} placeholder={f.placeholder} onChange={(e) => set(f.key, e.target.value)} />
                   ) : (
@@ -364,9 +371,22 @@ function StudentProjectPage() {
   );
 }
 
-function Field({ label, id, meter, children }: { label: string; id: string; meter?: React.ReactNode; children: React.ReactNode }) {
+function Field({
+  label,
+  id,
+  meter,
+  before,
+  children,
+}: {
+  label: string;
+  id: string;
+  meter?: React.ReactNode;
+  before?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-2">
+      {before}
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <Label htmlFor={id} className="text-sm font-semibold">
           {label}
@@ -374,6 +394,28 @@ function Field({ label, id, meter, children }: { label: string; id: string; mete
         {meter}
       </div>
       {children}
+    </div>
+  );
+}
+
+/** ABNT in-text citation examples, shown above the parts where citations are mandatory. */
+function CitationGuide() {
+  return (
+    <div className="mb-3 rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm">
+      <p className="font-semibold text-foreground">Obrigatório: citar os autores nas normas ABNT (NBR 10520:2023)</p>
+      <p className="mt-1 text-muted-foreground">
+        Toda ideia tirada de um artigo precisa da citação: sobrenome do autor e ano. Dentro dos parênteses, escreva o
+        nome com a primeira letra maiúscula (siglas podem ser todas maiúsculas). A etapa só pode ser entregue com pelo
+        menos uma citação correta, e toda obra citada precisa aparecer depois nas Referências.
+      </p>
+      <dl className="mt-3 grid gap-2 sm:grid-cols-2">
+        {CITATION_EXAMPLES.map((e) => (
+          <div key={e.label} className="rounded-md bg-background p-2.5">
+            <dt className="text-xs text-muted-foreground">{e.label}</dt>
+            <dd className="mt-0.5 font-mono text-xs text-foreground">{e.example}</dd>
+          </div>
+        ))}
+      </dl>
     </div>
   );
 }
@@ -389,10 +431,20 @@ function FieldMeter({ field, value }: { field: TextFieldKey; value: string }) {
   if (!lim) return null;
   const n = countWords(value);
   const ok = n >= lim.min && (lim.max === null || n <= lim.max);
+  const cites = CITATION_FIELDS[field] ? checkCitations(value) : null;
+  const citesOk = !cites || (cites.citations.length > 0 && cites.issues.length === 0);
   return (
-    <span className={cn("text-xs", ok ? "text-success" : "text-destructive")}>
-      {field === "specific_objectives" && `${objectiveLines(value).length} de no máx. 5 objetivos · `}
-      {n} palavra(s){lim.max !== null && ` · ${limitLabel(lim)}`}
+    <span className="flex flex-wrap gap-x-2 text-xs">
+      <span className={ok ? "text-success" : "text-destructive"}>
+        {field === "specific_objectives" && `${objectiveLines(value).length} de no máx. 5 objetivos · `}
+        {n} palavra(s){lim.max !== null && ` · ${limitLabel(lim)}`}
+      </span>
+      {cites && (
+        <span className={citesOk ? "text-success" : "text-destructive"}>
+          · {cites.citations.length} citação(ões) ABNT
+          {cites.issues.length > 0 && `, ${cites.issues.length} com erro`}
+        </span>
+      )}
     </span>
   );
 }
