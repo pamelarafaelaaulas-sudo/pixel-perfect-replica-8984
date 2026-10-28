@@ -15,9 +15,9 @@ import { plural } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/professora/alunos")({
   head: () => ({
     meta: [
-      { title: "Alunos — Caderno de Projetos" },
+      { title: "Alunos — PamLab" },
       { name: "description", content: "Todos os alunos com turma, grupo, etapas entregues e atrasos." },
-      { property: "og:title", content: "Alunos — Caderno de Projetos" },
+      { property: "og:title", content: "Alunos — PamLab" },
       { property: "og:description", content: "Todos os alunos com turma, grupo, etapas entregues e atrasos." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

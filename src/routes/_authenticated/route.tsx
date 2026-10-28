@@ -55,7 +55,7 @@ function AuthenticatedLayout() {
       </main>
       <footer className="mx-auto max-w-6xl px-6 pb-10 text-xs text-muted-foreground">
         <Link to="/" className="hover:underline">
-          Caderno de Projetos
+          PamLab
         </Link>
       </footer>
     </div>

@@ -36,9 +36,9 @@ import { AiEvaluationView, scoreTone } from "@/components/ai-feedback";
 export const Route = createFileRoute("/_authenticated/professora/grupo/$groupId")({
   head: () => ({
     meta: [
-      { title: "Grupo — Caderno de Projetos" },
+      { title: "Grupo — PamLab" },
       { name: "description", content: "Projeto, contribuições, avaliações e notas do grupo." },
-      { property: "og:title", content: "Grupo — Caderno de Projetos" },
+      { property: "og:title", content: "Grupo — PamLab" },
       { property: "og:description", content: "Projeto, contribuições, avaliações e notas do grupo." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

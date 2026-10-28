@@ -61,9 +61,9 @@ import { bannerBrief } from "@/lib/banner";
 export const Route = createFileRoute("/_authenticated/aluno/projeto/$groupId")({
   head: () => ({
     meta: [
-      { title: "Projeto do grupo — Caderno de Projetos" },
+      { title: "Projeto do grupo — PamLab" },
       { name: "description", content: "Escreva o projeto científico do grupo, etapa por etapa." },
-      { property: "og:title", content: "Projeto do grupo — Caderno de Projetos" },
+      { property: "og:title", content: "Projeto do grupo — PamLab" },
       { property: "og:description", content: "Escreva o projeto científico do grupo, etapa por etapa." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

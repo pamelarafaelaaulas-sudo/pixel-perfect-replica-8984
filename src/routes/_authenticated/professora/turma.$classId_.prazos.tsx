@@ -20,9 +20,9 @@ import { classLateness, daysLate, formatPoints, phasePenalty, phaseTotals, type 
 export const Route = createFileRoute("/_authenticated/professora/turma/$classId_/prazos")({
   head: () => ({
     meta: [
-      { title: "Prazos e atrasos — Caderno de Projetos" },
+      { title: "Prazos e atrasos — PamLab" },
       { name: "description", content: "Quando cada grupo entregou cada etapa e quanto perdeu por atraso." },
-      { property: "og:title", content: "Prazos e atrasos — Caderno de Projetos" },
+      { property: "og:title", content: "Prazos e atrasos — PamLab" },
       { property: "og:description", content: "Quando cada grupo entregou cada etapa e quanto perdeu por atraso." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

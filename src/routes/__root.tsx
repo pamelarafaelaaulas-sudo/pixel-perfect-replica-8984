@@ -80,7 +80,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Caderno de Projetos — Projeto científico escolar" },
+      { title: "PamLab — Projeto científico escolar" },
       {
         name: "description",
         content: "Acompanhe o projeto científico da turma: tema, artigos, pergunta norteadora e projeto escrito.",

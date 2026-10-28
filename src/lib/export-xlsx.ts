@@ -10,7 +10,7 @@ const HEADER_FILL = { type: "pattern" as const, pattern: "solid" as const, fgCol
 export async function buildWorkbook(rows: Rows, title: string): Promise<Blob> {
   const { default: ExcelJS } = await import("exceljs");
   const wb = new ExcelJS.Workbook();
-  wb.creator = "Caderno de Projetos";
+  wb.creator = "PamLab";
   wb.title = title;
 
   const sheet = (name: string, cols: { header: string; key: string; width: number; fmt?: string; wrap?: boolean }[]) => {

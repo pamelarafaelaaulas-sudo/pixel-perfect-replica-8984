@@ -9,13 +9,13 @@ import { PHASES, WRITTEN_END, WRITTEN_START } from "@/lib/phases";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Caderno de Projetos — Projeto científico da turma" },
+      { title: "PamLab — Projeto científico da turma" },
       {
         name: "description",
         content:
           "Grupos de até 3 alunos constroem o projeto científico etapa por etapa, com prazos, banner no Canva, feira, avaliação entre colegas e notas nos 4 bimestres.",
       },
-      { property: "og:title", content: "Caderno de Projetos — Projeto científico da turma" },
+      { property: "og:title", content: "PamLab — Projeto científico da turma" },
       {
         property: "og:description",
         content: "Tema, artigos, pergunta norteadora e projeto escrito — tudo num só caderno.",
