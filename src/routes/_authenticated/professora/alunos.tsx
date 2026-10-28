@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { teacherRosterQuery } from "@/lib/queries";
 import { buildRoster, filterRoster } from "@/lib/roster";
-import { phaseMeta } from "@/lib/phases";
+import { PHASE_COUNT, phaseMeta } from "@/lib/phases";
 import { formatPoints, type PhaseInfo } from "@/lib/penalty";
 import { plural } from "@/lib/format";
 
@@ -137,7 +137,7 @@ function RosterPage() {
                       <td className="px-4 py-3">
                         <PhaseDots phases={r.phases} />
                         <p className="mt-1 text-xs text-muted-foreground">
-                          {r.delivered} de 4 · {r.delivered < 4 ? `agora na etapa ${r.currentPhase}: ${phaseMeta(r.currentPhase).name}` : "projeto concluído"}
+                          {r.delivered} de {PHASE_COUNT} · {r.delivered < PHASE_COUNT ? `agora na etapa ${r.currentPhase}: ${phaseMeta(r.currentPhase).name}` : "projeto concluído"}
                         </p>
                       </td>
                       <td className="px-4 py-3 text-right">
@@ -160,7 +160,7 @@ function RosterPage() {
 
 function PhaseDots({ phases }: { phases: PhaseInfo[] }) {
   return (
-    <div className="flex gap-1.5">
+    <div className="flex gap-1">
       {phases.map((p) => {
         const late = p.daysLate > 0;
         const tone =
@@ -183,7 +183,7 @@ function PhaseDots({ phases }: { phases: PhaseInfo[] }) {
                 ? `Etapa ${p.phase}: atrasada (${plural(p.daysLate, "dia", "dias")})`
                 : `Etapa ${p.phase}: em andamento`
               : `Etapa ${p.phase}: não entregue`;
-        return <span key={p.phase} title={label} aria-label={label} className={cn("h-2 w-8 rounded-full", tone)} />;
+        return <span key={p.phase} title={label} aria-label={label} className={cn("h-2 w-3.5 rounded-full", tone)} />;
       })}
     </div>
   );
