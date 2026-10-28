@@ -112,3 +112,33 @@ export function classLateness(args: {
   const totalPenalty = Math.round(rows.reduce((s, r) => s + r.totalPenalty, 0) * 100) / 100;
   return { rows, totalPenalty, lateGroups: rows.filter((r) => r.totalPenalty > 0).length };
 }
+
+export type PhaseTotals = {
+  phase: number;
+  onTime: number;
+  deliveredLate: number;
+  openLate: number;
+  pending: number;
+  days: number;
+  penalty: number;
+};
+
+/** Per-phase totals across all groups of a class (for the deadlines screen). */
+export function phaseTotals(rows: { phases: PhaseInfo[] }[]): PhaseTotals[] {
+  return [1, 2, 3, 4].map((phase) => {
+    const t: PhaseTotals = { phase, onTime: 0, deliveredLate: 0, openLate: 0, pending: 0, days: 0, penalty: 0 };
+    for (const r of rows) {
+      const p = r.phases.find((x) => x.phase === phase);
+      if (!p) continue;
+      if (p.state === "delivered") {
+        if (p.daysLate > 0) t.deliveredLate += 1;
+        else t.onTime += 1;
+      } else if (p.daysLate > 0) t.openLate += 1;
+      else if (p.state !== "skipped") t.pending += 1;
+      t.days += p.daysLate;
+      t.penalty += p.penalty;
+    }
+    t.penalty = Math.round(t.penalty * 100) / 100;
+    return t;
+  });
+}
