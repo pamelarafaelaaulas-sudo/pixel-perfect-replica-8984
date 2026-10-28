@@ -79,7 +79,7 @@ function Index() {
               height={900}
               className="relative z-10 h-[440px] w-auto drop-shadow-xl md:h-[520px]"
             />
-            <figcaption className="absolute bottom-0 right-0 z-20 rotate-2 rounded-xl bg-highlight px-4 py-2 font-display text-lg font-semibold text-highlight-foreground shadow-lift">
+            <figcaption className="absolute -bottom-5 right-0 z-20 rotate-2 rounded-xl bg-highlight px-4 py-2 font-display text-lg font-semibold text-highlight-foreground shadow-lift">
               Bem-vindos ao PamLab!
             </figcaption>
           </figure>
