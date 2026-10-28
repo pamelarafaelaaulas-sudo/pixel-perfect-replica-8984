@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, BookOpenText, HelpCircle, Lightbulb, PenLine, Users } from "lucide-react";
+import { ArrowRight, BookOpenText, HelpCircle, Lightbulb, PenLine, Presentation, Users } from "lucide-react";
 import { Brand } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
