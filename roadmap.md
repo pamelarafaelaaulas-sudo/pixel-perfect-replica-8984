@@ -15,4 +15,4 @@
 - [x] 4 bimestres: 1º = Tema até Metodologia, 2º = Introdução até Resumo, 3º = Banner (Canva), 4º = Feira (detalhes depois); atraso desconta só do próprio bimestre
 - [x] Etapa Banner: modelo do Canva da professora, link do Canva + arquivo final, com prazo e desconto
 - [x] Tela "Modelo do banner" no painel: link do Canva, tamanho, seções e orientações por turma, com prévia do que o grupo vê
-- [ ] Exportar em planilha as notas e feedbacks (painel da professora)
+- [x] Exportar em planilha as notas e feedbacks (painel da professora)
