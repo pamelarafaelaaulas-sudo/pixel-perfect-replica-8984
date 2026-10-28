@@ -7,3 +7,4 @@
 - [x] Outras professoras podem se cadastrar com código de convite (cada uma vê só as próprias turmas)
 - [x] Tela de alunos (professora): lista completa com turma, grupo, etapas entregues e atrasos, sem abrir cada grupo
 - [x] Aluno não vê a nota da IA, só as sugestões (a professora continua vendo a nota)
+- [x] Tela por trimestre (professora): todas as turmas com nota lançada, desconto de atraso e total de cada grupo; cada grupo vê só a própria linha
