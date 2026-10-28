@@ -41,8 +41,8 @@ function Cards({
   compact,
 }: {
   phases: PhaseInfo[];
-  active?: number;
-  onSelect?: (phase: number) => void;
+  active?: number | undefined;
+  onSelect?: ((phase: number) => void) | undefined;
   className?: string;
   compact?: boolean;
 }) {

@@ -69,9 +69,11 @@ export function limitLabel(w: WordLimit): string {
 }
 
 /** Problems that block delivering a stage. Empty list = can deliver. */
+const str = (v: unknown) => (typeof v === "string" ? v : "");
+
 export function phaseProblems(
   phase: number,
-  values: Record<string, string>,
+  values: Partial<Record<string, unknown>>,
   articleCount: number,
 ): string[] {
   const problems: string[] = [];
@@ -82,7 +84,7 @@ export function phaseProblems(
   const checkWords = (key: string, label: string) => {
     const lim = WORD_LIMITS[key];
     if (!lim) return;
-    const n = countWords(values[key]);
+    const n = countWords(str(values[key]));
     if (n === 0) problems.push(`Preencha: ${label}.`);
     else if (n < lim.min) problems.push(`${label}: ${n} palavras, o mínimo é ${lim.min}.`);
     else if (lim.max !== null && n > lim.max) problems.push(`${label}: ${n} palavras, o máximo é ${lim.max}.`);
@@ -102,7 +104,7 @@ export function phaseProblems(
       break;
     case 6: {
       checkWords("specific_objectives", "Objetivos específicos");
-      const lines = objectiveLines(values["specific_objectives"]).length;
+      const lines = objectiveLines(str(values["specific_objectives"])).length;
       if (lines > MAX_SPECIFIC_OBJECTIVES)
         problems.push(`São ${lines} objetivos específicos; o máximo é ${MAX_SPECIFIC_OBJECTIVES} (um por linha).`);
       break;
@@ -124,10 +126,10 @@ export function phaseProblems(
       break;
     case 12: {
       checkWords("abstract", "Resumo");
-      const kws = splitKeywords(values["keywords"]);
+      const kws = splitKeywords(str(values["keywords"]));
       if (kws.length < KEYWORDS_MIN || kws.length > KEYWORDS_MAX)
         problems.push(`Palavras-chave: ${kws.length}; use de ${KEYWORDS_MIN} a ${KEYWORDS_MAX}, separadas por ponto e vírgula.`);
-      const repeated = keywordsInTitle(kws, values["title"]);
+      const repeated = keywordsInTitle(kws, str(values["title"]));
       if (repeated.length) problems.push(`Palavras-chave iguais ao título: ${repeated.join(", ")}.`);
       break;
     }
