@@ -38,7 +38,7 @@ function TeacherHome() {
       <PageHeader
         eyebrow="Painel da professora"
         title={`Olá, ${firstName}`}
-        description="Crie uma turma, compartilhe o código com os alunos e acompanhe cada grupo pelas 4 etapas."
+        description="Crie uma turma, compartilhe o código com os alunos e acompanhe cada grupo em todas as etapas."
         actions={
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" asChild>
@@ -60,7 +60,7 @@ function TeacherHome() {
         <EmptyState
           icon={<School className="size-5" />}
           title="Nenhuma turma ainda"
-          text="Crie sua primeira turma. Os prazos das 4 etapas já vêm sugeridos e você pode ajustar depois."
+          text="Crie sua primeira turma. Os prazos de todas as etapas já vêm sugeridos e você pode ajustar depois."
           action={<NewClassDialog />}
         />
       ) : (

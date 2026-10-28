@@ -4,7 +4,7 @@ import { ArrowRight, BookOpenText, HelpCircle, Lightbulb, PenLine, Users } from 
 import { Brand } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { PHASES } from "@/lib/phases";
+import { PHASES, PHASE_COUNT, WRITTEN_START } from "@/lib/phases";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Grupos de até 3 alunos constroem o projeto científico em 4 etapas, com prazos, avaliação entre colegas e notas por trimestre.",
+          "Grupos de até 3 alunos constroem o projeto científico etapa por etapa, com prazos, avaliação entre colegas e notas por trimestre.",
       },
       { property: "og:title", content: "Caderno de Projetos — Projeto científico da turma" },
       {
@@ -67,7 +67,14 @@ function Index() {
           </div>
 
           <ol className="card-paper relative space-y-1 p-6">
-            {PHASES.map((p, i) => {
+            {[
+              ...PHASES.filter((p) => p.number < WRITTEN_START),
+              {
+                number: WRITTEN_START,
+                name: "Projeto escrito",
+                hint: `${PHASE_COUNT - WRITTEN_START + 1} partes com prazo próprio: título, objetivos, metodologia, introdução, resultados, conclusão, referências e, por último, o resumo.`,
+              },
+            ].map((p, i) => {
               const Icon = ICONS[i] ?? Lightbulb;
               return (
                 <li key={p.number} className="flex gap-4 rounded-lg p-3 transition-colors hover:bg-muted">
