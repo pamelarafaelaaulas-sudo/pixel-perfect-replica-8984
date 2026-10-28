@@ -291,6 +291,8 @@ function StudentProjectPage() {
               </div>
             </div>
           )}
+
+          <AiFeedback phaseName={phaseMeta(selected).name} text={phaseText(draft, selected)} />
         </section>
 
         <aside className="space-y-4">
