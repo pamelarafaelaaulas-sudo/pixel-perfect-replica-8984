@@ -18,3 +18,4 @@
 - [x] Exportar em planilha as notas e feedbacks (painel da professora)
 - [x] Nome PamLab, cores roxo/azul/amarelo e caricatura da professora na tela inicial
 - [x] Código de cada projeto: ÁREA-SIGLA DA TURMA-000 (área escolhida ao criar o grupo; número segue a ordem de cadastro no site todo; sigla definida pela professora)
+- [x] Baixar o projeto em Word nas normas ABNT (professora e alunos)

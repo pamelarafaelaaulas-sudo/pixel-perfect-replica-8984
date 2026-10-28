@@ -58,6 +58,7 @@ import { bimesterPenalties, formatPoints, gradeAfterPenalty, projectLateness } f
 import { BannerStage } from "@/components/banner-stage";
 import { bannerBrief } from "@/lib/banner";
 import { ProjectAreaPicker, ProjectCodeTag } from "@/components/project-code";
+import { ProjectDocxButton } from "@/components/project-docx";
 
 export const Route = createFileRoute("/_authenticated/aluno/projeto/$groupId")({
   head: () => ({
@@ -232,13 +233,21 @@ function StudentProjectPage() {
           </span>
         }
         actions={
-          members.length > 1 && (
-            <Button asChild variant="outline">
-              <Link to="/aluno/avaliacao/$groupId" params={{ groupId }}>
-                <Star /> Avaliar colegas
-              </Link>
-            </Button>
-          )
+          <div className="flex flex-wrap gap-2">
+            <ProjectDocxButton
+              project={project}
+              groupName={group.group_name}
+              authors={members.map((m) => m.profiles?.name ?? "").filter(Boolean)}
+              cls={cls}
+            />
+            {members.length > 1 && (
+              <Button asChild variant="outline">
+                <Link to="/aluno/avaliacao/$groupId" params={{ groupId }}>
+                  <Star /> Avaliar colegas
+                </Link>
+              </Button>
+            )}
+          </div>
         }
       />
 
