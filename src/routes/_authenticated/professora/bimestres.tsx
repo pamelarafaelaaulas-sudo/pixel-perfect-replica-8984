@@ -5,36 +5,36 @@ import { PageHeader, EmptyState } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import { teacherTrimesterQuery } from "@/lib/queries";
-import { trimesterReport, type TrimesterClass } from "@/lib/trimester";
-import { TRIMESTERS } from "@/lib/phases";
+import { teacherBimesterQuery } from "@/lib/queries";
+import { bimesterReport, type BimesterClass } from "@/lib/bimester";
+import { BIMESTERS, bimesterMeta } from "@/lib/phases";
 import { formatPoints } from "@/lib/penalty";
 import { plural } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/professora/bimestres")({
   head: () => ({
     meta: [
-      { title: "Notas do trimestre — Caderno de Projetos" },
-      { name: "description", content: "Notas lançadas, desconto de atraso e total de cada grupo, por trimestre." },
-      { property: "og:title", content: "Notas do trimestre — Caderno de Projetos" },
-      { property: "og:description", content: "Notas lançadas, desconto de atraso e total de cada grupo, por trimestre." },
+      { title: "Notas do bimestre — Caderno de Projetos" },
+      { name: "description", content: "Notas lançadas, desconto de atraso e total de cada grupo, nos 4 bimestres." },
+      { property: "og:title", content: "Notas do bimestre — Caderno de Projetos" },
+      { property: "og:description", content: "Notas lançadas, desconto de atraso e total de cada grupo, nos 4 bimestres." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
   }),
   validateSearch: (search: Record<string, unknown>) => {
-    const t = Number(search["t"]);
-    return { t: t === 2 || t === 3 ? t : 1 };
+    const b = Number(search["b"]);
+    return { b: b === 2 || b === 3 || b === 4 ? b : 1 };
   },
-  loader: ({ context }) => context.queryClient.ensureQueryData(teacherTrimesterQuery),
-  component: TrimesterPage,
+  loader: ({ context }) => context.queryClient.ensureQueryData(teacherBimesterQuery),
+  component: BimesterPage,
 });
 
-function TrimesterPage() {
-  const { t } = Route.useSearch();
+function BimesterPage() {
+  const { b } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
-  const { data } = useSuspenseQuery(teacherTrimesterQuery);
-  const report = trimesterReport(data, t);
+  const { data } = useSuspenseQuery(teacherBimesterQuery);
+  const report = bimesterReport(data, b);
 
   return (
     <>
@@ -43,15 +43,19 @@ function TrimesterPage() {
       </Link>
       <PageHeader
         eyebrow="Painel da professora"
-        title={`Notas do ${t}º trimestre`}
-        description="Todas as turmas, com a nota lançada, o desconto de atraso e o total de cada grupo. Cada grupo de alunos vê só a própria linha."
+        title={`Notas do ${b}º bimestre · ${bimesterMeta(b).title}`}
+        description={
+          b === 4
+            ? "Todas as turmas, com a nota da feira de cada grupo. A feira não tem desconto de atraso. Cada grupo de alunos vê só a própria linha."
+            : "Todas as turmas, com a nota lançada, o desconto de atraso das etapas deste bimestre e o total de cada grupo. Cada grupo de alunos vê só a própria linha."
+        }
       />
 
-      <Tabs value={String(t)} onValueChange={(v) => navigate({ search: { t: Number(v) } })} className="mb-6">
-        <TabsList>
-          {TRIMESTERS.map((n) => (
-            <TabsTrigger key={n} value={String(n)}>
-              {n}º trimestre
+      <Tabs value={String(b)} onValueChange={(v) => navigate({ search: { b: Number(v) } })} className="mb-6">
+        <TabsList className="h-auto flex-wrap">
+          {BIMESTERS.map((n) => (
+            <TabsTrigger key={n.number} value={String(n.number)}>
+              {n.number}º bimestre · {n.title}
             </TabsTrigger>
           ))}
         </TabsList>
@@ -70,7 +74,7 @@ function TrimesterPage() {
   );
 }
 
-function ClassTable({ c }: { c: TrimesterClass }) {
+function ClassTable({ c }: { c: BimesterClass }) {
   return (
     <section>
       <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">

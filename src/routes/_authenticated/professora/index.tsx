@@ -47,8 +47,8 @@ function TeacherHome() {
               </Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link to="/professora/trimestres" search={{ t: 1 }}>
-                <ClipboardList /> Notas do trimestre
+              <Link to="/professora/bimestres" search={{ b: 1 }}>
+                <ClipboardList /> Notas do bimestre
               </Link>
             </Button>
             <TeacherInvitesDialog />
