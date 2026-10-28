@@ -48,11 +48,6 @@ function ClassPage() {
   const { data: cls } = useSuspenseQuery(classDetailQuery(classId));
   const qc = useQueryClient();
   const navigate = useNavigate();
-  if (!cls) return null;
-
-  const schedules = [...(cls.schedules ?? [])].sort((a, b) => a.phase_number - b.phase_number);
-  const groups = [...(cls.groups ?? [])].sort((a, b) => a.group_name.localeCompare(b.group_name));
-
   const remove = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from("classes").delete().eq("id", classId);
@@ -65,6 +60,11 @@ function ClassPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  if (!cls) return null;
+
+  const schedules = [...(cls.schedules ?? [])].sort((a, b) => a.phase_number - b.phase_number);
+  const groups = [...(cls.groups ?? [])].sort((a, b) => a.group_name.localeCompare(b.group_name));
 
   return (
     <>
