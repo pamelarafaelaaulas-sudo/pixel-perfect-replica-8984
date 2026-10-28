@@ -29,7 +29,7 @@ import { aiSuggestionsForGroupQuery, groupDetailQuery, meQuery } from "@/lib/que
 import { latestPerPhase } from "@/lib/ai-score";
 import { SOURCE_TYPES, TRIMESTERS, WRITTEN_SECTIONS, parseArticles, type Article, phaseMeta } from "@/lib/phases";
 import { fmtDateTime, whatsappLink } from "@/lib/format";
-import { formatPoints, projectLateness } from "@/lib/penalty";
+import { formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
 
 export const Route = createFileRoute("/_authenticated/aluno/projeto/$groupId")({
   head: () => ({
