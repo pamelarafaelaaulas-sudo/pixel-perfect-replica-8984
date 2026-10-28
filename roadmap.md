@@ -16,3 +16,4 @@
 - [x] Etapa Banner: modelo do Canva da professora, link do Canva + arquivo final, com prazo e desconto
 - [x] Tela "Modelo do banner" no painel: link do Canva, tamanho, seções e orientações por turma, com prévia do que o grupo vê
 - [x] Exportar em planilha as notas e feedbacks (painel da professora)
+- [x] Nome PamLab, cores roxo/azul/amarelo e caricatura da professora na tela inicial

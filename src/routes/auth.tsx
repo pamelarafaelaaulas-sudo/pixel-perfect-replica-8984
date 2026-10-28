@@ -13,9 +13,9 @@ import { lovable } from "@/integrations/lovable";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Entrar — Caderno de Projetos" },
+      { title: "Entrar — PamLab" },
       { name: "description", content: "Entre ou crie sua conta para acessar o projeto científico da turma." },
-      { property: "og:title", content: "Entrar — Caderno de Projetos" },
+      { property: "og:title", content: "Entrar — PamLab" },
       { property: "og:description", content: "Acesse o caderno do seu grupo ou o painel da professora." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

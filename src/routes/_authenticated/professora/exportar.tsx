@@ -16,9 +16,9 @@ import { formatPoints } from "@/lib/penalty";
 export const Route = createFileRoute("/_authenticated/professora/exportar")({
   head: () => ({
     meta: [
-      { title: "Exportar notas — Caderno de Projetos" },
+      { title: "Exportar notas — PamLab" },
       { name: "description", content: "Baixe em planilha as notas, descontos de atraso e feedbacks de cada grupo." },
-      { property: "og:title", content: "Exportar notas — Caderno de Projetos" },
+      { property: "og:title", content: "Exportar notas — PamLab" },
       { property: "og:description", content: "Planilha com notas e feedbacks das turmas." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

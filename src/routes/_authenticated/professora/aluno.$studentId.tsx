@@ -25,12 +25,12 @@ import { studentSummary } from "@/lib/student-review";
 export const Route = createFileRoute("/_authenticated/professora/aluno/$studentId")({
   head: () => ({
     meta: [
-      { title: "Revisão do aluno — Caderno de Projetos" },
+      { title: "Revisão do aluno — PamLab" },
       {
         name: "description",
         content: "Notas por etapa, total e histórico de atrasos de um aluno.",
       },
-      { property: "og:title", content: "Revisão do aluno — Caderno de Projetos" },
+      { property: "og:title", content: "Revisão do aluno — PamLab" },
       {
         property: "og:description",
         content: "Notas por etapa, total e histórico de atrasos de um aluno.",

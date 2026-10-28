@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, BookOpenText, HelpCircle, Lightbulb, PenLine, Presentation, Users } from "lucide-react";
+import { ArrowRight, BookOpenText, FlaskConical, HelpCircle, Lightbulb, PenLine, Presentation, Users } from "lucide-react";
+import caricature from "@/assets/pamela-caricatura.png";
 import { Brand } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,16 +10,16 @@ import { PHASES, WRITTEN_END, WRITTEN_START } from "@/lib/phases";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Caderno de Projetos — Projeto científico da turma" },
+      { title: "PamLab — Projeto científico da turma" },
       {
         name: "description",
         content:
           "Grupos de até 3 alunos constroem o projeto científico etapa por etapa, com prazos, banner no Canva, feira, avaliação entre colegas e notas nos 4 bimestres.",
       },
-      { property: "og:title", content: "Caderno de Projetos — Projeto científico da turma" },
+      { property: "og:title", content: "PamLab — Projeto científico da turma" },
       {
         property: "og:description",
-        content: "Tema, artigos, pergunta norteadora e projeto escrito — tudo num só caderno.",
+        content: "Tema, artigos, pergunta norteadora, projeto escrito, banner e feira — tudo no PamLab.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -45,10 +46,10 @@ function Index() {
       </header>
 
       <main className="mx-auto max-w-6xl px-6 pb-24">
-        <section className="grid gap-12 pt-10 md:grid-cols-[1.2fr_1fr] md:items-center md:pt-20">
+        <section className="grid gap-10 pt-10 md:grid-cols-[1.25fr_1fr] md:items-center md:pt-16">
           <div>
-            <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              Projeto científico escolar
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 font-mono text-xs uppercase tracking-[0.2em] text-secondary-foreground">
+              <FlaskConical className="size-3.5" /> Projeto científico escolar
             </p>
             <h1 className="text-5xl font-semibold leading-[1.05] text-foreground md:text-6xl">
               Da curiosidade à <span className="marker">pergunta científica</span>, em grupo.
@@ -61,13 +62,32 @@ function Index() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
                 <Link to={signedIn ? "/painel" : "/auth"}>
-                  {signedIn ? "Abrir meu caderno" : "Começar agora"} <ArrowRight />
+                  {signedIn ? "Abrir o PamLab" : "Começar agora"} <ArrowRight />
                 </Link>
               </Button>
             </div>
           </div>
 
-          <ol className="card-paper relative space-y-1 p-6">
+          <figure className="relative mx-auto flex w-full max-w-sm justify-center md:max-w-none">
+            <div aria-hidden className="absolute bottom-6 left-1/2 size-72 -translate-x-1/2 rounded-full bg-brand-gradient opacity-90 md:size-80" />
+            <div aria-hidden className="absolute bottom-48 left-[12%] size-20 rounded-full bg-highlight md:left-[16%]" />
+            <div aria-hidden className="absolute right-[14%] top-10 size-10 rounded-full border-4 border-info" />
+            <img
+              src={caricature}
+              alt="Caricatura da professora Pâmela segurando um troféu e usando medalhas"
+              width={270}
+              height={900}
+              className="relative z-10 h-[440px] w-auto drop-shadow-xl md:h-[520px]"
+            />
+            <figcaption className="absolute -bottom-5 right-0 z-20 rotate-2 rounded-xl bg-highlight px-4 py-2 font-display text-lg font-semibold text-highlight-foreground shadow-lift">
+              Bem-vindos ao PamLab!
+            </figcaption>
+          </figure>
+        </section>
+
+        <section className="mt-20">
+          <h2 className="mb-4 text-3xl font-semibold">O caminho do projeto</h2>
+          <ol className="card-paper relative grid gap-1 p-6 md:grid-cols-2">
             {[
               ...PHASES.filter((p) => p.number < WRITTEN_START),
               {
@@ -112,9 +132,16 @@ function Index() {
               title: "Avaliação entre colegas",
               text: "Confidencial: só quem avaliou e a professora conseguem ver.",
             },
-          ].map(({ icon: Icon, title, text }) => (
+          ].map(({ icon: Icon, title, text }, i) => (
             <div key={title} className="card-paper p-6">
-              <Icon className="size-5 text-primary" />
+              <span
+                className={[
+                  "grid size-10 place-items-center rounded-full",
+                  ["bg-primary text-primary-foreground", "bg-info text-info-foreground", "bg-highlight text-highlight-foreground"][i % 3],
+                ].join(" ")}
+              >
+                <Icon className="size-5" />
+              </span>
               <h3 className="mt-3 text-xl font-semibold">{title}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{text}</p>
             </div>

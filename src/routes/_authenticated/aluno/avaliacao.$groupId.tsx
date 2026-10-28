@@ -15,9 +15,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/aluno/avaliacao/$groupId")({
   head: () => ({
     meta: [
-      { title: "Avaliar colegas — Caderno de Projetos" },
+      { title: "Avaliar colegas — PamLab" },
       { name: "description", content: "Avaliação confidencial da colaboração dos colegas de grupo." },
-      { property: "og:title", content: "Avaliar colegas — Caderno de Projetos" },
+      { property: "og:title", content: "Avaliar colegas — PamLab" },
       { property: "og:description", content: "Avaliação confidencial da colaboração dos colegas de grupo." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

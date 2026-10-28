@@ -29,9 +29,9 @@ import { isCanvaUrl } from "@/lib/phase-rules";
 export const Route = createFileRoute("/_authenticated/professora/turma/$classId")({
   head: () => ({
     meta: [
-      { title: "Turma — Caderno de Projetos" },
+      { title: "Turma — PamLab" },
       { name: "description", content: "Prazos, grupos e notas da turma." },
-      { property: "og:title", content: "Turma — Caderno de Projetos" },
+      { property: "og:title", content: "Turma — PamLab" },
       { property: "og:description", content: "Prazos, grupos e notas da turma." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

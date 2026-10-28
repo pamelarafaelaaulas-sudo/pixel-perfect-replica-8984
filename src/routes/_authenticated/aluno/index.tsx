@@ -16,9 +16,9 @@ import { fmtAgo } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/aluno/")({
   head: () => ({
     meta: [
-      { title: "Meus projetos — Caderno de Projetos" },
+      { title: "Meus projetos — PamLab" },
       { name: "description", content: "Entre na turma pelo código e trabalhe no projeto do seu grupo." },
-      { property: "og:title", content: "Meus projetos — Caderno de Projetos" },
+      { property: "og:title", content: "Meus projetos — PamLab" },
       { property: "og:description", content: "Entre na turma pelo código e trabalhe no projeto do seu grupo." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
