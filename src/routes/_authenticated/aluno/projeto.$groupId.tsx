@@ -41,7 +41,16 @@ import {
   type Article,
   type TextFieldKey,
 } from "@/lib/phases";
-import { CITATION_FIELDS, WORD_LIMITS, countWords, limitLabel, objectiveLines, phaseProblems, splitKeywords } from "@/lib/phase-rules";
+import {
+  CITATION_FIELDS,
+  WORD_LIMITS,
+  countWords,
+  limitLabel,
+  objectiveLines,
+  phaseProblems,
+  referenceCheck,
+  splitKeywords,
+} from "@/lib/phase-rules";
 import { CITATION_EXAMPLES, checkCitations } from "@/lib/citations";
 import { fmtDateTime, whatsappLink } from "@/lib/format";
 import { formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
