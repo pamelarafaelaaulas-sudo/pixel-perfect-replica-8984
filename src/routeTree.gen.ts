@@ -16,6 +16,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAlunoRouteRouteImport } from './routes/_authenticated/aluno/route'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedProfessoraRouteRouteImport } from './routes/_authenticated/professora/route'
+import { Route as AuthenticatedProfessoraIndexRouteImport } from './routes/_authenticated/professora/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,22 +53,29 @@ const AuthenticatedProfessoraRouteRoute =
     path: '/professora',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProfessoraIndexRoute =
+  AuthenticatedProfessoraIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedProfessoraRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/aluno': typeof AuthenticatedAlunoRouteRoute
-  '/professora': typeof AuthenticatedProfessoraRouteRoute
+  '/professora': typeof AuthenticatedProfessoraRouteRouteWithChildren
   '/painel': typeof AuthenticatedPainelRoute
+  '/professora/': typeof AuthenticatedProfessoraIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/aluno': typeof AuthenticatedAlunoRouteRoute
-  '/professora': typeof AuthenticatedProfessoraRouteRoute
   '/painel': typeof AuthenticatedPainelRoute
+  '/professora': typeof AuthenticatedProfessoraIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -76,15 +84,22 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/aluno': typeof AuthenticatedAlunoRouteRoute
-  '/_authenticated/professora': typeof AuthenticatedProfessoraRouteRoute
+  '/_authenticated/professora': typeof AuthenticatedProfessoraRouteRouteWithChildren
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
+  '/_authenticated/professora/': typeof AuthenticatedProfessoraIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/reset-password' | '/aluno' | '/professora' | '/painel'
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/aluno'
+    | '/professora'
+    | '/painel'
+    | '/professora/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/reset-password' | '/aluno' | '/professora' | '/painel'
+  to: '/' | '/auth' | '/reset-password' | '/aluno' | '/painel' | '/professora'
   id:
     | '__root__'
     | '/'
@@ -94,6 +109,7 @@ export interface FileRouteTypes {
     | '/_authenticated/aluno'
     | '/_authenticated/professora'
     | '/_authenticated/painel'
+    | '/_authenticated/professora/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -154,18 +170,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfessoraRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/professora/': {
+      id: '/_authenticated/professora/'
+      path: '/'
+      fullPath: '/professora/'
+      preLoaderRoute: typeof AuthenticatedProfessoraIndexRouteImport
+      parentRoute: typeof AuthenticatedProfessoraRouteRoute
+    }
   }
 }
 
+interface AuthenticatedProfessoraRouteRouteChildren {
+  AuthenticatedProfessoraIndexRoute: typeof AuthenticatedProfessoraIndexRoute
+}
+
+const AuthenticatedProfessoraRouteRouteChildren: AuthenticatedProfessoraRouteRouteChildren =
+  {
+    AuthenticatedProfessoraIndexRoute: AuthenticatedProfessoraIndexRoute,
+  }
+
+const AuthenticatedProfessoraRouteRouteWithChildren =
+  AuthenticatedProfessoraRouteRoute._addFileChildren(
+    AuthenticatedProfessoraRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAlunoRouteRoute: typeof AuthenticatedAlunoRouteRoute
-  AuthenticatedProfessoraRouteRoute: typeof AuthenticatedProfessoraRouteRoute
+  AuthenticatedProfessoraRouteRoute: typeof AuthenticatedProfessoraRouteRouteWithChildren
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAlunoRouteRoute: AuthenticatedAlunoRouteRoute,
-  AuthenticatedProfessoraRouteRoute: AuthenticatedProfessoraRouteRoute,
+  AuthenticatedProfessoraRouteRoute:
+    AuthenticatedProfessoraRouteRouteWithChildren,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
 }
 
