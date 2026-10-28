@@ -19,7 +19,10 @@ export function BannerFileLink({ path, name }: { path: string; name: string | nu
     setBusy(true);
     const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, 60 * 10);
     setBusy(false);
-    if (error || !data) return toast.error("Não foi possível abrir o arquivo do banner.");
+    if (error || !data) {
+      toast.error("Não foi possível abrir o arquivo do banner.");
+      return;
+    }
     window.open(data.signedUrl, "_blank", "noopener");
   }
   return (
@@ -39,7 +42,8 @@ export function BannerView({
   filePath: string | null;
   fileName: string | null;
 }) {
-  if (!canvaUrl && !filePath) return <p className="text-sm italic text-muted-foreground">Ainda não enviado.</p>;
+  if (!canvaUrl && !filePath)
+    return <p className="text-sm italic text-muted-foreground">Ainda não enviado.</p>;
   return (
     <div className="flex flex-wrap items-center gap-3">
       {canvaUrl && (
@@ -85,30 +89,53 @@ export function BannerStage({
   async function logContribution(section: string, chars: number) {
     await supabase
       .from("project_contributions")
-      .insert({ project_id: projectId, student_id: studentId, section_name: section, char_count_added: chars });
+      .insert({
+        project_id: projectId,
+        student_id: studentId,
+        section_name: section,
+        char_count_added: chars,
+      });
   }
 
   async function saveLink() {
     setSavingLink(true);
     const value = link.trim() || null;
-    const { error } = await supabase.from("projects").update({ banner_canva_url: value }).eq("id", projectId);
+    const { error } = await supabase
+      .from("projects")
+      .update({ banner_canva_url: value })
+      .eq("id", projectId);
     setSavingLink(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     await logContribution("banner_canva_url", value?.length ?? 0);
     toast.success("Link do Canva salvo");
     qc.invalidateQueries({ queryKey: ["group", groupId] });
   }
 
   async function upload(file: File) {
-    if (!ACCEPT.split(",").includes(file.type)) return toast.error("Envie o banner em PDF, PNG ou JPG.");
-    if (file.size > MAX_BYTES) return toast.error("O arquivo passa de 25 MB. Exporte com qualidade menor.");
+    if (!ACCEPT.split(",").includes(file.type)) {
+      toast.error("Envie o banner em PDF, PNG ou JPG.");
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      toast.error("O arquivo passa de 25 MB. Exporte com qualidade menor.");
+      return;
+    }
     setUploading(true);
-    const safe = file.name.normalize("NFD").replace(/[^\w.-]+/g, "_").slice(-80);
+    const safe = file.name
+      .normalize("NFD")
+      .replace(/[^\w.-]+/g, "_")
+      .slice(-80);
     const path = `${groupId}/${Date.now()}-${safe}`;
     const up = await supabase.storage.from(BUCKET).upload(path, file, { contentType: file.type });
     if (up.error) {
       setUploading(false);
-      return toast.error(up.error.message);
+      {
+        toast.error(up.error.message);
+        return;
+      }
     }
     const { error } = await supabase
       .from("projects")
@@ -117,7 +144,10 @@ export function BannerStage({
     if (error) {
       await supabase.storage.from(BUCKET).remove([path]);
       setUploading(false);
-      return toast.error(error.message);
+      {
+        toast.error(error.message);
+        return;
+      }
     }
     if (filePath) await supabase.storage.from(BUCKET).remove([filePath]);
     await logContribution("banner_file_path", file.size > 0 ? 1000 : 0);
@@ -142,7 +172,9 @@ export function BannerStage({
             </Button>
           </>
         ) : (
-          <p className="mt-1 text-muted-foreground">A professora ainda não colocou o modelo do banner.</p>
+          <p className="mt-1 text-muted-foreground">
+            A professora ainda não colocou o modelo do banner.
+          </p>
         )}
       </div>
 
@@ -157,7 +189,12 @@ export function BannerStage({
             onChange={(e) => setLink(e.target.value)}
           />
           {editable && (
-            <Button type="button" variant="outline" onClick={saveLink} disabled={!linkDirty || linkInvalid || savingLink}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={saveLink}
+              disabled={!linkDirty || linkInvalid || savingLink}
+            >
               {savingLink ? <Loader2 className="animate-spin" /> : <Save />} Salvar link
             </Button>
           )}
@@ -191,13 +228,21 @@ export function BannerStage({
                   if (f) void upload(f);
                 }}
               />
-              <Button type="button" variant="secondary" onClick={() => fileInput.current?.click()} disabled={uploading}>
-                {uploading ? <Loader2 className="animate-spin" /> : <FileUp />} {filePath ? "Trocar arquivo" : "Enviar arquivo"}
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => fileInput.current?.click()}
+                disabled={uploading}
+              >
+                {uploading ? <Loader2 className="animate-spin" /> : <FileUp />}{" "}
+                {filePath ? "Trocar arquivo" : "Enviar arquivo"}
               </Button>
             </>
           )}
         </div>
-        <p className="text-xs text-muted-foreground">No Canva: Compartilhar → Baixar → PDF para impressão (ou PNG/JPG). Até 25 MB.</p>
+        <p className="text-xs text-muted-foreground">
+          No Canva: Compartilhar → Baixar → PDF para impressão (ou PNG/JPG). Até 25 MB.
+        </p>
       </div>
     </div>
   );
