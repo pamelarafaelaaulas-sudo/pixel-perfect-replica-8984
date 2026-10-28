@@ -25,7 +25,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { groupDetailQuery, meQuery } from "@/lib/queries";
-import { PHASES, SOURCE_TYPES, TRIMESTERS, WRITTEN_SECTIONS, parseArticles, type Article, phaseMeta } from "@/lib/phases";
+import { SOURCE_TYPES, TRIMESTERS, WRITTEN_SECTIONS, parseArticles, type Article, phaseMeta } from "@/lib/phases";
 import { fmtDateTime, whatsappLink } from "@/lib/format";
 import { formatPoints, projectLateness } from "@/lib/penalty";
 
