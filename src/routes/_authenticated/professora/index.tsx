@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { meQuery, teacherClassesQuery } from "@/lib/queries";
 import { plural } from "@/lib/format";
 import { TeacherInvitesDialog } from "@/components/teacher-invites";
+import { normalizeClassLabel } from "@/lib/project-code";
 
 export const Route = createFileRoute("/_authenticated/professora/")({
   head: () => ({
@@ -114,10 +115,11 @@ function NewClassDialog() {
   const qc = useQueryClient();
   const { data: me } = useSuspenseQuery(meQuery);
   const create = useMutation({
-    mutationFn: async (v: { name: string; penalty: number }) => {
+    mutationFn: async (v: { name: string; label: string; penalty: number }) => {
+      if (!v.label) throw new Error("Escreva a sigla da turma");
       const { error } = await supabase
         .from("classes")
-        .insert({ name: v.name, late_penalty_per_day: v.penalty, teacher_id: me!.id });
+        .insert({ name: v.name, code_label: v.label, late_penalty_per_day: v.penalty, teacher_id: me!.id });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -133,6 +135,7 @@ function NewClassDialog() {
     const f = new FormData(e.currentTarget);
     create.mutate({
       name: String(f.get("name")).trim(),
+      label: normalizeClassLabel(String(f.get("label") ?? "")),
       penalty: Number(String(f.get("penalty")).replace(",", ".")) || 0,
     });
   }
@@ -152,6 +155,19 @@ function NewClassDialog() {
           <div className="space-y-2">
             <Label htmlFor="name">Nome da turma</Label>
             <Input id="name" name="name" placeholder="Ex.: 2º ano B — 2026" required />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="label">Sigla da turma (para o código dos projetos)</Label>
+            <Input
+              id="label"
+              name="label"
+              placeholder="Ex.: 2B"
+              maxLength={8}
+              className="font-mono uppercase tracking-widest"
+              onChange={(e) => (e.currentTarget.value = normalizeClassLabel(e.currentTarget.value))}
+              required
+            />
+            <p className="text-xs text-muted-foreground">Os projetos ficam assim: BIO-2B-001.</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="penalty">Desconto por dia de atraso (pontos)</Label>

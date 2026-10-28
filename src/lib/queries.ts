@@ -59,7 +59,7 @@ export const classDetailQuery = (classId: string) =>
           groups!groups_class_id_fkey(
             id, group_name, created_at,
             group_members(id, student_id, whatsapp, profiles(name)),
-            projects(id, current_phase, updated_at, phase_submissions(phase_number, submitted_at)),
+            projects(id, current_phase, updated_at, area_code, project_seq, phase_submissions(phase_number, submitted_at)),
             grades(trimester, score)
           )`,
         )
@@ -78,7 +78,7 @@ export const groupDetailQuery = (groupId: string) =>
         .from("groups")
         .select(
           `*,
-          classes!groups_class_id_fkey(id, name, class_code, late_penalty_per_day, banner_template_url, banner_size, banner_sections, banner_instructions, schedules(*)),
+          classes!groups_class_id_fkey(id, name, class_code, code_label, late_penalty_per_day, banner_template_url, banner_size, banner_sections, banner_instructions, schedules(*)),
           group_members(id, student_id, whatsapp, profiles(name, email)),
           projects(*, phase_submissions(*), project_contributions(*)),
           grades(*)`,
@@ -115,9 +115,9 @@ export const myGroupsQuery = (userId: string) =>
         .select(
           `id, group_id,
           groups(id, group_name,
-            classes!groups_class_id_fkey(id, name, class_code),
+            classes!groups_class_id_fkey(id, name, class_code, code_label),
             group_members(id),
-            projects(id, current_phase, updated_at)
+            projects(id, current_phase, updated_at, area_code, project_seq)
           )`,
         )
         .eq("student_id", userId)
@@ -294,12 +294,12 @@ export const teacherExportQuery = queryOptions({
       supabase
         .from("classes")
         .select(
-          `id, name, late_penalty_per_day,
+          `id, name, code_label, late_penalty_per_day,
           schedules(phase_number, due_date),
           groups!groups_class_id_fkey(
             id, group_name,
             group_members(student_id, profiles(name)),
-            projects(current_phase, phase_submissions(phase_number, submitted_at)),
+            projects(current_phase, area_code, project_seq, phase_submissions(phase_number, submitted_at)),
             grades(trimester, score, feedback, is_reference_ten, created_at)
           )`,
         )

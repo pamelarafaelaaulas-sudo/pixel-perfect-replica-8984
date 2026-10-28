@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { ArrowLeft, CalendarClock, Copy, Trash2, Users, ArrowRight, Timer, Palette, ExternalLink } from "lucide-react";
+import { ArrowLeft, CalendarClock, Copy, Trash2, Users, ArrowRight, Timer, Palette, ExternalLink, Hash } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,8 @@ import { BIMESTER_NUMBERS, phaseMeta } from "@/lib/phases";
 import { endOfDayFromInput, fmtAgo, toDateInput } from "@/lib/format";
 import { formatPoints, projectLateness } from "@/lib/penalty";
 import { isCanvaUrl } from "@/lib/phase-rules";
+import { normalizeClassLabel } from "@/lib/project-code";
+import { ProjectCodeTag } from "@/components/project-code";
 
 export const Route = createFileRoute("/_authenticated/professora/turma/$classId")({
   head: () => ({
@@ -122,6 +124,7 @@ function ClassPage() {
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.6fr]">
         <div className="space-y-6">
+          <ClassLabelCard key={cls.code_label ?? ""} classId={classId} current={cls.code_label} />
           <ScheduleCard classId={classId} schedules={schedules} penalty={Number(cls.late_penalty_per_day)} />
           <BannerTemplateCard key={cls.banner_template_url ?? ""} classId={classId} current={cls.banner_template_url} />
         </div>
@@ -156,7 +159,11 @@ function ClassPage() {
                       className="group flex flex-wrap items-center gap-4 rounded-lg px-2 py-4 transition-colors hover:bg-muted"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="font-medium text-foreground">{g.group_name}</p>
+                        <div className="flex flex-wrap items-center gap-2 font-medium text-foreground">
+                          {g.group_name}
+                          <ProjectCodeTag area={project?.area_code} classLabel={cls.code_label} seq={project?.project_seq} />
+                          {project && !project.area_code && <Badge variant="warning">Sem área</Badge>}
+                        </div>
                         <p className="truncate text-sm text-muted-foreground">
                           {(g.group_members ?? []).map((m) => m.profiles?.name).join(", ") || "Sem integrantes"}
                         </p>
@@ -291,6 +298,53 @@ function BannerTemplateCard({ classId, current }: { classId: string; current: st
           </a>
         )}
       </div>
+    </section>
+  );
+}
+
+function ClassLabelCard({ classId, current }: { classId: string; current: string | null }) {
+  const qc = useQueryClient();
+  const [label, setLabel] = useState(current ?? "");
+  const save = useMutation({
+    mutationFn: async () => {
+      if (!label) throw new Error("Escreva a sigla da turma");
+      const { error } = await supabase.from("classes").update({ code_label: label }).eq("id", classId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Sigla salva");
+      qc.invalidateQueries({ queryKey: ["class", classId] });
+      qc.invalidateQueries({ queryKey: ["teacher"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  return (
+    <section className="card-paper p-6">
+      <h2 className="mb-1 flex items-center gap-2 text-xl font-semibold">
+        <Hash className="size-5 text-primary" /> Sigla da turma
+      </h2>
+      <p className="mb-4 text-sm text-muted-foreground">
+        Entra no meio do código de cada projeto: ÁREA-<strong className="text-foreground">{label || "SIGLA"}</strong>-001.
+      </p>
+      <form
+        className="flex gap-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          save.mutate();
+        }}
+      >
+        <Input
+          value={label}
+          onChange={(e) => setLabel(normalizeClassLabel(e.target.value))}
+          placeholder="Ex.: 2B"
+          aria-label="Sigla da turma"
+          className="font-mono uppercase tracking-widest"
+        />
+        <Button variant="outline" disabled={save.isPending || label === (current ?? "")}>
+          Salvar
+        </Button>
+      </form>
+      {!current && <p className="mt-2 text-xs text-warning">Sem sigla, os códigos aparecem com “???”.</p>}
     </section>
   );
 }

@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { meQuery, myGroupsQuery } from "@/lib/queries";
 import { PHASES, phaseMeta } from "@/lib/phases";
 import { fmtAgo } from "@/lib/format";
+import { AreaSelect, ProjectCodeTag } from "@/components/project-code";
 
 export const Route = createFileRoute("/_authenticated/aluno/")({
   head: () => ({
@@ -67,7 +68,10 @@ function StudentHome() {
                     </span>
                     <Badge variant="secondary">{g.group_members?.length ?? 0}/3 integrantes</Badge>
                   </div>
-                  <h2 className="text-2xl font-semibold">{g.group_name}</h2>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-2xl font-semibold">{g.group_name}</h2>
+                    <ProjectCodeTag area={g.projects?.area_code} classLabel={g.classes?.code_label} seq={g.projects?.project_seq} />
+                  </div>
                   <div className="flex gap-1.5">
                     {PHASES.map((p) => (
                       <span
@@ -117,6 +121,7 @@ function JoinClass({ defaultWhatsapp }: { defaultWhatsapp: string }) {
   const [groups, setGroups] = useState<ClassGroup[]>([]);
   const [whatsapp, setWhatsapp] = useState(defaultWhatsapp);
   const [newName, setNewName] = useState("");
+  const [area, setArea] = useState("");
   const [busy, setBusy] = useState(false);
 
   async function lookup(e: FormEvent) {
@@ -167,6 +172,7 @@ function JoinClass({ defaultWhatsapp }: { defaultWhatsapp: string }) {
         _code: code,
         _group_name: newName,
         _whatsapp: whatsapp,
+        _area: area,
       });
       if (error) throw error;
       return data;
@@ -250,13 +256,20 @@ function JoinClass({ defaultWhatsapp }: { defaultWhatsapp: string }) {
             className="space-y-2"
           >
             <Label htmlFor="gname">Ou crie um grupo novo</Label>
+            <Input id="gname" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Nome do grupo" required />
             <div className="flex gap-2">
-              <Input id="gname" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Nome do grupo" required />
-              <Button variant="highlight" disabled={!whatsapp.trim() || create.isPending}>
+              <AreaSelect value={area} onChange={setArea} className="flex-1" />
+              <Button variant="highlight" disabled={!whatsapp.trim() || !area || create.isPending}>
                 <Plus /> Criar
               </Button>
             </div>
-            {!whatsapp.trim() && <p className="text-xs text-muted-foreground">Preencha seu WhatsApp para continuar.</p>}
+            <p className="text-xs text-muted-foreground">
+              {!whatsapp.trim()
+                ? "Preencha seu WhatsApp para continuar."
+                : !area
+                  ? "Escolha a área do projeto: ela forma o código do projeto."
+                  : "A área não pode ser trocada depois (só a professora muda)."}
+            </p>
           </form>
         </div>
       )}

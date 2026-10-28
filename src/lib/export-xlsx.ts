@@ -33,6 +33,7 @@ export async function buildWorkbook(rows: Rows, title: string): Promise<Blob> {
   const grades = sheet("Notas", [
     { header: "Turma", key: "className", width: 18 },
     { header: "Grupo", key: "groupName", width: 22 },
+    { header: "Código do projeto", key: "projectCode", width: 16 },
     { header: "Integrantes", key: "members", width: 32, wrap: true },
     { header: "Bimestre", key: "bimester", width: 34 },
     { header: "Nota lançada (0–10)", key: "score", width: 12, fmt: "0.0" },
@@ -47,7 +48,7 @@ export async function buildWorkbook(rows: Rows, title: string): Promise<Blob> {
     grades.addRow({
       ...r,
       score: r.score ?? null,
-      total: { formula: `IF(E${n}="","",MAX(0,E${n}-F${n}))`, result: r.total ?? "" },
+      total: { formula: `IF(F${n}="","",MAX(0,F${n}-G${n}))`, result: r.total ?? "" },
       launchedAt: r.launchedAt ?? null,
     });
   });

@@ -85,6 +85,7 @@ export type Database = {
           banner_size: string | null
           banner_template_url: string | null
           class_code: string
+          code_label: string | null
           created_at: string
           id: string
           late_penalty_per_day: number
@@ -97,6 +98,7 @@ export type Database = {
           banner_size?: string | null
           banner_template_url?: string | null
           class_code?: string
+          code_label?: string | null
           created_at?: string
           id?: string
           late_penalty_per_day?: number
@@ -109,6 +111,7 @@ export type Database = {
           banner_size?: string | null
           banner_template_url?: string | null
           class_code?: string
+          code_label?: string | null
           created_at?: string
           id?: string
           late_penalty_per_day?: number
@@ -404,6 +407,7 @@ export type Database = {
       projects: {
         Row: {
           abstract: string | null
+          area_code: string | null
           area_subarea: string | null
           banner_canva_url: string | null
           banner_file_name: string | null
@@ -418,6 +422,7 @@ export type Database = {
           introduction: string | null
           keywords: string | null
           methodology: string | null
+          project_seq: number | null
           references_list: string | null
           results_discussion: string | null
           scientific_articles: Json
@@ -428,6 +433,7 @@ export type Database = {
         }
         Insert: {
           abstract?: string | null
+          area_code?: string | null
           area_subarea?: string | null
           banner_canva_url?: string | null
           banner_file_name?: string | null
@@ -442,6 +448,7 @@ export type Database = {
           introduction?: string | null
           keywords?: string | null
           methodology?: string | null
+          project_seq?: number | null
           references_list?: string | null
           results_discussion?: string | null
           scientific_articles?: Json
@@ -452,6 +459,7 @@ export type Database = {
         }
         Update: {
           abstract?: string | null
+          area_code?: string | null
           area_subarea?: string | null
           banner_canva_url?: string | null
           banner_file_name?: string | null
@@ -466,6 +474,7 @@ export type Database = {
           introduction?: string | null
           keywords?: string | null
           methodology?: string | null
+          project_seq?: number | null
           references_list?: string | null
           results_discussion?: string | null
           scientific_articles?: Json
@@ -591,7 +600,12 @@ export type Database = {
         Returns: boolean
       }
       create_group: {
-        Args: { _code: string; _group_name: string; _whatsapp: string }
+        Args: {
+          _area: string
+          _code: string
+          _group_name: string
+          _whatsapp: string
+        }
         Returns: string
       }
       find_class: {
