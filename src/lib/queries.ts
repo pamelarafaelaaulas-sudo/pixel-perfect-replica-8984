@@ -322,3 +322,27 @@ export const teacherExportQuery = queryOptions({
     return { classes: classes.data ?? [], ai: ai.data ?? [], peers: peers.data ?? [] };
   },
 });
+
+/* ---------------- Teacher: each group's banner ---------------- */
+
+export const classBannersQuery = (classId: string) =>
+  queryOptions({
+    queryKey: ["teacher", "banners", classId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("groups")
+        .select(
+          `id, group_name,
+          projects(
+            id, area_code, project_seq, banner_canva_url, banner_file_path, banner_file_name,
+            phase_submissions(phase_number, submitted_at),
+            project_contributions(section_name, edited_at, profiles(name)),
+            banner_drive_files(drive_file_id, synced_at)
+          )`,
+        )
+        .eq("class_id", classId)
+        .order("created_at", { ascending: true });
+      fail(error);
+      return data ?? [];
+    },
+  });
