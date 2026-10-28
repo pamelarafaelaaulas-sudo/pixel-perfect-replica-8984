@@ -1,6 +1,6 @@
 import { Check, Clock, Lock, AlertTriangle, SkipForward } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { isWrittenPart, phaseMeta } from "@/lib/phases";
+import { BANNER_PHASE, isWrittenPart, phaseMeta } from "@/lib/phases";
 import { fmtDate } from "@/lib/format";
 import { formatPoints, type PhaseInfo } from "@/lib/penalty";
 
@@ -13,8 +13,9 @@ export function PhaseTimeline({
   active?: number;
   onSelect?: (phase: number) => void;
 }) {
-  const planning = phases.filter((p) => !isWrittenPart(p.phase));
+  const planning = phases.filter((p) => p.phase < BANNER_PHASE && !isWrittenPart(p.phase));
   const written = phases.filter((p) => isWrittenPart(p.phase));
+  const banner = phases.filter((p) => p.phase >= BANNER_PHASE);
   return (
     <div className="space-y-4">
       <div>
@@ -27,6 +28,14 @@ export function PhaseTimeline({
             Projeto escrito · {written.length} partes, cada uma com seu prazo
           </p>
           <Cards phases={written} active={active} onSelect={onSelect} className="sm:grid-cols-3 lg:grid-cols-5" compact />
+        </div>
+      )}
+      {banner.length > 0 && (
+        <div>
+          <p className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+            3º bimestre · Banner no Canva
+          </p>
+          <Cards phases={banner} active={active} onSelect={onSelect} className="sm:grid-cols-3" />
         </div>
       )}
     </div>

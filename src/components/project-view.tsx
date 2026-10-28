@@ -1,6 +1,7 @@
 import { ExternalLink } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { PHASES, parseArticles } from "@/lib/phases";
+import { BannerView } from "@/components/banner-stage";
 
 type Project = Database["public"]["Tables"]["projects"]["Row"];
 
@@ -75,6 +76,9 @@ export function ProjectView({ project }: { project: Project }) {
           <Part title="Conclusão" value={project.conclusion} />
           <Part title="Referências" value={project.references_list} />
         </div>
+      </Section>
+      <Section n={5} title="Banner">
+        <BannerView canvaUrl={project.banner_canva_url} filePath={project.banner_file_path} fileName={project.banner_file_name} />
       </Section>
     </div>
   );
