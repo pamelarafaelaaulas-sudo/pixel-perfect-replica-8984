@@ -36,7 +36,7 @@ function StudentHome() {
 
   return (
     <>
-      <PageHeader
+      <PageHeader mascot
         eyebrow="Área do aluno"
         title={`Olá, ${firstName}`}
         description="Aqui ficam os projetos dos seus grupos. Para entrar numa turma nova, use o código que a professora passou."
