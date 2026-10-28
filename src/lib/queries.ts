@@ -159,6 +159,17 @@ export const aiEvaluationsForGroupQuery = (groupId: string) =>
     },
   });
 
+/** Student view: AI suggestions only — scores are never sent to students. */
+export const aiSuggestionsForGroupQuery = (groupId: string) =>
+  queryOptions({
+    queryKey: ["ai", "group", groupId, "suggestions"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("group_ai_suggestions", { _group_id: groupId });
+      fail(error);
+      return (data ?? []).map((r) => parseSavedEvaluation({ ...r, overall: 0, evaluated_text: "" }));
+    },
+  });
+
 /* ---------------- Teacher: per-student review ---------------- */
 
 async function fetchStudentReview(studentId: string) {

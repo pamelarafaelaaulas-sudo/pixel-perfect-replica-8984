@@ -77,6 +77,31 @@ export function AiEvaluationView({ evaluation, showTips = true }: { evaluation: 
   );
 }
 
+/** Student view: written suggestions only, no grades. */
+export function AiSuggestionsView({ evaluation }: { evaluation: AiEvaluation }) {
+  const comments = evaluation.criteria.filter((c) => c.comment);
+  return (
+    <div className="space-y-5 text-sm">
+      {evaluation.summary && <p className="text-foreground">{evaluation.summary}</p>}
+      {comments.length > 0 && (
+        <ul className="grid gap-3 sm:grid-cols-2">
+          {comments.map((c) => (
+            <li key={c.key} className="card-paper p-3">
+              <span className="font-medium text-foreground">{c.label}</span>
+              <p className="mt-1 text-xs text-muted-foreground">{c.comment}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="space-y-4">
+        <TipList title="Dicas de clareza" tips={evaluation.tips.clarity} />
+        <TipList title="Dicas de organização" tips={evaluation.tips.organization} />
+        <TipList title="Dicas de citações" tips={evaluation.tips.citations} />
+      </div>
+    </div>
+  );
+}
+
 export function AiFeedback({
   projectId,
   groupId,
@@ -113,24 +138,23 @@ export function AiFeedback({
     <div className="mt-6 rounded-lg border border-border bg-muted/40 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="font-medium">Avaliação da IA</p>
+          <p className="font-medium">Sugestões da IA</p>
           <p className="text-sm text-muted-foreground">
-            Nota estimada por critério e dicas de clareza, organização e citações. Fica salva para a professora ver e
-            não substitui a nota dela.
+            Dicas de clareza, organização e citações para melhorar o texto desta etapa.
           </p>
         </div>
         <Button variant="secondary" onClick={run} disabled={loading || tooShort}>
           {loading ? <Loader2 className="animate-spin" /> : <Sparkles />}
-          {loading ? "Avaliando…" : saved ? "Avaliar de novo" : "Avaliar com IA"}
+          {loading ? "Analisando…" : saved ? "Pedir novas sugestões" : "Pedir sugestões"}
         </Button>
       </div>
-      {tooShort && <p className="mt-2 text-xs text-muted-foreground">Escreva um pouco mais para pedir a avaliação.</p>}
+      {tooShort && <p className="mt-2 text-xs text-muted-foreground">Escreva um pouco mais para pedir sugestões.</p>}
       {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
 
       {saved && (
         <div className="mt-5">
-          <p className="mb-3 text-xs text-muted-foreground">Última avaliação: {fmtDateTime(saved.createdAt)}</p>
-          <AiEvaluationView evaluation={saved.evaluation} />
+          <p className="mb-3 text-xs text-muted-foreground">Últimas sugestões: {fmtDateTime(saved.createdAt)}</p>
+          <AiSuggestionsView evaluation={saved.evaluation} />
         </div>
       )}
     </div>

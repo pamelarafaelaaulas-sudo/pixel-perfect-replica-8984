@@ -47,5 +47,6 @@ export const getPhaseEvaluation = createServerFn({ method: "POST" })
       .single();
     if (saveError) console.error("Failed to save AI evaluation", saveError);
 
-    return { evaluation, savedAt: saved?.created_at ?? null };
+    // Scores stay with the teacher; the student screen reloads the score-free suggestions.
+    return { savedAt: saved?.created_at ?? null };
   });

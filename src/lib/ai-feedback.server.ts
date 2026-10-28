@@ -41,7 +41,8 @@ Dê uma nota de 0 a 10 (pode usar uma casa decimal) para cada critério, com um 
 Seja justa e coerente: notas altas só para textos realmente bons; textos muito curtos ou vagos recebem notas baixas.
 Em "summary", escreva 1 a 2 frases encorajadoras com a visão geral.
 Em clarity_tips, organization_tips e citation_tips, escreva de 2 a 4 dicas curtas e concretas cada, citando trechos do texto quando útil.
-Não reescreva o trabalho pelos alunos: oriente para que eles mesmos melhorem.`;
+Não reescreva o trabalho pelos alunos: oriente para que eles mesmos melhorem.
+Os alunos verão os comentários, o resumo e as dicas, mas não as notas: nunca mencione notas, pontuações ou números de avaliação nesses textos.`;
 
 function friendlyError(failure: unknown): Error {
   console.error("AI evaluation error", failure);
