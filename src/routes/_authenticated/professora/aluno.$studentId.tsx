@@ -296,8 +296,8 @@ function Stat({
 }: {
   label: string;
   value: string;
-  tone?: string;
-  hint?: string;
+  tone?: string | undefined;
+  hint?: string | undefined;
 }) {
   return (
     <div className="card-paper p-4">
