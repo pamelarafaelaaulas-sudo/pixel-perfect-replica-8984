@@ -53,6 +53,10 @@ export function checkCitations(text: string | null | undefined): CitationCheck {
 /** One cited work: the citation as written, its author part and its year. */
 export type CitedWork = { citation: string; authors: string; year: string };
 
+const STARTERS = new Set(
+  "segundo conforme para como em no na nos nas ja assim ainda porem entao logo tambem alem apos com sobre entretanto contudo".split(" "),
+);
+
 const IN_PAREN_YEAR = /,\s*(\d{4})[a-z]?(?:,\s*(?:p|local|cap|slide)\.\s*[\w\-–]+)?/gu;
 
 /** Every work cited in a text, one entry per author+year (a citation can list several works). */
@@ -69,7 +73,10 @@ export function citedWorks(text: string | null | undefined): CitedWork[] {
     }
   }
   for (const m of t.matchAll(NARRATIVE)) {
-    const c = m[0].trim();
+    let c = m[0].trim();
+    // A sentence often starts with a capitalized connector ("Segundo Silva (2020)"): drop it.
+    const first = /^(\p{L}+)\s+/u.exec(c);
+    if (first && STARTERS.has(normalizeText(first[1]!))) c = c.slice(first[0].length);
     out.push({ citation: c, authors: c.slice(0, c.lastIndexOf("(")).trim(), year: /\((\d{4})/.exec(c)![1]! });
   }
   return out;
