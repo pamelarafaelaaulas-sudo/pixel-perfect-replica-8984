@@ -78,7 +78,7 @@ export const groupDetailQuery = (groupId: string) =>
         .from("groups")
         .select(
           `*,
-          classes!groups_class_id_fkey(id, name, class_code, late_penalty_per_day, schedules(*)),
+          classes!groups_class_id_fkey(id, name, class_code, late_penalty_per_day, banner_template_url, schedules(*)),
           group_members(id, student_id, whatsapp, profiles(name, email)),
           projects(*, phase_submissions(*), project_contributions(*)),
           grades(*)`,
@@ -262,10 +262,10 @@ export const teacherRosterQuery = queryOptions({
   },
 });
 
-/* ---------------- Teacher: trimester grades across classes ---------------- */
+/* ---------------- Teacher: bimestre grades across classes ---------------- */
 
-export const teacherTrimesterQuery = queryOptions({
-  queryKey: ["teacher", "trimester"],
+export const teacherBimesterQuery = queryOptions({
+  queryKey: ["teacher", "bimester"],
   queryFn: async () => {
     const { data, error } = await supabase
       .from("classes")

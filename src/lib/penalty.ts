@@ -1,4 +1,4 @@
-import { PHASES } from "./phases";
+import { BIMESTER_NUMBERS, PHASES } from "./phases";
 
 const STAGES = PHASES.map((p) => p.number);
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -66,6 +66,19 @@ export function projectLateness(args: {
   });
   const totalPenalty = Math.round(phases.reduce((s, p) => s + p.penalty, 0) * 100) / 100;
   return { phases, totalPenalty };
+}
+
+/**
+ * Late penalty per bimestre: each stage's penalty comes off only the bimestre that stage belongs to
+ * (1º = Tema a Metodologia, 2º = Introdução a Resumo, 3º = Banner, 4º = Feira, no stages).
+ */
+export function bimesterPenalties(phases: PhaseInfo[]): Record<number, number> {
+  const out: Record<number, number> = Object.fromEntries(BIMESTER_NUMBERS.map((b) => [b, 0]));
+  for (const p of phases) {
+    const b = PHASES[p.phase - 1]?.bimester;
+    if (b) out[b] = Math.round(((out[b] ?? 0) + p.penalty) * 100) / 100;
+  }
+  return out;
 }
 
 export type GroupLateness = {

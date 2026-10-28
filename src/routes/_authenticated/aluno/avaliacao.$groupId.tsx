@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { groupDetailQuery, meQuery, myPeerEvaluationsQuery } from "@/lib/queries";
-import { TRIMESTERS } from "@/lib/phases";
+import { BIMESTER_NUMBERS } from "@/lib/phases";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/aluno/avaliacao/$groupId")({
@@ -65,10 +65,10 @@ function PeerEvaluationPage() {
       />
 
       <Tabs value={String(trimester)} onValueChange={(v) => setTrimester(Number(v))} className="mb-6">
-        <TabsList>
-          {TRIMESTERS.map((t) => (
+        <TabsList className="h-auto flex-wrap">
+          {BIMESTER_NUMBERS.map((t) => (
             <TabsTrigger key={t} value={String(t)}>
-              {t}º trimestre
+              {t}º bimestre
             </TabsTrigger>
           ))}
         </TabsList>

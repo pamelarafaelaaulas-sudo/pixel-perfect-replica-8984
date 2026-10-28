@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { ArrowLeft, CalendarClock, Copy, Trash2, Users, ArrowRight, Timer } from "lucide-react";
+import { ArrowLeft, CalendarClock, Copy, Trash2, Users, ArrowRight, Timer, Palette, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -21,9 +21,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { classDetailQuery } from "@/lib/queries";
-import { phaseMeta } from "@/lib/phases";
+import { BIMESTER_NUMBERS, phaseMeta } from "@/lib/phases";
 import { endOfDayFromInput, fmtAgo, toDateInput } from "@/lib/format";
 import { formatPoints, projectLateness } from "@/lib/penalty";
+import { isCanvaUrl } from "@/lib/phase-rules";
 
 export const Route = createFileRoute("/_authenticated/professora/turma/$classId")({
   head: () => ({
@@ -120,7 +121,10 @@ function ClassPage() {
       />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.6fr]">
-        <ScheduleCard classId={classId} schedules={schedules} penalty={Number(cls.late_penalty_per_day)} />
+        <div className="space-y-6">
+          <ScheduleCard classId={classId} schedules={schedules} penalty={Number(cls.late_penalty_per_day)} />
+          <BannerTemplateCard key={cls.banner_template_url ?? ""} classId={classId} current={cls.banner_template_url} />
+        </div>
 
         <section className="card-paper p-6">
           <div className="mb-4 flex items-center justify-between">
@@ -165,15 +169,15 @@ function ClassPage() {
                       </Badge>
                       {totalPenalty > 0 && <Badge variant="warning">−{formatPoints(totalPenalty)} atraso</Badge>}
                       <div className="flex gap-1">
-                        {[1, 2, 3].map((t) => {
+                        {BIMESTER_NUMBERS.map((t) => {
                           const gr = grades.find((x) => x.trimester === t);
                           return (
                             <span
                               key={t}
-                              title={`${t}º trimestre`}
+                              title={`${t}º bimestre`}
                               className="min-w-10 rounded-md border border-border px-1.5 py-0.5 text-center font-mono text-xs text-muted-foreground"
                             >
-                              {gr ? formatPoints(Number(gr.score)) : `T${t}`}
+                              {gr ? formatPoints(Number(gr.score)) : `B${t}`}
                             </span>
                           );
                         })}
@@ -258,6 +262,57 @@ function ScheduleCard({
       <Button className="mt-5 w-full" onClick={() => save.mutate()} disabled={save.isPending}>
         Salvar cronograma
       </Button>
+    </section>
+  );
+}
+
+function BannerTemplateCard({ classId, current }: { classId: string; current: string | null }) {
+  const qc = useQueryClient();
+  const [url, setUrl] = useState(current ?? "");
+  const invalid = url.trim() !== "" && !isCanvaUrl(url);
+  const save = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("classes")
+        .update({ banner_template_url: url.trim() || null })
+        .eq("id", classId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Modelo do banner salvo");
+      qc.invalidateQueries({ queryKey: ["class", classId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  return (
+    <section className="card-paper p-6">
+      <h2 className="mb-1 flex items-center gap-2 text-xl font-semibold">
+        <Palette className="size-5 text-primary" /> Modelo do banner
+      </h2>
+      <p className="mb-4 text-sm text-muted-foreground">
+        Link do modelo no Canva que os grupos copiam para montar o banner (etapa 13, 3º bimestre).
+      </p>
+      <Label htmlFor="banner-template">Link do modelo no Canva</Label>
+      <div className="mt-1 flex flex-col gap-2 sm:flex-row">
+        <Input
+          id="banner-template"
+          value={url}
+          placeholder="https://www.canva.com/design/.../view?utm_content=...&mode=preview"
+          onChange={(e) => setUrl(e.target.value)}
+        />
+        <Button onClick={() => save.mutate()} disabled={invalid || url.trim() === (current ?? "") || save.isPending}>
+          Salvar
+        </Button>
+      </div>
+      {invalid ? (
+        <p className="mt-1 text-xs text-destructive">O link precisa ser do Canva (começa com https://www.canva.com/).</p>
+      ) : current ? (
+        <a href={current} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-sm text-primary hover:underline">
+          Abrir modelo atual <ExternalLink className="size-3" />
+        </a>
+      ) : (
+        <p className="mt-1 text-xs text-muted-foreground">No Canva: Compartilhar → “Modelo” → copiar link.</p>
+      )}
     </section>
   );
 }

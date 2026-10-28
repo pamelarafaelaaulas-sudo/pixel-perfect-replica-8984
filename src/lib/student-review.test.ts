@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { projectLateness } from "./penalty";
 import { studentSummary } from "./student-review";
 
-describe("per-student review before launching a trimester", () => {
+describe("per-student review before launching a bimestre", () => {
   const { phases, totalPenalty } = projectLateness({
     currentPhase: 3,
     perDay: 0.5,
@@ -36,14 +36,14 @@ describe("per-student review before launching a trimester", () => {
     expect(summary.totalPenalty).toBe(1);
   });
 
-  it("subtracts the late penalty from the teacher's trimester grade", () => {
-    expect(summary.trimesters[0]?.final).toBe(8);
-    expect(summary.trimesters[1]?.final).toBeNull();
+  it("subtracts the late penalty from the teacher's bimestre grade (all late stages are in the 1º bimestre)", () => {
+    expect(summary.bimesters[0]?.final).toBe(8);
+    expect(summary.bimesters[1]?.final).toBeNull();
     expect(summary.finalAverage).toBe(8);
   });
 
-  it("averages the AI score of evaluated phases and the peer scores per trimester", () => {
+  it("averages the AI score of evaluated phases and the peer scores per bimestre", () => {
     expect(summary.aiAverage).toBe(7.3);
-    expect(summary.trimesters[0]?.peerAverage).toBe(4.5);
+    expect(summary.bimesters[0]?.peerAverage).toBe(4.5);
   });
 });

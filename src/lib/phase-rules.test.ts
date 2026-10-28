@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { countWords, keywordsInTitle, phaseProblems } from "./phase-rules";
+import { countWords, isCanvaUrl, keywordsInTitle, phaseProblems } from "./phase-rules";
 import { PHASES } from "./phases";
 
 const words = (n: number) => Array.from({ length: n }, (_, i) => `palavra${i}`).join(" ");
@@ -19,7 +19,22 @@ describe("written project order", () => {
       "Conclusão",
       "Referências",
       "Resumo",
+      "Banner",
     ]);
+  });
+});
+
+describe("banner delivery", () => {
+  it("needs both a Canva link and the final file", () => {
+    expect(phaseProblems(13, { banner_canva_url: "", banner_file_path: "" }, 0)).toHaveLength(2);
+    expect(phaseProblems(13, { banner_canva_url: "https://www.canva.com/design/abc/view", banner_file_path: "" }, 0)).toHaveLength(1);
+    expect(phaseProblems(13, { banner_canva_url: "https://www.canva.com/design/abc/view", banner_file_path: "g/b.pdf" }, 0)).toEqual([]);
+  });
+
+  it("rejects links that are not from Canva", () => {
+    expect(isCanvaUrl("https://drive.google.com/file/x")).toBe(false);
+    expect(isCanvaUrl("http://www.canva.com/design/x")).toBe(false);
+    expect(isCanvaUrl("https://canva.link/abc")).toBe(true);
   });
 });
 

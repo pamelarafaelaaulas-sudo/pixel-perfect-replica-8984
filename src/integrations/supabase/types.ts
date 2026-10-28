@@ -80,6 +80,7 @@ export type Database = {
       }
       classes: {
         Row: {
+          banner_template_url: string | null
           class_code: string
           created_at: string
           id: string
@@ -88,6 +89,7 @@ export type Database = {
           teacher_id: string
         }
         Insert: {
+          banner_template_url?: string | null
           class_code?: string
           created_at?: string
           id?: string
@@ -96,6 +98,7 @@ export type Database = {
           teacher_id: string
         }
         Update: {
+          banner_template_url?: string | null
           class_code?: string
           created_at?: string
           id?: string
@@ -393,6 +396,9 @@ export type Database = {
         Row: {
           abstract: string | null
           area_subarea: string | null
+          banner_canva_url: string | null
+          banner_file_name: string | null
+          banner_file_path: string | null
           conclusion: string | null
           current_phase: number
           general_objective: string | null
@@ -414,6 +420,9 @@ export type Database = {
         Insert: {
           abstract?: string | null
           area_subarea?: string | null
+          banner_canva_url?: string | null
+          banner_file_name?: string | null
+          banner_file_path?: string | null
           conclusion?: string | null
           current_phase?: number
           general_objective?: string | null
@@ -435,6 +444,9 @@ export type Database = {
         Update: {
           abstract?: string | null
           area_subarea?: string | null
+          banner_canva_url?: string | null
+          banner_file_name?: string | null
+          banner_file_path?: string | null
           conclusion?: string | null
           current_phase?: number
           general_objective?: string | null
@@ -563,6 +575,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      banner_group: { Args: { _name: string }; Returns: string }
+      can_edit_banner: { Args: { _group_id: string }; Returns: boolean }
       consume_teacher_invite: {
         Args: { _code: string; _user_id: string }
         Returns: boolean

@@ -1,63 +1,84 @@
 /**
  * Project stages, in delivery order. Stages 1–3 are planning; stages 4–12 are the parts
- * of the written project ("Projeto escrito"), each with its own deadline.
+ * of the written project ("Projeto escrito"), each with its own deadline; stage 13 is the banner.
+ * Each stage belongs to one bimestre: its late penalty comes off only that bimestre's grade.
  * Guidance and limits follow the teacher's specification document.
  */
 export const PHASES = [
-  { number: 1, name: "Tema", hint: "Escolham e descrevam o tema que o grupo vai investigar." },
-  { number: 2, name: "Artigos científicos", hint: "Reúnam artigos e fontes confiáveis sobre o tema, com a citação em ABNT." },
-  { number: 3, name: "Pergunta norteadora", hint: "Formulem a pergunta que o projeto vai tentar responder." },
+  { number: 1, bimester: 1, name: "Tema", hint: "Escolham e descrevam o tema que o grupo vai investigar." },
+  { number: 2, bimester: 1, name: "Artigos científicos", hint: "Reúnam artigos e fontes confiáveis sobre o tema, com a citação em ABNT." },
+  { number: 3, bimester: 1, name: "Pergunta norteadora", hint: "Formulem a pergunta que o projeto vai tentar responder." },
   {
-    number: 4,
+    number: 4, bimester: 1,
     name: "Título",
     hint: "Título do projeto, instituição onde ele é desenvolvido e a área/subárea. Os nomes do grupo e da orientadora entram automaticamente.",
   },
   {
-    number: 5,
+    number: 5, bimester: 1,
     name: "Objetivo geral",
     hint: "Único e conciso: é a questão principal do projeto de pesquisa. Máximo de 50 palavras, sem gráficos ou imagens.",
   },
   {
-    number: 6,
+    number: 6, bimester: 1,
     name: "Objetivos específicos",
     hint: "Etapas necessárias para alcançar o objetivo geral, escritas com assertividade (as fases, não a descrição do processo). No máximo 5, um por linha, até 100 palavras no total. Sem caixa alta.",
   },
   {
-    number: 7,
+    number: 7, bimester: 1,
     name: "Metodologia",
     hint: "Descreva com clareza todas as etapas de desenvolvimento: teorias metodológicas escolhidas e por quê, escolhas, informações e o passo a passo para cumprir os objetivos. De 250 a 750 palavras. Pode ter gráficos, imagens e tabelas.",
   },
   {
-    number: 8,
+    number: 8, bimester: 2,
     name: "Introdução",
     hint: "Apresente e contextualize o projeto: o problema/pergunta observado, a hipótese (quando houver) e a justificativa da pesquisa, citando os autores nas normas ABNT. De 250 a 500 palavras. Sem caixa alta.",
   },
   {
-    number: 9,
+    number: 9, bimester: 2,
     name: "Resultados e discussão",
     hint: "Os dados obtidos em cada etapa da metodologia e a discussão deles (positivos ou não), comparando com as referências (citações obrigatórias nas normas ABNT). Se ainda não houver resultados, descreva os esperados e chame o tópico de \"Resultados parciais/esperados e discussão\". De 250 a 750 palavras.",
   },
   {
-    number: 10,
+    number: 10, bimester: 2,
     name: "Conclusão",
     hint: "Responda ao objetivo geral a partir da discussão dos resultados, sintetizando os destaques da pesquisa, sem trazer conceitos ou objetivos novos. Máximo de 150 palavras.",
   },
   {
-    number: 11,
+    number: 11, bimester: 2,
     name: "Referências",
     hint: "Todas as referências citadas no projeto, em ordem alfabética, conforme a ABNT (NBR 6023/2023). Uma por linha.",
   },
   {
-    number: 12,
+    number: 12, bimester: 2,
     name: "Resumo",
     hint: "Linguagem objetiva e acadêmica, com introdução, área e tema, objetivo(s), metodologia e resultados alcançados ou esperados. De 150 a 250 palavras, sem caixa alta, imagens, tabelas ou gráficos. Depois, de 3 a 5 palavras-chave separadas por ponto e vírgula, diferentes das usadas no título.",
+  },
+  {
+    number: 13,
+    bimester: 3,
+    name: "Banner",
+    hint: "Montem o banner do projeto no Canva a partir do modelo da professora. Entreguem o link do design no Canva e o arquivo final exportado (PDF ou imagem).",
   },
 ] as const;
 
 export const PHASE_COUNT = PHASES.length;
-/** First stage that belongs to the written project. */
+/** First and last stages that belong to the written project. */
 export const WRITTEN_START = 4;
-export const isWrittenPart = (n: number) => n >= WRITTEN_START;
+export const WRITTEN_END = 12;
+export const isWrittenPart = (n: number) => n >= WRITTEN_START && n <= WRITTEN_END;
+export const BANNER_PHASE = 13;
+
+/** The 4 bimestres of the school year and what each one grades. */
+export const BIMESTERS = [
+  { number: 1, title: "Projeto: Tema a Metodologia" },
+  { number: 2, title: "Projeto: Introdução a Resumo" },
+  { number: 3, title: "Banner" },
+  { number: 4, title: "Feira" },
+] as const;
+export const BIMESTER_NUMBERS = BIMESTERS.map((b) => b.number);
+export const bimesterMeta = (n: number) => BIMESTERS[n - 1] ?? BIMESTERS[0];
+/** Stages graded in a bimestre (empty for the fair). */
+export const bimesterPhases = (b: number) => PHASES.filter((p) => p.bimester === b).map((p) => p.number);
 
 export type TextFieldKey =
   | "theme"
@@ -132,11 +153,14 @@ export const PHASE_FORM: Record<number, FormField[]> = {
 /** Fields saved by each stage (used to know whether the current stage has unsaved edits). */
 export function phaseFields(n: number): string[] {
   if (n === 2) return ["scientific_articles"];
+  if (n === BANNER_PHASE) return ["banner_canva_url", "banner_file_path"];
   return (PHASE_FORM[n] ?? []).map((f) => f.key);
 }
 
 export const SECTION_LABELS: Record<string, string> = {
   scientific_articles: "Artigos científicos",
+  banner_canva_url: "Banner (link do Canva)",
+  banner_file_path: "Banner (arquivo)",
   ...Object.fromEntries(Object.values(PHASE_FORM).flat().map((f) => [f.key, f.label.replace(/ \(.*\)$/, "")])),
 };
 
@@ -167,8 +191,6 @@ export function parseArticles(value: unknown): Article[] {
     };
   });
 }
-
-export const TRIMESTERS = [1, 2, 3] as const;
 
 export function phaseMeta(n: number) {
   return PHASES[n - 1] ?? PHASES[0];

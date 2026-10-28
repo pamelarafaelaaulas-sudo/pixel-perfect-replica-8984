@@ -33,7 +33,8 @@ import {
   PHASE_FORM,
   SOURCE_TYPES,
   TEXT_FIELDS,
-  TRIMESTERS,
+  BANNER_PHASE,
+  BIMESTERS,
   isWrittenPart,
   parseArticles,
   phaseFields,
@@ -53,7 +54,8 @@ import {
 } from "@/lib/phase-rules";
 import { CITATION_EXAMPLES, checkCitations } from "@/lib/citations";
 import { fmtDateTime, whatsappLink } from "@/lib/format";
-import { formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
+import { bimesterPenalties, formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
+import { BannerStage } from "@/components/banner-stage";
 
 export const Route = createFileRoute("/_authenticated/aluno/projeto/$groupId")({
   head: () => ({
@@ -171,11 +173,17 @@ function StudentProjectPage() {
     submissions,
     perDay: Number(cls.late_penalty_per_day),
   });
+  const penalties = bimesterPenalties(lateness.phases);
+  const isBanner = selected === BANNER_PHASE;
   const info = lateness.phases[selected - 1] ?? lateness.phases[0]!;
   const isSubmitted = info.state === "delivered";
   const editable = !isSubmitted && selected <= project.current_phase && info.state !== "skipped";
   const phaseDirty = changedFields.some((f) => phaseFields(selected).includes(f));
-  const problems = phaseProblems(selected, draft, draft.scientific_articles.length);
+  const problems = phaseProblems(
+    selected,
+    isBanner ? { banner_canva_url: project.banner_canva_url, banner_file_path: project.banner_file_path } : draft,
+    draft.scientific_articles.length,
+  );
   const grades = [...(group.grades ?? [])].sort((a, b) => a.trimester - b.trimester);
 
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => (d ? { ...d, [k]: v } : d));
@@ -249,7 +257,19 @@ function StudentProjectPage() {
           </div>
 
           <fieldset disabled={!editable} className="space-y-5">
-            {selected === 2 ? (
+            {isBanner ? (
+              <BannerStage
+                key={project.id}
+                groupId={groupId}
+                projectId={project.id}
+                studentId={me!.id}
+                templateUrl={cls.banner_template_url}
+                canvaUrl={project.banner_canva_url}
+                filePath={project.banner_file_path}
+                fileName={project.banner_file_name}
+                editable={editable}
+              />
+            ) : selected === 2 ? (
               <ArticlesEditor value={draft.scientific_articles} onChange={(v) => set("scientific_articles", v)} editable={editable} />
             ) : (
               (PHASE_FORM[selected] ?? []).map((f) => (
@@ -296,14 +316,16 @@ function StudentProjectPage() {
           {editable && (
             <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-5">
               <p className="text-sm text-muted-foreground">
-                {phaseDirty ? "Há alterações não salvas." : "Tudo salvo."}
+                {isBanner ? "O link e o arquivo são salvos na hora." : phaseDirty ? "Há alterações não salvas." : "Tudo salvo."}
                 {info.daysLate > 0 &&
                   ` · ${info.daysLate} dia(s) de atraso (−${formatPoints(info.penalty)} até agora)`}
               </p>
               <div className="flex gap-2">
-                <Button variant="outline" onClick={save} disabled={!phaseDirty || saveMutation.isPending}>
-                  <Save /> Salvar
-                </Button>
+                {!isBanner && (
+                  <Button variant="outline" onClick={save} disabled={!phaseDirty || saveMutation.isPending}>
+                    <Save /> Salvar
+                  </Button>
+                )}
                 {selected === project.current_phase && (
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
@@ -331,6 +353,7 @@ function StudentProjectPage() {
             </div>
           )}
 
+          {!isBanner && (
           <AiFeedback
             key={selected}
             projectId={project.id}
@@ -343,25 +366,29 @@ function StudentProjectPage() {
                 : null
             }
           />
+          )}
         </section>
 
         <aside className="space-y-4">
           <div className="card-paper p-5">
             <h3 className="mb-3 text-lg font-semibold">Notas</h3>
             <ul className="space-y-3">
-              {TRIMESTERS.map((t) => {
+              {BIMESTERS.map(({ number: t, title }) => {
                 const g = grades.find((x) => x.trimester === t);
-                const total = g ? gradeAfterPenalty(Number(g.score), lateness.totalPenalty) : null;
+                const penalty = penalties[t] ?? 0;
+                const total = g ? gradeAfterPenalty(Number(g.score), penalty) : null;
                 return (
                   <li key={t} className="rounded-lg bg-muted p-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">{t}º trimestre</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-medium">
+                        {t}º bimestre <span className="block text-xs font-normal text-muted-foreground">{title}</span>
+                      </span>
                       <span className="font-display text-xl font-semibold">{total !== null ? formatPoints(total) : "—"}</span>
                     </div>
                     {g ? (
                       <p className="mt-1 text-xs text-muted-foreground">
                         Nota {formatPoints(Number(g.score))}
-                        {lateness.totalPenalty > 0 && ` − ${formatPoints(lateness.totalPenalty)} de atraso`}
+                        {penalty > 0 && ` − ${formatPoints(penalty)} de atraso`}
                       </p>
                     ) : (
                       <p className="mt-1 text-xs text-muted-foreground">Ainda não lançada</p>
@@ -374,7 +401,7 @@ function StudentProjectPage() {
           </div>
           <div className="card-paper p-5 text-sm text-muted-foreground">
             Desconto por atraso nesta turma: <strong className="text-foreground">{formatPoints(Number(cls.late_penalty_per_day))}</strong>{" "}
-            ponto por dia. Acumulado do grupo:{" "}
+            ponto por dia, descontado só da nota do bimestre da etapa atrasada. Acumulado do grupo:{" "}
             <strong className={lateness.totalPenalty > 0 ? "text-destructive" : "text-foreground"}>
               {formatPoints(lateness.totalPenalty)}
             </strong>
