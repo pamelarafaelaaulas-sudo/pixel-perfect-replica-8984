@@ -1,12 +1,13 @@
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Download, ExternalLink, FileUp, Loader2, Palette, Save } from "lucide-react";
+import { Download, ExternalLink, FileUp, Loader2, Palette, Ruler, Save } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { isCanvaUrl } from "@/lib/phase-rules";
+import type { BannerBrief } from "@/lib/banner";
 
 const BUCKET = "banners";
 const MAX_BYTES = 25 * 1024 * 1024;
@@ -58,12 +59,52 @@ export function BannerView({
   );
 }
 
+/** The teacher's banner template as the group sees it: Canva link, size, sections and guidance. */
+export function BannerBriefView({ brief }: { brief: BannerBrief }) {
+  return (
+    <div className="space-y-4 rounded-lg border border-border bg-muted/50 p-4 text-sm">
+      <div>
+        <p className="font-medium text-foreground">Modelo da professora</p>
+        {brief.ready ? (
+          <>
+            <p className="mt-1 text-muted-foreground">Abra o modelo, use-o no Canva e monte o banner do grupo nessa cópia.</p>
+            <Button asChild variant="secondary" size="sm" className="mt-3">
+              <a href={brief.templateUrl!} target="_blank" rel="noreferrer">
+                <Palette /> Abrir modelo no Canva <ExternalLink className="size-3" />
+              </a>
+            </Button>
+          </>
+        ) : (
+          <p className="mt-1 text-muted-foreground">A professora ainda não colocou o modelo do banner.</p>
+        )}
+      </div>
+      <p className="flex items-center gap-2 text-foreground">
+        <Ruler className="size-4 text-primary" /> Tamanho: <strong>{brief.size}</strong>
+      </p>
+      <div>
+        <p className="font-medium text-foreground">O banner precisa ter</p>
+        <ol className="mt-1 ml-5 list-decimal space-y-0.5 text-muted-foreground">
+          {brief.sections.map((s, i) => (
+            <li key={`${i}-${s}`}>{s}</li>
+          ))}
+        </ol>
+      </div>
+      {brief.instructions && (
+        <div>
+          <p className="font-medium text-foreground">Orientações</p>
+          <p className="mt-1 whitespace-pre-wrap text-muted-foreground">{brief.instructions}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /** Student editor for the banner stage: Canva link + final exported file. */
 export function BannerStage({
   groupId,
   projectId,
   studentId,
-  templateUrl,
+  brief,
   canvaUrl,
   filePath,
   fileName,
@@ -72,7 +113,7 @@ export function BannerStage({
   groupId: string;
   projectId: string;
   studentId: string;
-  templateUrl: string | null;
+  brief: BannerBrief;
   canvaUrl: string | null;
   filePath: string | null;
   fileName: string | null;
@@ -158,25 +199,7 @@ export function BannerStage({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border border-border bg-muted/50 p-4 text-sm">
-        <p className="font-medium text-foreground">Modelo da professora</p>
-        {templateUrl ? (
-          <>
-            <p className="mt-1 text-muted-foreground">
-              Abra o modelo, faça uma cópia no Canva e monte o banner do grupo nela.
-            </p>
-            <Button asChild variant="secondary" size="sm" className="mt-3">
-              <a href={templateUrl} target="_blank" rel="noreferrer">
-                <Palette /> Abrir modelo no Canva <ExternalLink className="size-3" />
-              </a>
-            </Button>
-          </>
-        ) : (
-          <p className="mt-1 text-muted-foreground">
-            A professora ainda não colocou o modelo do banner.
-          </p>
-        )}
-      </div>
+      <BannerBriefView brief={brief} />
 
       <div className="space-y-2">
         <Label htmlFor="banner-link">Link do banner no Canva</Label>

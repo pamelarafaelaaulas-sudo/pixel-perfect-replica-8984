@@ -56,6 +56,7 @@ import { CITATION_EXAMPLES, checkCitations } from "@/lib/citations";
 import { fmtDateTime, whatsappLink } from "@/lib/format";
 import { bimesterPenalties, formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
 import { BannerStage } from "@/components/banner-stage";
+import { bannerBrief } from "@/lib/banner";
 
 export const Route = createFileRoute("/_authenticated/aluno/projeto/$groupId")({
   head: () => ({
@@ -263,7 +264,7 @@ function StudentProjectPage() {
                 groupId={groupId}
                 projectId={project.id}
                 studentId={me!.id}
-                templateUrl={cls.banner_template_url}
+                brief={bannerBrief(cls)}
                 canvaUrl={project.banner_canva_url}
                 filePath={project.banner_file_path}
                 fileName={project.banner_file_name}

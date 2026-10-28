@@ -80,6 +80,9 @@ export type Database = {
       }
       classes: {
         Row: {
+          banner_instructions: string | null
+          banner_sections: string[] | null
+          banner_size: string | null
           banner_template_url: string | null
           class_code: string
           created_at: string
@@ -89,6 +92,9 @@ export type Database = {
           teacher_id: string
         }
         Insert: {
+          banner_instructions?: string | null
+          banner_sections?: string[] | null
+          banner_size?: string | null
           banner_template_url?: string | null
           class_code?: string
           created_at?: string
@@ -98,6 +104,9 @@ export type Database = {
           teacher_id: string
         }
         Update: {
+          banner_instructions?: string | null
+          banner_sections?: string[] | null
+          banner_size?: string | null
           banner_template_url?: string | null
           class_code?: string
           created_at?: string

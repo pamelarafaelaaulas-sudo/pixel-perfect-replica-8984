@@ -267,52 +267,30 @@ function ScheduleCard({
 }
 
 function BannerTemplateCard({ classId, current }: { classId: string; current: string | null }) {
-  const qc = useQueryClient();
-  const [url, setUrl] = useState(current ?? "");
-  const invalid = url.trim() !== "" && !isCanvaUrl(url);
-  const save = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase
-        .from("classes")
-        .update({ banner_template_url: url.trim() || null })
-        .eq("id", classId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Modelo do banner salvo");
-      qc.invalidateQueries({ queryKey: ["class", classId] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+  const ready = isCanvaUrl(current);
   return (
     <section className="card-paper p-6">
       <h2 className="mb-1 flex items-center gap-2 text-xl font-semibold">
         <Palette className="size-5 text-primary" /> Modelo do banner
       </h2>
       <p className="mb-4 text-sm text-muted-foreground">
-        Link do modelo no Canva que os grupos copiam para montar o banner (etapa 13, 3º bimestre).
+        {ready
+          ? "Pronto: os grupos já veem o link do Canva, o tamanho e as seções na etapa do banner."
+          : "Ainda sem link do Canva: monte o modelo para os grupos poderem começar o banner."}
       </p>
-      <Label htmlFor="banner-template">Link do modelo no Canva</Label>
-      <div className="mt-1 flex flex-col gap-2 sm:flex-row">
-        <Input
-          id="banner-template"
-          value={url}
-          placeholder="https://www.canva.com/design/.../view?utm_content=...&mode=preview"
-          onChange={(e) => setUrl(e.target.value)}
-        />
-        <Button onClick={() => save.mutate()} disabled={invalid || url.trim() === (current ?? "") || save.isPending}>
-          Salvar
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge variant={ready ? "success" : "warning"}>{ready ? "Pronto para os grupos" : "Falta o link"}</Badge>
+        <Button asChild variant="outline" size="sm">
+          <Link to="/professora/banner" search={{ turma: classId }}>
+            {ready ? "Editar modelo" : "Montar modelo"} <ArrowRight />
+          </Link>
         </Button>
+        {ready && (
+          <a href={current!} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
+            Abrir no Canva <ExternalLink className="size-3" />
+          </a>
+        )}
       </div>
-      {invalid ? (
-        <p className="mt-1 text-xs text-destructive">O link precisa ser do Canva (começa com https://www.canva.com/).</p>
-      ) : current ? (
-        <a href={current} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-sm text-primary hover:underline">
-          Abrir modelo atual <ExternalLink className="size-3" />
-        </a>
-      ) : (
-        <p className="mt-1 text-xs text-muted-foreground">No Canva: Compartilhar → “Modelo” → copiar link.</p>
-      )}
     </section>
   );
 }

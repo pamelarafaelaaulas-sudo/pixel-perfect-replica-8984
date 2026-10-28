@@ -57,6 +57,13 @@
       "when": 1793220453194,
       "tag": "0007_bimesters_and_banner_stage",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793220958884,
+      "tag": "0008_banner_template_brief",
+      "breakpoints": true
     }
   ]
 }
