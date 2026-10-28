@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { aiEvaluationsForGroupQuery, groupDetailQuery, peerEvaluationsForGroupQuery } from "@/lib/queries";
-import { BIMESTERS, PHASES, SECTION_LABELS, bimesterMeta } from "@/lib/phases";
+import { BANNER_PHASE, BIMESTERS, PHASES, SECTION_LABELS, bimesterMeta } from "@/lib/phases";
 import { fmtAgo, fmtDateTime, whatsappLink } from "@/lib/format";
 import { bimesterPenalties, formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
 import { latestPerPhase, overallScore, type SavedAiEvaluation } from "@/lib/ai-score";
@@ -487,7 +487,7 @@ function AiTab({
         </p>
       </section>
 
-      {PHASES.map((p) => {
+      {PHASES.filter((p) => p.number !== BANNER_PHASE).map((p) => {
         const entry = byPhase[p.number];
         const older = history.filter((h) => h.phaseNumber === p.number && h.id !== entry?.latest.id);
         return (

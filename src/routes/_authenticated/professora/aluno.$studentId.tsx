@@ -61,7 +61,7 @@ function StudentReviewPage() {
         <ArrowLeft className="size-4" /> Minhas turmas
       </Link>
       <PageHeader
-        eyebrow="Revisão antes de lançar o trimestre"
+        eyebrow="Revisão antes de lançar o bimestre"
         title={profile.name}
         description={
           <span className="inline-flex flex-wrap items-center gap-3">
@@ -229,15 +229,18 @@ function GroupReview({
         </div>
 
         <div className="card-paper p-5">
-          <h3 className="text-lg font-semibold">Trimestres</h3>
+          <h3 className="text-lg font-semibold">Bimestres</h3>
           <p className="mb-3 text-xs text-muted-foreground">
-            Nota final = sua nota − desconto de atraso.
+            Nota final = sua nota − desconto de atraso das etapas daquele bimestre.
           </p>
           <ul className="space-y-3">
-            {summary.trimesters.map((t) => (
-              <li key={t.trimester} className="rounded-lg border border-border p-3">
+            {summary.bimesters.map((t) => (
+              <li key={t.bimester} className="rounded-lg border border-border p-3">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium">{t.trimester}º trimestre</span>
+                  <span className="font-medium">
+                    {t.bimester}º bimestre{" "}
+                    <span className="text-xs font-normal text-muted-foreground">· {bimesterMeta(t.bimester).title}</span>
+                  </span>
                   {t.score === null ? (
                     <Badge variant="muted">Não lançada</Badge>
                   ) : (
@@ -247,10 +250,10 @@ function GroupReview({
                 {t.score !== null && (
                   <p className="mt-2 font-mono text-sm">
                     {formatPoints(t.score)}
-                    {summary.totalPenalty > 0 && (
+                    {t.penalty > 0 && (
                       <span className="text-destructive">
                         {" "}
-                        − {formatPoints(summary.totalPenalty)}
+                        − {formatPoints(t.penalty)}
                       </span>
                     )}{" "}
                     = <strong className="text-base">{formatPoints(t.final ?? 0)}</strong>
