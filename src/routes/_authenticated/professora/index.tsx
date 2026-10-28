@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
-import { Plus, School, Users, ArrowRight, ClipboardList } from "lucide-react";
+import { Plus, School, Users, ArrowRight, ClipboardList, Palette } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -49,6 +49,11 @@ function TeacherHome() {
             <Button variant="outline" asChild>
               <Link to="/professora/bimestres" search={{ b: 1 }}>
                 <ClipboardList /> Notas do bimestre
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/professora/banner" search={{}}>
+                <Palette /> Modelo do banner
               </Link>
             </Button>
             <TeacherInvitesDialog />
