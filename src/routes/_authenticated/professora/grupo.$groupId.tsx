@@ -333,7 +333,7 @@ function GradeForm({
 }: {
   groupId: string;
   trimester: number;
-  existing?: { score: number; feedback: string | null; is_reference_ten: boolean; created_at: string };
+  existing?: { score: number; feedback: string | null; is_reference_ten: boolean; created_at: string } | undefined;
   penalty: number;
   onSaved: () => void;
 }) {

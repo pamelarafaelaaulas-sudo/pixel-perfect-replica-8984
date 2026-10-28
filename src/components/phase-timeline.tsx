@@ -1,6 +1,6 @@
 import { Check, Clock, Lock, AlertTriangle, SkipForward } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { PHASES } from "@/lib/phases";
+import { phaseMeta } from "@/lib/phases";
 import { fmtDate } from "@/lib/format";
 import { formatPoints, type PhaseInfo } from "@/lib/penalty";
 
@@ -16,7 +16,7 @@ export function PhaseTimeline({
   return (
     <ol className="grid gap-3 sm:grid-cols-4">
       {phases.map((p) => {
-        const meta = PHASES[p.phase - 1];
+        const meta = phaseMeta(p.phase);
         const late = p.daysLate > 0;
         const Icon =
           p.state === "delivered"
