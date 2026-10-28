@@ -1,12 +1,17 @@
 import { AI_CRITERIA, latestPerPhase, parseSavedEvaluation } from "./ai-score";
 import { bimesterPenalties, gradeAfterPenalty, projectLateness } from "./penalty";
 import { BIMESTER_NUMBERS, bimesterMeta, phaseMeta } from "./phases";
+import { projectCode } from "./project-code";
 
 type InputGroup = {
   id: string;
   group_name: string;
   group_members: { student_id: string; profiles: { name: string } | null }[] | null;
-  projects: { current_phase: number; phase_submissions: { phase_number: number; submitted_at: string }[] | null } | null;
+  projects: {
+    current_phase: number;
+    area_code?: string | null;
+    project_seq?: number | null;
+    phase_submissions: { phase_number: number; submitted_at: string }[] | null } | null;
   /** `trimester` holds the bimestre number (database column name). */
   grades:
     | { trimester: number; score: number | string; feedback: string | null; is_reference_ten: boolean; created_at: string }[]
@@ -17,6 +22,7 @@ export type ExportInput = {
   classes: {
     id: string;
     name: string;
+    code_label?: string | null;
     late_penalty_per_day: number | string;
     schedules: { phase_number: number; due_date: string }[] | null;
     groups: InputGroup[] | null;
@@ -49,6 +55,7 @@ export type ExportFilters = { classId?: string | undefined; bimester?: number | 
 export type GradeExportRow = {
   className: string;
   groupName: string;
+  projectCode: string;
   members: string;
   bimester: string;
   score: number | null;
@@ -122,6 +129,7 @@ export function buildExport(input: ExportInput, filters: ExportFilters = {}) {
         grades.push({
           className: c.name,
           groupName: g.group_name,
+          projectCode: projectCode(g.projects?.area_code, c.code_label, g.projects?.project_seq) ?? "",
           members: [...names.values()].filter(Boolean).sort(byText).join(", "),
           bimester: bimLabel(b),
           score,
