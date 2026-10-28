@@ -99,8 +99,9 @@ function DocxPanel({ project, groupName, authors, cls }: Props) {
             </p>
           )}
           <Button className="w-full" onClick={() => downloadBlob(ready.blob, ready.name)}>
-            <FileDown /> Baixar {ready.name}
+            <FileDown /> Baixar arquivo Word
           </Button>
+          <p className="break-all text-center text-xs text-muted-foreground">{ready.name}</p>
         </div>
       )}
     </>
