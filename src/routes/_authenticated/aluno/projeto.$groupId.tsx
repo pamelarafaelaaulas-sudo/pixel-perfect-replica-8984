@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { ArrowLeft, Lock, MessageCircle, Plus, Save, Send, Star, Trash2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Lock, MessageCircle, Plus, Save, Send, Star, Trash2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { PhaseTimeline } from "@/components/phase-timeline";
@@ -41,7 +41,16 @@ import {
   type Article,
   type TextFieldKey,
 } from "@/lib/phases";
-import { CITATION_FIELDS, WORD_LIMITS, countWords, limitLabel, objectiveLines, phaseProblems, splitKeywords } from "@/lib/phase-rules";
+import {
+  CITATION_FIELDS,
+  WORD_LIMITS,
+  countWords,
+  limitLabel,
+  objectiveLines,
+  phaseProblems,
+  referenceCheck,
+  splitKeywords,
+} from "@/lib/phase-rules";
 import { CITATION_EXAMPLES, checkCitations } from "@/lib/citations";
 import { fmtDateTime, whatsappLink } from "@/lib/format";
 import { formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
@@ -249,7 +258,13 @@ function StudentProjectPage() {
                   label={f.label}
                   id={f.key}
                   meter={<FieldMeter field={f.key} value={draft[f.key]} />}
-                  before={CITATION_FIELDS[f.key] ? <CitationGuide /> : null}
+                  before={
+                    CITATION_FIELDS[f.key] ? (
+                      <CitationGuide />
+                    ) : f.key === "references_list" ? (
+                      <ReferenceChecklist values={draft} />
+                    ) : null
+                  }
                 >
                   {f.rows === 1 ? (
                     <Input id={f.key} value={draft[f.key]} placeholder={f.placeholder} onChange={(e) => set(f.key, e.target.value)} />
@@ -394,6 +409,45 @@ function Field({
         {meter}
       </div>
       {children}
+    </div>
+  );
+}
+
+/** Live list of the works cited in Introdução and Resultados, ticked when the reference list has them. */
+function ReferenceChecklist({ values }: { values: Partial<Record<string, unknown>> }) {
+  const items = referenceCheck(values);
+  const missing = items.filter((i) => !i.found).length;
+  return (
+    <div className="mb-3 rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm">
+      <p className="font-semibold text-foreground">Conferência das citações</p>
+      <p className="mt-1 text-muted-foreground">
+        Toda obra citada na Introdução e em Resultados e discussão precisa estar aqui, com o mesmo sobrenome e o mesmo
+        ano. Ex.: (Silva, 2020) → <span className="font-mono text-xs">SILVA, J. Título da obra. Cidade: Editora, 2020.</span>
+      </p>
+      {items.length === 0 ? (
+        <p className="mt-3 text-muted-foreground">Nenhuma citação encontrada na Introdução nem em Resultados e discussão.</p>
+      ) : (
+        <>
+          <p className={cn("mt-3 text-xs font-medium", missing ? "text-destructive" : "text-success")}>
+            {missing ? `${missing} de ${items.length} obra(s) citada(s) ainda faltam` : `Todas as ${items.length} obra(s) citada(s) estão nas Referências`}
+          </p>
+          <ul className="mt-2 grid gap-1.5 sm:grid-cols-2">
+            {items.map(({ work, label, found }) => (
+              <li key={`${work.citation}|${work.year}|${work.authors}`} className="flex items-start gap-2 rounded-md bg-background p-2">
+                {found ? (
+                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-success" aria-label="Encontrada" />
+                ) : (
+                  <XCircle className="mt-0.5 size-4 shrink-0 text-destructive" aria-label="Faltando" />
+                )}
+                <span>
+                  <span className="font-mono text-xs text-foreground">{work.authors}, {work.year}</span>
+                  <span className="block text-xs text-muted-foreground">{label}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   );
 }
