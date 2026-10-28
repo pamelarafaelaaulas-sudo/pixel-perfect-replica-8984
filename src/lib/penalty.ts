@@ -1,3 +1,6 @@
+import { PHASES } from "./phases";
+
+const STAGES = PHASES.map((p) => p.number);
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /**
@@ -38,7 +41,7 @@ export type PhaseInfo = {
 };
 
 /**
- * Lateness for each of the 4 phases of a project.
+ * Lateness for each stage of a project.
  * Delivered phases count days between deadline and delivery.
  * Undelivered phases (current or future) keep accruing days once the deadline passes.
  */
@@ -50,7 +53,7 @@ export function projectLateness(args: {
   now?: Date;
 }): { phases: PhaseInfo[]; totalPenalty: number } {
   const now = args.now ?? new Date();
-  const phases: PhaseInfo[] = [1, 2, 3, 4].map((phase) => {
+  const phases: PhaseInfo[] = STAGES.map((phase) => {
     const due = args.schedules.find((s) => s.phase_number === phase)?.due_date ?? null;
     const sub = args.submissions.find((s) => s.phase_number === phase)?.submitted_at ?? null;
     let state: PhaseState;
@@ -125,7 +128,7 @@ export type PhaseTotals = {
 
 /** Per-phase totals across all groups of a class (for the deadlines screen). */
 export function phaseTotals(rows: { phases: PhaseInfo[] }[]): PhaseTotals[] {
-  return [1, 2, 3, 4].map((phase) => {
+  return STAGES.map((phase) => {
     const t: PhaseTotals = { phase, onTime: 0, deliveredLate: 0, openLate: 0, pending: 0, days: 0, penalty: 0 };
     for (const r of rows) {
       const p = r.phases.find((x) => x.phase === phase);

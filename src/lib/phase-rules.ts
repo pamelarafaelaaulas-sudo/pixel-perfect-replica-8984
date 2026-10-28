@@ -62,8 +62,6 @@ export function keywordsInTitle(keywords: string[], title: string | null | undef
   });
 }
 
-export type LimitText = (w: WordLimit) => string;
-
 export function limitLabel(w: WordLimit): string {
   if (w.max === null) return "obrigatório";
   if (w.min <= 1) return `até ${w.max} palavras`;
