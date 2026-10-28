@@ -36,7 +36,7 @@ function TeacherHome() {
 
   return (
     <>
-      <PageHeader
+      <PageHeader mascot
         eyebrow="Painel da professora"
         title={`Olá, ${firstName}`}
         description="Crie uma turma, compartilhe o código com os alunos e acompanhe cada grupo em todas as etapas."
