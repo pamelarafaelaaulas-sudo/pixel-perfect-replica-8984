@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { parseSavedEvaluation } from "@/lib/ai-score";
 
 export type Role = "teacher" | "student";
 
@@ -137,5 +138,21 @@ export const myPeerEvaluationsQuery = (groupId: string, userId: string) =>
         .eq("evaluator_student_id", userId);
       fail(error);
       return data ?? [];
+    },
+  });
+
+/* ---------------- AI evaluations ---------------- */
+
+export const aiEvaluationsForGroupQuery = (groupId: string) =>
+  queryOptions({
+    queryKey: ["ai", "group", groupId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("ai_evaluations")
+        .select("id, phase_number, requested_by, created_at, overall, criteria, summary, tips, evaluated_text")
+        .eq("group_id", groupId)
+        .order("created_at", { ascending: false });
+      fail(error);
+      return (data ?? []).map(parseSavedEvaluation);
     },
   });
