@@ -22,6 +22,13 @@
       "when": 1793196205704,
       "tag": "0002_multiple_teachers_invites",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793208587882,
+      "tag": "0003_ai_suggestions_without_scores_for_students",
+      "breakpoints": true
     }
   ]
 }
