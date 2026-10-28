@@ -15,6 +15,13 @@
       "when": 1793193557115,
       "tag": "0001_ai_evaluations",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793196205704,
+      "tag": "0002_multiple_teachers_invites",
+      "breakpoints": true
     }
   ]
 }

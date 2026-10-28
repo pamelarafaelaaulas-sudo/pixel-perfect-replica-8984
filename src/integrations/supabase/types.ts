@@ -480,6 +480,51 @@ export type Database = {
           },
         ]
       }
+      teacher_invites: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string
+          id: string
+          used_at: string | null
+          used_by: string | null
+          used_by_name: string | null
+        }
+        Insert: {
+          code?: string
+          created_at?: string
+          created_by: string
+          id?: string
+          used_at?: string | null
+          used_by?: string | null
+          used_by_name?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          used_at?: string | null
+          used_by?: string | null
+          used_by_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_invites_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_invites_used_by_fkey"
+            columns: ["used_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -503,6 +548,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consume_teacher_invite: {
+        Args: { _code: string; _user_id: string }
+        Returns: boolean
+      }
       create_group: {
         Args: { _code: string; _group_name: string; _whatsapp: string }
         Returns: string
@@ -538,8 +587,12 @@ export type Database = {
         }[]
       }
       project_group: { Args: { _project_id: string }; Returns: string }
+      redeem_teacher_invite: { Args: { _code: string }; Returns: undefined }
       shares_group_with: { Args: { _other: string }; Returns: boolean }
       submit_phase: { Args: { _project_id: string }; Returns: number }
+      teaches_class: { Args: { _class_id: string }; Returns: boolean }
+      teaches_group: { Args: { _group_id: string }; Returns: boolean }
+      teaches_student: { Args: { _student_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "teacher" | "student"

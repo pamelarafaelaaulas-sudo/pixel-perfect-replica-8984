@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { supabase } from "@/integrations/supabase/client";
 import { meQuery, teacherClassesQuery } from "@/lib/queries";
 import { plural } from "@/lib/format";
+import { TeacherInvitesDialog } from "@/components/teacher-invites";
 
 export const Route = createFileRoute("/_authenticated/professora/")({
   head: () => ({
@@ -38,7 +39,12 @@ function TeacherHome() {
         eyebrow="Painel da professora"
         title={`Olá, ${firstName}`}
         description="Crie uma turma, compartilhe o código com os alunos e acompanhe cada grupo pelas 4 etapas."
-        actions={<NewClassDialog />}
+        actions={
+          <div className="flex flex-wrap gap-2">
+            <TeacherInvitesDialog />
+            <NewClassDialog />
+          </div>
+        }
       />
       {classes.length === 0 ? (
         <EmptyState
