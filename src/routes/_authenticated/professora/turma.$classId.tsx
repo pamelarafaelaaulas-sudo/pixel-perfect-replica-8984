@@ -159,11 +159,11 @@ function ClassPage() {
                       className="group flex flex-wrap items-center gap-4 rounded-lg px-2 py-4 transition-colors hover:bg-muted"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="flex flex-wrap items-center gap-2 font-medium text-foreground">
+                        <div className="flex flex-wrap items-center gap-2 font-medium text-foreground">
                           {g.group_name}
                           <ProjectCodeTag area={project?.area_code} classLabel={cls.code_label} seq={project?.project_seq} />
                           {project && !project.area_code && <Badge variant="warning">Sem área</Badge>}
-                        </p>
+                        </div>
                         <p className="truncate text-sm text-muted-foreground">
                           {(g.group_members ?? []).map((m) => m.profiles?.name).join(", ") || "Sem integrantes"}
                         </p>
