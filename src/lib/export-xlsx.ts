@@ -19,7 +19,7 @@ export async function buildWorkbook(rows: Rows, title: string): Promise<Blob> {
       header: c.header,
       key: c.key,
       width: c.width,
-      style: { font: FONT, numFmt: c.fmt, alignment: { vertical: "top", wrapText: !!c.wrap } },
+      style: { font: FONT, ...(c.fmt ? { numFmt: c.fmt } : {}), alignment: { vertical: "top" as const, wrapText: !!c.wrap } },
     }));
     const head = ws.getRow(1);
     head.font = { ...FONT, bold: true, color: { argb: "FFFFFFFF" } };
