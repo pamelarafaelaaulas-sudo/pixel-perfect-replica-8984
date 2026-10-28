@@ -86,6 +86,14 @@ export const normalizeText = (s: string) =>
 
 const NOT_A_NAME = new Set(["de", "da", "do", "das", "dos", "del", "van", "von", "e", "et", "al"]);
 
+const authorWords = (w: CitedWork) =>
+  normalizeText(w.authors)
+    .split(" ")
+    .filter((x) => x.length >= 2 && !NOT_A_NAME.has(x));
+
+/** Same key for the same work written two ways, e.g. "(Silva, 2020)" and "Silva (2020, p. 3)". */
+export const workKey = (w: CitedWork) => `${authorWords(w).join(" ")}|${w.year}`;
+
 /**
  * Cited works with no matching line in the reference list. A line matches when it has the
  * citation's year and at least one of its author words (ABNT lists start with the surname in
@@ -98,10 +106,8 @@ export function missingReferences(works: CitedWork[], referencesText: string | n
     .filter((l) => l.trim() !== "");
   const seen = new Set<string>();
   return works.filter((w) => {
-    const words = normalizeText(w.authors)
-      .split(" ")
-      .filter((x) => x.length >= 2 && !NOT_A_NAME.has(x));
-    const key = `${words.join(" ")}|${w.year}`;
+    const words = authorWords(w);
+    const key = workKey(w);
     if (seen.has(key)) return false;
     seen.add(key);
     const yearRe = new RegExp(String.raw`(^|\D)${w.year}(\D|$)`);

@@ -3,7 +3,7 @@
  * A stage can only be delivered when every check passes.
  * The database (phase_rule_problem in submit_phase) enforces the same word limits.
  */
-import { checkCitations, citedWorks, missingReferences, type CitedWork } from "./citations";
+import { checkCitations, citedWorks, missingReferences, workKey, type CitedWork } from "./citations";
 
 /** Parts where ABNT in-text citations are mandatory. */
 export const CITATION_FIELDS: Record<string, string> = {
@@ -22,9 +22,8 @@ export function referenceCheck(
   const all = Object.entries(CITATION_FIELDS).flatMap(([key, label]) =>
     citedWorks(typeof values[key] === "string" ? (values[key] as string) : "").map((work) => ({ work, label })),
   );
-  const unique = all.filter(
-    (a, i) => missingReferences(all.slice(0, i + 1).map((x) => x.work), "").length === missingReferences(all.slice(0, i).map((x) => x.work), "").length + 1,
-  );
+  const keys = all.map((a) => workKey(a.work));
+  const unique = all.filter((_, i) => keys.indexOf(keys[i]!) === i);
   const missing = new Set(missingReferences(unique.map((u) => u.work), refs));
   return unique.map((u) => ({ ...u, found: !missing.has(u.work) }));
 }
