@@ -33,6 +33,7 @@ import { bimesterPenalties, formatPoints, gradeAfterPenalty, projectLateness } f
 import { latestPerPhase, overallScore, type SavedAiEvaluation } from "@/lib/ai-score";
 import { AiEvaluationView, scoreTone } from "@/components/ai-feedback";
 import { ProjectAreaPicker, ProjectCodeTag } from "@/components/project-code";
+import { ProjectDocxButton } from "@/components/project-docx";
 
 export const Route = createFileRoute("/_authenticated/professora/grupo/$groupId")({
   head: () => ({
@@ -131,6 +132,16 @@ function TeacherGroupPage() {
       <PageHeader
         eyebrow={`Grupo · ${cls.name}`}
         title={group.group_name}
+        actions={
+          project && (
+            <ProjectDocxButton
+              project={project}
+              groupName={group.group_name}
+              authors={members.map((m) => m.profiles?.name ?? "").filter(Boolean)}
+              cls={cls}
+            />
+          )
+        }
         description={
           project ? (
             <span className="flex flex-wrap items-center gap-3">

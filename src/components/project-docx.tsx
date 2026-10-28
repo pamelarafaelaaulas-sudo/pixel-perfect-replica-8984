@@ -62,7 +62,9 @@ function DocxPanel({ project, groupName, authors, cls }: Props) {
     return () => {
       alive = false;
     };
-  }, [project, groupName, authors, cls]);
+    // Rebuild only when the saved text, authors or code parts change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [project.id, project.updated_at, project.area_code, groupName, authors.join("|"), cls.class_code, cls.code_label]);
 
   return (
     <>
@@ -70,7 +72,7 @@ function DocxPanel({ project, groupName, authors, cls }: Props) {
         <DialogTitle className="font-display text-2xl">Projeto em Word</DialogTitle>
         <DialogDescription>
           Formatado nas normas ABNT: folha A4, margens 3 cm (superior e esquerda) e 2 cm, Arial 12, espaçamento 1,5,
-          capa, folha de rosto, resumo, seções numeradas e referências em ordem alfabética.
+          capa, folha de rosto, resumo, seções numeradas e referências em ordem alfabética. Usa o texto já salvo.
         </DialogDescription>
       </DialogHeader>
       {error ? (
