@@ -97,7 +97,7 @@ export function classLateness(args: {
         schedules: args.schedules,
         submissions: g.submissions,
         perDay: args.perDay,
-        now: args.now,
+        now: args.now ?? new Date(),
       });
       return {
         id: g.id,
