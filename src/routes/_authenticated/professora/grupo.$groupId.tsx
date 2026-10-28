@@ -32,6 +32,7 @@ import { fmtAgo, fmtDateTime, whatsappLink } from "@/lib/format";
 import { bimesterPenalties, formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
 import { latestPerPhase, overallScore, type SavedAiEvaluation } from "@/lib/ai-score";
 import { AiEvaluationView, scoreTone } from "@/components/ai-feedback";
+import { ProjectAreaPicker, ProjectCodeTag } from "@/components/project-code";
 
 export const Route = createFileRoute("/_authenticated/professora/grupo/$groupId")({
   head: () => ({
@@ -130,7 +131,15 @@ function TeacherGroupPage() {
       <PageHeader
         eyebrow={`Grupo · ${cls.name}`}
         title={group.group_name}
-        description={project ? `Última edição ${fmtAgo(project.updated_at)}` : undefined}
+        description={
+          project ? (
+            <span className="flex flex-wrap items-center gap-3">
+              <ProjectCodeTag area={project.area_code} classLabel={cls.code_label} seq={project.project_seq} className="text-sm" />
+              <ProjectAreaPicker projectId={project.id} groupId={group.id} value={project.area_code} />
+              <span>Última edição {fmtAgo(project.updated_at)}</span>
+            </span>
+          ) : undefined
+        }
       />
 
       <section className="mb-6 grid gap-3 sm:grid-cols-3">

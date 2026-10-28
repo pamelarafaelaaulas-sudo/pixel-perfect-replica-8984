@@ -57,6 +57,7 @@ import { fmtDateTime, whatsappLink } from "@/lib/format";
 import { bimesterPenalties, formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
 import { BannerStage } from "@/components/banner-stage";
 import { bannerBrief } from "@/lib/banner";
+import { ProjectAreaPicker, ProjectCodeTag } from "@/components/project-code";
 
 export const Route = createFileRoute("/_authenticated/aluno/projeto/$groupId")({
   head: () => ({
@@ -207,7 +208,15 @@ function StudentProjectPage() {
         eyebrow={cls.name}
         title={group.group_name}
         description={
-          <span className="flex flex-wrap gap-x-4 gap-y-1">
+          <span className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            {project.area_code ? (
+              <ProjectCodeTag area={project.area_code} classLabel={cls.code_label} seq={project.project_seq} className="text-sm" />
+            ) : (
+              <span className="inline-flex items-center gap-2 text-sm">
+                Escolha a área para gerar o código do projeto:
+                <ProjectAreaPicker projectId={project.id} groupId={groupId} value={null} />
+              </span>
+            )}
             {members.map((m) => (
               <a
                 key={m.id}
