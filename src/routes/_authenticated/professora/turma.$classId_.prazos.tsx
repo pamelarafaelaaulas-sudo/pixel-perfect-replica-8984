@@ -304,7 +304,7 @@ function HowItWorks({ schedules, perDay }: { schedules: { phase_number: number; 
             Desconto da etapa = <strong className="text-foreground">dias de atraso × {formatPoints(perDay)}</strong> ponto(s).
           </li>
           <li>Etapas ainda não entregues continuam somando dias depois do prazo, até o grupo entregar.</li>
-          <li>O desconto do grupo é a soma das etapas e sai da nota de cada trimestre, sem ficar abaixo de zero.</li>
+          <li>O desconto de cada etapa sai só da nota do bimestre daquela etapa (1º bimestre: Tema a Metodologia; 2º: Introdução a Resumo; 3º: Banner), sem ficar abaixo de zero. A feira (4º bimestre) não tem desconto.</li>
           <li>
             Essa conta é uma regra fixa do app, igual para todos os grupos. A IA não participa: ela só dá sugestões sobre o
             texto.

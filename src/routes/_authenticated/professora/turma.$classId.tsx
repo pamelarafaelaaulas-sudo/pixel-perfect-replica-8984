@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { classDetailQuery } from "@/lib/queries";
-import { phaseMeta } from "@/lib/phases";
+import { BIMESTER_NUMBERS, phaseMeta } from "@/lib/phases";
 import { endOfDayFromInput, fmtAgo, toDateInput } from "@/lib/format";
 import { formatPoints, projectLateness } from "@/lib/penalty";
 
@@ -165,15 +165,15 @@ function ClassPage() {
                       </Badge>
                       {totalPenalty > 0 && <Badge variant="warning">−{formatPoints(totalPenalty)} atraso</Badge>}
                       <div className="flex gap-1">
-                        {[1, 2, 3].map((t) => {
+                        {BIMESTER_NUMBERS.map((t) => {
                           const gr = grades.find((x) => x.trimester === t);
                           return (
                             <span
                               key={t}
-                              title={`${t}º trimestre`}
+                              title={`${t}º bimestre`}
                               className="min-w-10 rounded-md border border-border px-1.5 py-0.5 text-center font-mono text-xs text-muted-foreground"
                             >
-                              {gr ? formatPoints(Number(gr.score)) : `T${t}`}
+                              {gr ? formatPoints(Number(gr.score)) : `B${t}`}
                             </span>
                           );
                         })}
