@@ -4,7 +4,7 @@ import { ArrowRight, BookOpenText, HelpCircle, Lightbulb, PenLine, Users } from 
 import { Brand } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { PHASES, PHASE_COUNT, WRITTEN_START } from "@/lib/phases";
+import { PHASES, WRITTEN_END, WRITTEN_START } from "@/lib/phases";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Grupos de até 3 alunos constroem o projeto científico etapa por etapa, com prazos, avaliação entre colegas e notas por trimestre.",
+          "Grupos de até 3 alunos constroem o projeto científico etapa por etapa, com prazos, banner no Canva, feira, avaliação entre colegas e notas nos 4 bimestres.",
       },
       { property: "og:title", content: "Caderno de Projetos — Projeto científico da turma" },
       {
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const ICONS = [Lightbulb, BookOpenText, HelpCircle, PenLine];
+const ICONS = [Lightbulb, BookOpenText, HelpCircle, PenLine, Presentation];
 
 function Index() {
   const [signedIn, setSignedIn] = useState(false);
@@ -54,8 +54,9 @@ function Index() {
               Da curiosidade à <span className="marker">pergunta científica</span>, em grupo.
             </h1>
             <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-              Os alunos formam grupos de até 3 integrantes e escrevem o projeto em quatro etapas. A
-              professora acompanha prazos, vê quem contribuiu e lança as notas do trimestre.
+              Os alunos formam grupos de até 3 integrantes, escrevem o projeto etapa por etapa, montam o
+              banner e apresentam na feira. A professora acompanha prazos, vê quem contribuiu e lança as
+              notas de cada bimestre.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
@@ -72,8 +73,9 @@ function Index() {
               {
                 number: WRITTEN_START,
                 name: "Projeto escrito",
-                hint: `${PHASE_COUNT - WRITTEN_START + 1} partes com prazo próprio: título, objetivos, metodologia, introdução, resultados, conclusão, referências e, por último, o resumo.`,
+                hint: `${WRITTEN_END - WRITTEN_START + 1} partes com prazo próprio: título, objetivos, metodologia, introdução, resultados, conclusão, referências e, por último, o resumo.`,
               },
+              { number: WRITTEN_START + 1, name: "Banner e feira", hint: "No 3º bimestre, o banner montado no Canva; no 4º, a apresentação na feira." },
             ].map((p, i) => {
               const Icon = ICONS[i] ?? Lightbulb;
               return (
