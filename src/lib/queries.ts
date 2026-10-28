@@ -78,7 +78,7 @@ export const groupDetailQuery = (groupId: string) =>
         .from("groups")
         .select(
           `*,
-          classes!groups_class_id_fkey(id, name, class_code, late_penalty_per_day, banner_template_url, schedules(*)),
+          classes!groups_class_id_fkey(id, name, class_code, late_penalty_per_day, banner_template_url, banner_size, banner_sections, banner_instructions, schedules(*)),
           group_members(id, student_id, whatsapp, profiles(name, email)),
           projects(*, phase_submissions(*), project_contributions(*)),
           grades(*)`,
