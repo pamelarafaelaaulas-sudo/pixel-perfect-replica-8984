@@ -9,3 +9,4 @@
 - [x] Aluno não vê a nota da IA, só as sugestões (a professora continua vendo a nota)
 - [x] Tela por trimestre (professora): todas as turmas com nota lançada, desconto de atraso e total de cada grupo; cada grupo vê só a própria linha
 - [x] Tela de prazos e atrasos por etapa: ajustar prazo de cada etapa e desconto, com prévia ao vivo e explicação/simulação do cálculo do atraso
+- [x] Projeto escrito dividido em partes com prazo próprio (Título → Objetivo geral → Objetivos específicos → Metodologia → Introdução → Resultados e discussão → Conclusão → Referências → Resumo), com as regras do arquivo Word e entrega bloqueada fora dos limites

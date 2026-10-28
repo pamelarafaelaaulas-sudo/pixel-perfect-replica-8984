@@ -29,6 +29,13 @@
       "when": 1793208587882,
       "tag": "0003_ai_suggestions_without_scores_for_students",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793210871039,
+      "tag": "0004_written_project_parts_with_deadlines",
+      "breakpoints": true
     }
   ]
 }

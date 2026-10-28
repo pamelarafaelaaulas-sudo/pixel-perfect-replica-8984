@@ -1,6 +1,6 @@
 import { ExternalLink } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
-import { PHASES, WRITTEN_SECTIONS, parseArticles } from "@/lib/phases";
+import { PHASES, parseArticles } from "@/lib/phases";
 
 type Project = Database["public"]["Tables"]["projects"]["Row"];
 
@@ -50,16 +50,42 @@ export function ProjectView({ project }: { project: Project }) {
       <Section n={3} title={PHASES[2].name}>
         <Text value={project.guiding_question} />
       </Section>
-      <Section n={4} title={PHASES[3].name}>
+      <Section n={4} title="Projeto escrito">
         <div className="space-y-5">
-          {WRITTEN_SECTIONS.map((s) => (
-            <div key={s.key}>
-              <h4 className="mb-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">{s.label}</h4>
-              <Text value={project[s.key]} />
-            </div>
-          ))}
+          <div>
+            <p className="font-display text-xl font-semibold text-foreground">{project.title?.trim() || "Sem título ainda"}</p>
+            {(project.institution || project.area_subarea) && (
+              <p className="text-sm text-muted-foreground">
+                {[project.institution, project.area_subarea].filter(Boolean).join(" · ")}
+              </p>
+            )}
+          </div>
+          <Part title="Resumo" value={project.abstract}>
+            {project.keywords?.trim() && (
+              <p className="mt-2 text-sm">
+                <strong>Palavras-chave:</strong> {project.keywords}
+              </p>
+            )}
+          </Part>
+          <Part title="Introdução" value={project.introduction} />
+          <Part title="Objetivo geral" value={project.general_objective} />
+          <Part title="Objetivos específicos" value={project.specific_objectives} />
+          <Part title="Metodologia" value={project.methodology} />
+          <Part title="Resultados e discussão" value={project.results_discussion} />
+          <Part title="Conclusão" value={project.conclusion} />
+          <Part title="Referências" value={project.references_list} />
         </div>
       </Section>
+    </div>
+  );
+}
+
+function Part({ title, value, children }: { title: string; value: string | null; children?: React.ReactNode }) {
+  return (
+    <div>
+      <h4 className="mb-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">{title}</h4>
+      <Text value={value} />
+      {children}
     </div>
   );
 }

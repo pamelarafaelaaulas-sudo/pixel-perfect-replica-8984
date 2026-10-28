@@ -30,7 +30,7 @@ describe("late delivery penalty", () => {
 
 import { projectLateness } from "./penalty";
 
-describe("project lateness across the 4 phases", () => {
+describe("project lateness across the stages", () => {
   it("adds delivered-late days and still-open late days at the class rate", () => {
     const { phases, totalPenalty } = projectLateness({
       currentPhase: 2,
@@ -44,7 +44,7 @@ describe("project lateness across the 4 phases", () => {
       ],
       submissions: [{ phase_number: 1, submitted_at: "2026-10-11T12:00:00Z" }],
     });
-    expect(phases.map((p) => p.daysLate)).toEqual([1, 2, 0, 0]);
+    expect(phases.slice(0, 4).map((p) => p.daysLate)).toEqual([1, 2, 0, 0]);
     expect(totalPenalty).toBe(1.5);
   });
 });

@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { generateEvaluation } from "./ai-feedback.server";
-import { phaseMeta } from "./phases";
+import { PHASE_COUNT, isWrittenPart, phaseMeta } from "./phases";
 
 export const getPhaseEvaluation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -10,7 +10,7 @@ export const getPhaseEvaluation = createServerFn({ method: "POST" })
     z
       .object({
         projectId: z.string().uuid(),
-        phaseNumber: z.number().int().min(1).max(4),
+        phaseNumber: z.number().int().min(1).max(PHASE_COUNT),
         text: z.string().min(20).max(30000),
       })
       .parse(d),
@@ -26,7 +26,12 @@ export const getPhaseEvaluation = createServerFn({ method: "POST" })
     const { data: isMember } = await context.supabase.rpc("is_group_member", { _group_id: project.group_id });
     if (!isMember) throw new Error("Só integrantes do grupo podem pedir sugestões.");
 
-    const evaluation = await generateEvaluation(phaseMeta(data.phaseNumber).name, data.text);
+    const meta = phaseMeta(data.phaseNumber);
+    const evaluation = await generateEvaluation(
+      isWrittenPart(meta.number) ? `${meta.name} (parte do projeto escrito)` : meta.name,
+      meta.hint,
+      data.text,
+    );
 
     // Students cannot insert evaluations directly (no insert policy), so scores can't be forged.
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

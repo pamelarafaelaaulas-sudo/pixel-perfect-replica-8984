@@ -192,7 +192,7 @@ function DeadlinesPage() {
         />
       ) : (
         <section className="card-paper overflow-x-auto p-0">
-          <table className="w-full min-w-[860px] border-collapse text-sm">
+          <table className="w-full min-w-[1900px] border-collapse text-sm">
             <thead>
               <tr className="border-b border-border text-left">
                 <th className="px-4 py-3 font-medium text-muted-foreground">Grupo</th>

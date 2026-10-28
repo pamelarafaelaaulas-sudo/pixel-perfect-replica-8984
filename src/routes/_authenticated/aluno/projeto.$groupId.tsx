@@ -24,10 +24,24 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 import type { Database } from "@/integrations/supabase/types";
 import { aiSuggestionsForGroupQuery, groupDetailQuery, meQuery } from "@/lib/queries";
 import { latestPerPhase } from "@/lib/ai-score";
-import { SOURCE_TYPES, TRIMESTERS, WRITTEN_SECTIONS, parseArticles, type Article, phaseMeta } from "@/lib/phases";
+import {
+  PHASE_COUNT,
+  PHASE_FORM,
+  SOURCE_TYPES,
+  TEXT_FIELDS,
+  TRIMESTERS,
+  isWrittenPart,
+  parseArticles,
+  phaseFields,
+  phaseMeta,
+  type Article,
+  type TextFieldKey,
+} from "@/lib/phases";
+import { WORD_LIMITS, countWords, limitLabel, objectiveLines, phaseProblems, splitKeywords } from "@/lib/phase-rules";
 import { fmtDateTime, whatsappLink } from "@/lib/format";
 import { formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
 
@@ -53,36 +67,26 @@ export const Route = createFileRoute("/_authenticated/aluno/projeto/$groupId")({
 });
 
 type Project = Database["public"]["Tables"]["projects"]["Row"];
-type TextField = "theme" | "guiding_question" | (typeof WRITTEN_SECTIONS)[number]["key"];
-type Draft = Record<TextField, string> & { scientific_articles: Article[] };
-
-const PHASE_FIELDS: Record<number, (TextField | "scientific_articles")[]> = {
-  1: ["theme"],
-  2: ["scientific_articles"],
-  3: ["guiding_question"],
-  4: WRITTEN_SECTIONS.map((s) => s.key),
-};
+type Draft = Record<TextFieldKey, string> & { scientific_articles: Article[] };
 
 function toDraft(p: Project): Draft {
   return {
-    theme: p.theme ?? "",
-    guiding_question: p.guiding_question ?? "",
+    ...(Object.fromEntries(TEXT_FIELDS.map((k) => [k, p[k] ?? ""])) as Record<TextFieldKey, string>),
     scientific_articles: parseArticles(p.scientific_articles),
-    ...(Object.fromEntries(WRITTEN_SECTIONS.map((s) => [s.key, p[s.key] ?? ""])) as Record<
-      (typeof WRITTEN_SECTIONS)[number]["key"],
-      string
-    >),
   };
 }
 
+/** Text the AI reads for a stage: the stage's own fields (plus the title, for context, in the abstract). */
 function phaseText(d: Draft, phase: number) {
-  if (phase === 1) return d.theme;
   if (phase === 2)
     return d.scientific_articles
       .map((a, i) => `${i + 1}. ${a.title}\n${a.url}\nCitação ABNT: ${a.abnt_citation}`)
       .join("\n\n");
-  if (phase === 3) return d.guiding_question;
-  return WRITTEN_SECTIONS.map((s) => `### ${s.label}\n${d[s.key]}`).join("\n\n");
+  const fields = PHASE_FORM[phase] ?? [];
+  if (fields.length === 1) return d[fields[0]!.key];
+  const parts = fields.map((f) => `### ${f.label}\n${d[f.key]}`);
+  if (phase === 12) parts.unshift(`### Título do projeto\n${d.title}`);
+  return parts.join("\n\n");
 }
 
 function size(v: string | Article[]) {
@@ -142,7 +146,7 @@ function StudentProjectPage() {
       toast.success("Etapa entregue para a professora!");
       qc.invalidateQueries({ queryKey: ["group", groupId] });
       qc.invalidateQueries({ queryKey: ["student"] });
-      setSelected((s) => Math.min(4, s + 1));
+      setSelected((s) => Math.min(PHASE_COUNT, s + 1));
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -160,7 +164,8 @@ function StudentProjectPage() {
   const info = lateness.phases[selected - 1] ?? lateness.phases[0]!;
   const isSubmitted = info.state === "delivered";
   const editable = !isSubmitted && selected <= project.current_phase && info.state !== "skipped";
-  const phaseDirty = changedFields.some((f) => (PHASE_FIELDS[selected] ?? []).includes(f));
+  const phaseDirty = changedFields.some((f) => phaseFields(selected).includes(f));
+  const problems = phaseProblems(selected, draft, draft.scientific_articles.length);
   const grades = [...(group.grades ?? [])].sort((a, b) => a.trimester - b.trimester);
 
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => (d ? { ...d, [k]: v } : d));
@@ -215,9 +220,12 @@ function StudentProjectPage() {
         <section className="card-paper p-6 md:p-8">
           <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Etapa {selected}</p>
+              <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                Etapa {selected}
+                {isWrittenPart(selected) && " · Projeto escrito"}
+              </p>
               <h2 className="text-2xl font-semibold">{phaseMeta(selected).name}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{phaseMeta(selected).hint}</p>
+              <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{phaseMeta(selected).hint}</p>
             </div>
             {isSubmitted ? (
               <Badge variant={info.daysLate > 0 ? "warning" : "success"}>Entregue em {fmtDateTime(info.submittedAt)}</Badge>
@@ -231,45 +239,37 @@ function StudentProjectPage() {
           </div>
 
           <fieldset disabled={!editable} className="space-y-5">
-            {selected === 1 && (
-              <Field label="Tema do projeto" id="theme">
-                <Textarea
-                  id="theme"
-                  rows={5}
-                  value={draft.theme}
-                  onChange={(e) => set("theme", e.target.value)}
-                  placeholder="Sobre o que o grupo vai pesquisar e por quê?"
-                />
-              </Field>
-            )}
-
-            {selected === 2 && (
+            {selected === 2 ? (
               <ArticlesEditor value={draft.scientific_articles} onChange={(v) => set("scientific_articles", v)} editable={editable} />
-            )}
-
-            {selected === 3 && (
-              <Field label="Pergunta norteadora" id="gq">
-                <Textarea
-                  id="gq"
-                  rows={4}
-                  value={draft.guiding_question}
-                  onChange={(e) => set("guiding_question", e.target.value)}
-                  placeholder="Ex.: De que forma o descarte de óleo de cozinha afeta a qualidade da água do bairro?"
-                />
-              </Field>
-            )}
-
-            {selected === 4 &&
-              WRITTEN_SECTIONS.map((s) => (
-                <Field key={s.key} label={s.label} id={s.key} count={draft[s.key].length}>
-                  {s.rows === 1 ? (
-                    <Input id={s.key} value={draft[s.key]} onChange={(e) => set(s.key, e.target.value)} />
+            ) : (
+              (PHASE_FORM[selected] ?? []).map((f) => (
+                <Field key={f.key} label={f.label} id={f.key} meter={<FieldMeter field={f.key} value={draft[f.key]} />}>
+                  {f.rows === 1 ? (
+                    <Input id={f.key} value={draft[f.key]} placeholder={f.placeholder} onChange={(e) => set(f.key, e.target.value)} />
                   ) : (
-                    <Textarea id={s.key} rows={s.rows} value={draft[s.key]} onChange={(e) => set(s.key, e.target.value)} />
+                    <Textarea
+                      id={f.key}
+                      rows={f.rows}
+                      value={draft[f.key]}
+                      placeholder={f.placeholder}
+                      onChange={(e) => set(f.key, e.target.value)}
+                    />
                   )}
                 </Field>
-              ))}
+              ))
+            )}
           </fieldset>
+
+          {editable && selected === project.current_phase && problems.length > 0 && (
+            <div className="mt-6 rounded-lg border border-warning/40 bg-warning/10 p-4 text-sm">
+              <p className="font-medium text-foreground">Para entregar esta etapa, falta:</p>
+              <ul className="mt-1 ml-5 list-disc text-muted-foreground">
+                {problems.map((p) => (
+                  <li key={p}>{p}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {editable && (
             <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-5">
@@ -285,7 +285,7 @@ function StudentProjectPage() {
                 {selected === project.current_phase && (
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button disabled={submitMutation.isPending}>
+                      <Button disabled={submitMutation.isPending || problems.length > 0}>
                         <Send /> Entregar etapa
                       </Button>
                     </AlertDialogTrigger>
@@ -364,17 +364,36 @@ function StudentProjectPage() {
   );
 }
 
-function Field({ label, id, count, children }: { label: string; id: string; count?: number; children: React.ReactNode }) {
+function Field({ label, id, meter, children }: { label: string; id: string; meter?: React.ReactNode; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
-      <div className="flex items-baseline justify-between">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
         <Label htmlFor={id} className="text-sm font-semibold">
           {label}
         </Label>
-        {count !== undefined && <span className="text-xs text-muted-foreground">{count} caracteres</span>}
+        {meter}
       </div>
       {children}
     </div>
+  );
+}
+
+/** Live counter for a field: words against the limit, objectives per line, or keywords. */
+function FieldMeter({ field, value }: { field: TextFieldKey; value: string }) {
+  if (field === "keywords") {
+    const n = splitKeywords(value).length;
+    const ok = n >= 3 && n <= 5;
+    return <span className={cn("text-xs", ok ? "text-success" : "text-destructive")}>{n} palavra(s)-chave · de 3 a 5</span>;
+  }
+  const lim = WORD_LIMITS[field];
+  if (!lim) return null;
+  const n = countWords(value);
+  const ok = n >= lim.min && (lim.max === null || n <= lim.max);
+  return (
+    <span className={cn("text-xs", ok ? "text-success" : "text-destructive")}>
+      {field === "specific_objectives" && `${objectiveLines(value).length} de no máx. 5 objetivos · `}
+      {n} palavra(s){lim.max !== null && ` · ${limitLabel(lim)}`}
+    </span>
   );
 }
 

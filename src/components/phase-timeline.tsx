@@ -1,6 +1,6 @@
 import { Check, Clock, Lock, AlertTriangle, SkipForward } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { phaseMeta } from "@/lib/phases";
+import { isWrittenPart, phaseMeta } from "@/lib/phases";
 import { fmtDate } from "@/lib/format";
 import { formatPoints, type PhaseInfo } from "@/lib/penalty";
 
@@ -13,8 +13,41 @@ export function PhaseTimeline({
   active?: number;
   onSelect?: (phase: number) => void;
 }) {
+  const planning = phases.filter((p) => !isWrittenPart(p.phase));
+  const written = phases.filter((p) => isWrittenPart(p.phase));
   return (
-    <ol className="grid gap-3 sm:grid-cols-4">
+    <div className="space-y-4">
+      <div>
+        <p className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">Planejamento</p>
+        <Cards phases={planning} active={active} onSelect={onSelect} className="sm:grid-cols-3" />
+      </div>
+      {written.length > 0 && (
+        <div>
+          <p className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+            Projeto escrito · {written.length} partes, cada uma com seu prazo
+          </p>
+          <Cards phases={written} active={active} onSelect={onSelect} className="sm:grid-cols-3 lg:grid-cols-5" compact />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Cards({
+  phases,
+  active,
+  onSelect,
+  className,
+  compact,
+}: {
+  phases: PhaseInfo[];
+  active?: number | undefined;
+  onSelect?: ((phase: number) => void) | undefined;
+  className?: string;
+  compact?: boolean;
+}) {
+  return (
+    <ol className={cn("grid gap-3", className)}>
       {phases.map((p) => {
         const meta = phaseMeta(p.phase);
         const late = p.daysLate > 0;
@@ -36,7 +69,8 @@ export function PhaseTimeline({
               disabled={!clickable}
               onClick={() => onSelect?.(p.phase)}
               className={cn(
-                "card-paper flex h-full w-full flex-col gap-2 p-4 text-left transition-all",
+                "card-paper flex h-full w-full flex-col text-left transition-all",
+                compact ? "gap-1 p-3" : "gap-2 p-4",
                 clickable && "hover:-translate-y-0.5 hover:shadow-lift",
                 !clickable && "cursor-default",
                 active === p.phase && "ring-2 ring-primary",

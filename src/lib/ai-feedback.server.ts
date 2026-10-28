@@ -36,7 +36,7 @@ Dê uma nota de 0 a 10 (pode usar uma casa decimal) para cada critério, com um 
 - clarity (Clareza): o texto é fácil de entender, com frases objetivas e vocabulário adequado?
 - organization (Organização): as ideias seguem uma ordem lógica, com começo, desenvolvimento e ligação entre as partes?
 - citations (Citações e fontes): as fontes estão citadas e seguem as normas ABNT? Se a etapa normalmente não exige citações (por exemplo, o Tema ou a Pergunta norteadora), avalie se o texto mostra base em fontes confiáveis e não penalize com rigor excessivo.
-- phase_fit (Adequação à etapa): o texto cumpre o objetivo desta etapa do projeto?
+- phase_fit (Adequação à etapa): o texto cumpre o que a professora pede nesta etapa (veja "O que a professora pede"), incluindo limites de palavras e quantidade de itens?
 
 Seja justa e coerente: notas altas só para textos realmente bons; textos muito curtos ou vagos recebem notas baixas.
 Em "summary", escreva 1 a 2 frases encorajadoras com a visão geral.
@@ -54,7 +54,7 @@ function friendlyError(failure: unknown): Error {
 
 const cleanTips = (tips: string[]) => tips.map((t) => t.trim()).filter(Boolean).slice(0, 4);
 
-export async function generateEvaluation(phaseName: string, text: string): Promise<AiEvaluation> {
+export async function generateEvaluation(phaseName: string, phaseGuide: string, text: string): Promise<AiEvaluation> {
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) throw new Error("A IA não está configurada.");
   const provider = createOpenAI({
@@ -67,7 +67,7 @@ export async function generateEvaluation(phaseName: string, text: string): Promi
   const result = streamText({
     model: provider.responses("openai/gpt-6-astra"),
     system: INSTRUCTIONS,
-    messages: [{ role: "user", content: `Etapa: ${phaseName}\n\nTexto do grupo:\n${text}` }],
+    messages: [{ role: "user", content: `Etapa: ${phaseName}\nO que a professora pede nesta etapa: ${phaseGuide}\n\nTexto do grupo:\n${text}` }],
     output: Output.object({ schema: evaluationSchema }),
     maxRetries: 0,
     onError: ({ error }) => {
