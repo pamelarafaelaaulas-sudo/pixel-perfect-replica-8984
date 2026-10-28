@@ -184,7 +184,9 @@ function StudentProjectPage() {
   const phaseDirty = changedFields.some((f) => phaseFields(selected).includes(f));
   const problems = phaseProblems(
     selected,
-    isBanner ? { banner_canva_url: project.banner_canva_url, banner_file_path: project.banner_file_path } : draft,
+    isBanner
+      ? { banner_canva_url: project.banner_canva_url, banner_file_path: project.banner_file_path, banner_template_url: cls.banner_template_url }
+      : draft,
     draft.scientific_articles.length,
   );
   const grades = [...(group.grades ?? [])].sort((a, b) => a.trimester - b.trimester);
