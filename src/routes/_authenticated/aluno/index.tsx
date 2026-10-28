@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
-import { ArrowRight, KeyRound, Plus, Users } from "lucide-react";
+import { ArrowRight, GraduationCap, KeyRound, Plus, Users } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -97,7 +97,10 @@ function StudentHome() {
           )}
         </section>
 
-        <JoinClass defaultWhatsapp={me?.whatsapp ?? ""} />
+        <div className="space-y-6">
+          <JoinClass defaultWhatsapp={me?.whatsapp ?? ""} />
+          {memberships.length === 0 && <RedeemTeacherInvite />}
+        </div>
       </div>
     </>
   );
@@ -257,6 +260,55 @@ function JoinClass({ defaultWhatsapp }: { defaultWhatsapp: string }) {
           </form>
         </div>
       )}
+    </aside>
+  );
+}
+
+function RedeemTeacherInvite() {
+  const qc = useQueryClient();
+  const navigate = useNavigate();
+  const [code, setCode] = useState("");
+  const redeem = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.rpc("redeem_teacher_invite", { _code: code });
+      if (error) throw error;
+    },
+    onSuccess: async () => {
+      toast.success("Pronto! Agora sua conta é de professora.");
+      await qc.fetchQuery({ ...meQuery, staleTime: 0 });
+      navigate({ to: "/professora", replace: true });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <aside className="card-paper h-fit p-6">
+      <h2 className="mb-1 flex items-center gap-2 text-lg font-semibold">
+        <GraduationCap className="size-5 text-primary" /> É professora?
+      </h2>
+      <p className="mb-4 text-sm text-muted-foreground">
+        Se outra professora te passou um código de convite, digite aqui para mudar sua conta para professora.
+      </p>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          redeem.mutate();
+        }}
+        className="flex gap-2"
+      >
+        <Input
+          value={code}
+          onChange={(e) => setCode(e.target.value.toUpperCase())}
+          placeholder="EX.: 1A2B3C4D"
+          maxLength={8}
+          className="font-mono uppercase tracking-widest"
+          aria-label="Código de convite de professora"
+          required
+        />
+        <Button variant="outline" disabled={redeem.isPending}>
+          Usar
+        </Button>
+      </form>
     </aside>
   );
 }
