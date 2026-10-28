@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { ArrowLeft, CalendarClock, Copy, Trash2, Users, ArrowRight } from "lucide-react";
+import { ArrowLeft, CalendarClock, Copy, Trash2, Users, ArrowRight, Timer } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -90,6 +90,12 @@ function ClassPage() {
           </span>
         }
         actions={
+          <>
+          <Button variant="secondary" asChild>
+            <Link to="/professora/turma/$classId/prazos" params={{ classId }}>
+              <Timer /> Prazos e atrasos
+            </Link>
+          </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="outline">
@@ -109,6 +115,7 @@ function ClassPage() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          </>
         }
       />
 

@@ -64,3 +64,51 @@ export function projectLateness(args: {
   const totalPenalty = Math.round(phases.reduce((s, p) => s + p.penalty, 0) * 100) / 100;
   return { phases, totalPenalty };
 }
+
+export type GroupLateness = {
+  id: string;
+  name: string;
+  members: string[];
+  phases: PhaseInfo[];
+  totalDays: number;
+  totalPenalty: number;
+};
+
+/**
+ * Lateness for every group in a class, most penalized first.
+ * Uses the same per-phase math as projectLateness so every screen agrees.
+ */
+export function classLateness(args: {
+  perDay: number;
+  schedules: { phase_number: number; due_date: string }[];
+  groups: {
+    id: string;
+    name: string;
+    members: string[];
+    currentPhase: number;
+    submissions: { phase_number: number; submitted_at: string }[];
+  }[];
+  now?: Date;
+}): { rows: GroupLateness[]; totalPenalty: number; lateGroups: number } {
+  const rows = args.groups
+    .map((g) => {
+      const { phases, totalPenalty } = projectLateness({
+        currentPhase: g.currentPhase,
+        schedules: args.schedules,
+        submissions: g.submissions,
+        perDay: args.perDay,
+        now: args.now ?? new Date(),
+      });
+      return {
+        id: g.id,
+        name: g.name,
+        members: g.members,
+        phases,
+        totalDays: phases.reduce((s, p) => s + p.daysLate, 0),
+        totalPenalty,
+      };
+    })
+    .sort((a, b) => b.totalPenalty - a.totalPenalty || a.name.localeCompare(b.name, "pt-BR"));
+  const totalPenalty = Math.round(rows.reduce((s, r) => s + r.totalPenalty, 0) * 100) / 100;
+  return { rows, totalPenalty, lateGroups: rows.filter((r) => r.totalPenalty > 0).length };
+}
