@@ -187,24 +187,20 @@ export const studentReviewQuery = (studentId: string) =>
       fail(membershipsRes.error);
       fail(peersRes.error);
       const groupIds = (membershipsRes.data ?? []).map((m) => m.groups?.id).filter((x): x is string => !!x);
-      let ai: ReturnType<typeof parseSavedEvaluation>[] = [];
-      const aiGroup: Record<string, string> = {};
+      let ai: (ReturnType<typeof parseSavedEvaluation> & { groupId: string })[] = [];
       if (groupIds.length) {
         const aiRes = await supabase
           .from("ai_evaluations")
           .select("id, group_id, phase_number, requested_by, created_at, overall, criteria, summary, tips, evaluated_text")
           .in("group_id", groupIds);
         fail(aiRes.error);
-        ai = (aiRes.data ?? []).map((r) => {
-          aiGroup[r.id] = r.group_id;
-          return parseSavedEvaluation(r);
-        });
+        ai = (aiRes.data ?? []).map((r) => ({ ...parseSavedEvaluation(r), groupId: r.group_id }));
       }
       return {
         profile: profileRes.data,
         memberships: membershipsRes.data ?? [],
         peers: peersRes.data ?? [],
-        aiByGroup: (groupId: string) => ai.filter((e) => aiGroup[e.id] === groupId),
+        aiEvaluations: ai,
       };
     },
   });
