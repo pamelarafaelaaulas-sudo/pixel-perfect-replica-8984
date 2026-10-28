@@ -149,7 +149,9 @@ export const aiEvaluationsForGroupQuery = (groupId: string) =>
     queryFn: async () => {
       const { data, error } = await supabase
         .from("ai_evaluations")
-        .select("id, phase_number, requested_by, created_at, overall, criteria, summary, tips, evaluated_text")
+        .select(
+          "id, phase_number, requested_by, created_at, overall, criteria, summary, tips, evaluated_text",
+        )
         .eq("group_id", groupId)
         .order("created_at", { ascending: false });
       fail(error);
@@ -159,48 +161,56 @@ export const aiEvaluationsForGroupQuery = (groupId: string) =>
 
 /* ---------------- Teacher: per-student review ---------------- */
 
-export const studentReviewQuery = (studentId: string) =>
-  queryOptions({
-    queryKey: ["teacher", "student", studentId],
-    queryFn: async () => {
-      const [profileRes, membershipsRes, peersRes] = await Promise.all([
-        supabase.from("profiles").select("id, name, email, whatsapp").eq("id", studentId).maybeSingle(),
-        supabase
-          .from("group_members")
-          .select(
-            `id, whatsapp, joined_at,
+async function fetchStudentReview(studentId: string) {
+  const [profileRes, membershipsRes, peersRes] = await Promise.all([
+    supabase.from("profiles").select("id, name, email, whatsapp").eq("id", studentId).maybeSingle(),
+    supabase
+      .from("group_members")
+      .select(
+        `id, whatsapp, joined_at,
             groups(id, group_name,
               classes!groups_class_id_fkey(id, name, late_penalty_per_day, schedules(phase_number, due_date)),
               group_members(student_id),
               projects(id, current_phase, phase_submissions(phase_number, submitted_at), project_contributions(student_id, char_count_added)),
               grades(trimester, score, feedback, is_reference_ten, created_at)
             )`,
-          )
-          .eq("student_id", studentId)
-          .order("joined_at", { ascending: false }),
-        supabase
-          .from("peer_evaluations")
-          .select("group_id, trimester, score")
-          .eq("evaluated_student_id", studentId),
-      ]);
-      fail(profileRes.error);
-      fail(membershipsRes.error);
-      fail(peersRes.error);
-      const groupIds = (membershipsRes.data ?? []).map((m) => m.groups?.id).filter((x): x is string => !!x);
-      let ai: (ReturnType<typeof parseSavedEvaluation> & { groupId: string })[] = [];
-      if (groupIds.length) {
-        const aiRes = await supabase
-          .from("ai_evaluations")
-          .select("id, group_id, phase_number, requested_by, created_at, overall, criteria, summary, tips, evaluated_text")
-          .in("group_id", groupIds);
-        fail(aiRes.error);
-        ai = (aiRes.data ?? []).map((r) => ({ ...parseSavedEvaluation(r), groupId: r.group_id }));
-      }
-      return {
-        profile: profileRes.data,
-        memberships: membershipsRes.data ?? [],
-        peers: peersRes.data ?? [],
-        aiEvaluations: ai,
-      };
-    },
+      )
+      .eq("student_id", studentId)
+      .order("joined_at", { ascending: false }),
+    supabase
+      .from("peer_evaluations")
+      .select("group_id, trimester, score")
+      .eq("evaluated_student_id", studentId),
+  ]);
+  fail(profileRes.error);
+  fail(membershipsRes.error);
+  fail(peersRes.error);
+  const groupIds = (membershipsRes.data ?? [])
+    .map((m) => m.groups?.id)
+    .filter((x): x is string => !!x);
+  let ai: (ReturnType<typeof parseSavedEvaluation> & { groupId: string })[] = [];
+  if (groupIds.length) {
+    const aiRes = await supabase
+      .from("ai_evaluations")
+      .select(
+        "id, group_id, phase_number, requested_by, created_at, overall, criteria, summary, tips, evaluated_text",
+      )
+      .in("group_id", groupIds);
+    fail(aiRes.error);
+    ai = (aiRes.data ?? []).map((r) => ({ ...parseSavedEvaluation(r), groupId: r.group_id }));
+  }
+  return {
+    profile: profileRes.data,
+    memberships: membershipsRes.data ?? [],
+    peers: peersRes.data ?? [],
+    aiEvaluations: ai,
+  };
+}
+
+export type StudentReview = Awaited<ReturnType<typeof fetchStudentReview>>;
+
+export const studentReviewQuery = (studentId: string) =>
+  queryOptions({
+    queryKey: ["teacher", "student", studentId],
+    queryFn: () => fetchStudentReview(studentId),
   });

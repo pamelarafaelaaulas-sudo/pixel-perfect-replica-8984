@@ -20,6 +20,7 @@ import { Route as AuthenticatedAlunoIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedProfessoraIndexRouteImport } from './routes/_authenticated/professora/index'
 import { Route as AuthenticatedAlunoAvaliacaoGroupIdRouteImport } from './routes/_authenticated/aluno/avaliacao.$groupId'
 import { Route as AuthenticatedAlunoProjetoGroupIdRouteImport } from './routes/_authenticated/aluno/projeto.$groupId'
+import { Route as AuthenticatedProfessoraAlunoStudentIdRouteImport } from './routes/_authenticated/professora/aluno.$studentId'
 import { Route as AuthenticatedProfessoraGrupoGroupIdRouteImport } from './routes/_authenticated/professora/grupo.$groupId'
 import { Route as AuthenticatedProfessoraTurmaClassIdRouteImport } from './routes/_authenticated/professora/turma.$classId'
 import { Route as AuthenticatedProfessoraTurmaClassIdPrazosRouteImport } from './routes/_authenticated/professora/turma.$classId_.prazos'
@@ -82,6 +83,12 @@ const AuthenticatedAlunoProjetoGroupIdRoute =
     path: '/projeto/$groupId',
     getParentRoute: () => AuthenticatedAlunoRouteRoute,
   } as any)
+const AuthenticatedProfessoraAlunoStudentIdRoute =
+  AuthenticatedProfessoraAlunoStudentIdRouteImport.update({
+    id: '/aluno/$studentId',
+    path: '/aluno/$studentId',
+    getParentRoute: () => AuthenticatedProfessoraRouteRoute,
+  } as any)
 const AuthenticatedProfessoraGrupoGroupIdRoute =
   AuthenticatedProfessoraGrupoGroupIdRouteImport.update({
     id: '/grupo/$groupId',
@@ -112,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/professora/': typeof AuthenticatedProfessoraIndexRoute
   '/aluno/avaliacao/$groupId': typeof AuthenticatedAlunoAvaliacaoGroupIdRoute
   '/aluno/projeto/$groupId': typeof AuthenticatedAlunoProjetoGroupIdRoute
+  '/professora/aluno/$studentId': typeof AuthenticatedProfessoraAlunoStudentIdRoute
   '/professora/grupo/$groupId': typeof AuthenticatedProfessoraGrupoGroupIdRoute
   '/professora/turma/$classId': typeof AuthenticatedProfessoraTurmaClassIdRoute
   '/professora/turma/$classId/prazos': typeof AuthenticatedProfessoraTurmaClassIdPrazosRoute
@@ -125,6 +133,7 @@ export interface FileRoutesByTo {
   '/professora': typeof AuthenticatedProfessoraIndexRoute
   '/aluno/avaliacao/$groupId': typeof AuthenticatedAlunoAvaliacaoGroupIdRoute
   '/aluno/projeto/$groupId': typeof AuthenticatedAlunoProjetoGroupIdRoute
+  '/professora/aluno/$studentId': typeof AuthenticatedProfessoraAlunoStudentIdRoute
   '/professora/grupo/$groupId': typeof AuthenticatedProfessoraGrupoGroupIdRoute
   '/professora/turma/$classId': typeof AuthenticatedProfessoraTurmaClassIdRoute
   '/professora/turma/$classId/prazos': typeof AuthenticatedProfessoraTurmaClassIdPrazosRoute
@@ -142,6 +151,7 @@ export interface FileRoutesById {
   '/_authenticated/professora/': typeof AuthenticatedProfessoraIndexRoute
   '/_authenticated/aluno/avaliacao/$groupId': typeof AuthenticatedAlunoAvaliacaoGroupIdRoute
   '/_authenticated/aluno/projeto/$groupId': typeof AuthenticatedAlunoProjetoGroupIdRoute
+  '/_authenticated/professora/aluno/$studentId': typeof AuthenticatedProfessoraAlunoStudentIdRoute
   '/_authenticated/professora/grupo/$groupId': typeof AuthenticatedProfessoraGrupoGroupIdRoute
   '/_authenticated/professora/turma/$classId': typeof AuthenticatedProfessoraTurmaClassIdRoute
   '/_authenticated/professora/turma/$classId_/prazos': typeof AuthenticatedProfessoraTurmaClassIdPrazosRoute
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/professora/'
     | '/aluno/avaliacao/$groupId'
     | '/aluno/projeto/$groupId'
+    | '/professora/aluno/$studentId'
     | '/professora/grupo/$groupId'
     | '/professora/turma/$classId'
     | '/professora/turma/$classId/prazos'
@@ -172,6 +183,7 @@ export interface FileRouteTypes {
     | '/professora'
     | '/aluno/avaliacao/$groupId'
     | '/aluno/projeto/$groupId'
+    | '/professora/aluno/$studentId'
     | '/professora/grupo/$groupId'
     | '/professora/turma/$classId'
     | '/professora/turma/$classId/prazos'
@@ -188,6 +200,7 @@ export interface FileRouteTypes {
     | '/_authenticated/professora/'
     | '/_authenticated/aluno/avaliacao/$groupId'
     | '/_authenticated/aluno/projeto/$groupId'
+    | '/_authenticated/professora/aluno/$studentId'
     | '/_authenticated/professora/grupo/$groupId'
     | '/_authenticated/professora/turma/$classId'
     | '/_authenticated/professora/turma/$classId_/prazos'
@@ -279,6 +292,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAlunoProjetoGroupIdRouteImport
       parentRoute: typeof AuthenticatedAlunoRouteRoute
     }
+    '/_authenticated/professora/aluno/$studentId': {
+      id: '/_authenticated/professora/aluno/$studentId'
+      path: '/aluno/$studentId'
+      fullPath: '/professora/aluno/$studentId'
+      preLoaderRoute: typeof AuthenticatedProfessoraAlunoStudentIdRouteImport
+      parentRoute: typeof AuthenticatedProfessoraRouteRoute
+    }
     '/_authenticated/professora/grupo/$groupId': {
       id: '/_authenticated/professora/grupo/$groupId'
       path: '/grupo/$groupId'
@@ -325,6 +345,7 @@ const AuthenticatedAlunoRouteRouteWithChildren =
 
 interface AuthenticatedProfessoraRouteRouteChildren {
   AuthenticatedProfessoraIndexRoute: typeof AuthenticatedProfessoraIndexRoute
+  AuthenticatedProfessoraAlunoStudentIdRoute: typeof AuthenticatedProfessoraAlunoStudentIdRoute
   AuthenticatedProfessoraGrupoGroupIdRoute: typeof AuthenticatedProfessoraGrupoGroupIdRoute
   AuthenticatedProfessoraTurmaClassIdRoute: typeof AuthenticatedProfessoraTurmaClassIdRoute
   AuthenticatedProfessoraTurmaClassIdPrazosRoute: typeof AuthenticatedProfessoraTurmaClassIdPrazosRoute
@@ -333,6 +354,8 @@ interface AuthenticatedProfessoraRouteRouteChildren {
 const AuthenticatedProfessoraRouteRouteChildren: AuthenticatedProfessoraRouteRouteChildren =
   {
     AuthenticatedProfessoraIndexRoute: AuthenticatedProfessoraIndexRoute,
+    AuthenticatedProfessoraAlunoStudentIdRoute:
+      AuthenticatedProfessoraAlunoStudentIdRoute,
     AuthenticatedProfessoraGrupoGroupIdRoute:
       AuthenticatedProfessoraGrupoGroupIdRoute,
     AuthenticatedProfessoraTurmaClassIdRoute:
