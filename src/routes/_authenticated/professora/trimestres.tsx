@@ -62,7 +62,7 @@ function TrimesterPage() {
       ) : (
         <div className="space-y-8">
           {report.map((c) => (
-            <ClassTable key={c.classId} c={c} trimester={t} />
+            <ClassTable key={c.classId} c={c} />
           ))}
         </div>
       )}
@@ -70,7 +70,7 @@ function TrimesterPage() {
   );
 }
 
-function ClassTable({ c, trimester }: { c: TrimesterClass; trimester: number }) {
+function ClassTable({ c }: { c: TrimesterClass }) {
   return (
     <section>
       <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
@@ -129,7 +129,6 @@ function ClassTable({ c, trimester }: { c: TrimesterClass; trimester: number }) 
           </tbody>
         </table>
       </div>
-      <span className="sr-only">{trimester}º trimestre</span>
     </section>
   );
 }

@@ -18,4 +18,5 @@
 - Late-penalty math lives in `src/lib/penalty.ts` (pure, unit-tested) so teacher and student screens show the same numbers.
 - AI phase evaluation returns per-criterion scores via a strict schema; the overall grade is computed in `src/lib/ai-score.ts` (pure, unit-tested), never taken from the model. Results are saved to `ai_evaluations` only by the server function (admin insert after a membership check; no client insert policy) so students cannot forge scores. Students have no SELECT on `ai_evaluations`; they read score-free suggestions through the `group_ai_suggestions` RPC, and the server function returns no scores.
 - The teacher's all-students list (`src/lib/roster.ts`, pure, unit-tested) reuses `projectLateness`, so a student's lateness equals their group's.
+- Trimester report math (`src/lib/trimester.ts`, pure, unit-tested) uses the same total rule as the per-student review; students see only their own group's grades because `grades` RLS is group-scoped.
 - Per-student review math (final trimester grade = teacher score − project late penalty, AI/peer averages) lives in `src/lib/student-review.ts` (pure, unit-tested); the screen only renders it.
