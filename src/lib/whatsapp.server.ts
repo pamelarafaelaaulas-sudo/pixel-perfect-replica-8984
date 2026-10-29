@@ -164,7 +164,7 @@ async function processEvent(admin: Db, ev: { event: string; payload: unknown; re
       _wa_id: s.id,
       _status: s.status,
       _at: at,
-      _error: err ?? "",
+      _error: err as string,
     });
     if (error) throw new Error(error.message);
     if (!data) allMatched = false;
