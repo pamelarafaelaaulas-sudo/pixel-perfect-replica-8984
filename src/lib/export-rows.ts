@@ -253,7 +253,7 @@ export function buildNumberingRows(classes: NumberingInputClass[], areaName: (co
         className: c.name,
         classLabel: c.code_label ?? "",
         groupName: g.group_name,
-        area: areaName(g.projects.area_code) ?? "",
+        area: areaName(g.projects.area_code ?? null) ?? "",
         members: (g.group_members ?? []).map((m) => m.profiles?.name ?? "").filter(Boolean).sort(byText).join(", "),
       });
     }
