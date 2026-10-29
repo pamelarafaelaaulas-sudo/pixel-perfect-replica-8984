@@ -127,6 +127,8 @@ export type Database = {
           code_label: string | null
           code_order: number | null
           created_at: string
+          fair_at: string | null
+          fair_name: string
           id: string
           late_penalty_per_day: number
           name: string
@@ -141,6 +143,8 @@ export type Database = {
           code_label?: string | null
           code_order?: number | null
           created_at?: string
+          fair_at?: string | null
+          fair_name?: string
           id?: string
           late_penalty_per_day?: number
           name: string
@@ -155,6 +159,8 @@ export type Database = {
           code_label?: string | null
           code_order?: number | null
           created_at?: string
+          fair_at?: string | null
+          fair_name?: string
           id?: string
           late_penalty_per_day?: number
           name?: string

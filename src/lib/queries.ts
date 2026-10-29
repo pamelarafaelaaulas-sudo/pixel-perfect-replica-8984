@@ -120,7 +120,7 @@ export const myGroupsQuery = (userId: string) =>
         .select(
           `id, group_id,
           groups(id, group_name,
-            classes!groups_class_id_fkey(id, name, class_code, code_label),
+            classes!groups_class_id_fkey(id, name, class_code, code_label, fair_at, fair_name),
             group_members(id),
             projects(id, current_phase, updated_at, area_code, code_number)
           )`,
@@ -355,7 +355,7 @@ export const teacherNumberingQuery = queryOptions({
       .from("classes")
       .select(
         `id, name, code_label, code_order, created_at,
-        groups!groups_class_id_fkey(id, group_name, created_at, projects(id, area_code, code_number))`,
+        groups!groups_class_id_fkey(id, group_name, created_at, group_members(profiles(name)), projects(id, area_code, code_number))`,
       )
       .order("created_at");
     fail(error);

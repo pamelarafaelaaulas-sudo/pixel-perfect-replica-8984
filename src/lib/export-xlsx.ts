@@ -1,4 +1,4 @@
-import type { buildExport } from "./export-rows";
+import type { buildExport, buildStudentGrades, NumberingRow } from "./export-rows";
 import { AI_CRITERIA } from "./ai-score";
 
 type Rows = ReturnType<typeof buildExport>;
@@ -94,4 +94,89 @@ export function downloadBlob(blob: Blob, filename: string) {
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 30_000);
+}
+
+type Col = { header: string; key: string; width: number; fmt?: string; wrap?: boolean };
+
+async function newWorkbook(title: string) {
+  const { default: ExcelJS } = await import("exceljs");
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "PamLab";
+  wb.title = title;
+  const used = new Set<string>();
+  const addSheet = (rawName: string, cols: Col[]) => {
+    const base = rawName.replace(/[[\]:*?/\\]/g, " ").trim().slice(0, 28) || "Planilha";
+    let name = base;
+    for (let i = 2; used.has(name.toLowerCase()); i++) name = `${base} ${i}`;
+    used.add(name.toLowerCase());
+    const ws = wb.addWorksheet(name, { views: [{ state: "frozen", ySplit: 1 }] });
+    ws.columns = cols.map((c) => ({
+      header: c.header,
+      key: c.key,
+      width: c.width,
+      style: { font: FONT, ...(c.fmt ? { numFmt: c.fmt } : {}), alignment: { vertical: "top" as const, wrapText: !!c.wrap } },
+    }));
+    const head = ws.getRow(1);
+    head.font = { ...FONT, bold: true, color: { argb: "FFFFFFFF" } };
+    head.fill = HEADER_FILL;
+    head.alignment = { vertical: "middle", wrapText: true };
+    head.height = 28;
+    ws.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: cols.length } };
+    return ws;
+  };
+  const finish = async () => {
+    const buf = await wb.xlsx.writeBuffer();
+    return new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  };
+  return { addSheet, finish };
+}
+
+/** One sheet per class: student name, group, project code, final grade per bimestre and the average (live formula). */
+export async function buildStudentGradesWorkbook(
+  blocks: ReturnType<typeof buildStudentGrades>,
+  bimesterTitles: string[],
+): Promise<Blob> {
+  const { addSheet, finish } = await newWorkbook("Notas dos alunos por turma");
+  const first = 4;
+  const last = first + bimesterTitles.length - 1;
+  const colL = (n: number) => String.fromCharCode(64 + n);
+  for (const block of blocks.length ? blocks : [{ className: "Alunos", rows: [] }]) {
+    const ws = addSheet(block.className, [
+      { header: "Aluno", key: "name", width: 30 },
+      { header: "Grupo", key: "groupName", width: 24 },
+      { header: "Código do projeto", key: "projectCode", width: 16 },
+      ...bimesterTitles.map((t, i) => ({ header: t, key: `b${i}`, width: 14, fmt: "0.0" })),
+      { header: "Média", key: "avg", width: 10, fmt: "0.0" },
+    ]);
+    block.rows.forEach((r, i) => {
+      const n = i + 2;
+      const filled = r.totals.filter((t): t is number => t !== null);
+      const avg = filled.length ? Math.round((filled.reduce((s, x) => s + x, 0) / filled.length) * 10) / 10 : "";
+      const range = `${colL(first)}${n}:${colL(last)}${n}`;
+      ws.addRow({
+        name: r.name,
+        groupName: r.groupName,
+        projectCode: r.projectCode,
+        ...Object.fromEntries(r.totals.map((t, j) => [`b${j}`, t])),
+        avg: { formula: `IF(COUNT(${range})=0,"",ROUND(AVERAGE(${range}),1))`, result: avg },
+      });
+    });
+  }
+  return finish();
+}
+
+/** Single sheet with every project's number and code, in numbering order. */
+export async function buildNumberingWorkbook(rows: NumberingRow[]): Promise<Blob> {
+  const { addSheet, finish } = await newWorkbook("Numeração dos trabalhos");
+  const ws = addSheet("Numeração", [
+    { header: "Nº", key: "number", width: 6, fmt: "00" },
+    { header: "Código do projeto", key: "projectCode", width: 18 },
+    { header: "Turma", key: "className", width: 20 },
+    { header: "Sigla", key: "classLabel", width: 8 },
+    { header: "Grupo", key: "groupName", width: 26 },
+    { header: "Área", key: "area", width: 22 },
+    { header: "Integrantes", key: "members", width: 40, wrap: true },
+  ]);
+  for (const r of rows) ws.addRow(r);
+  return finish();
 }

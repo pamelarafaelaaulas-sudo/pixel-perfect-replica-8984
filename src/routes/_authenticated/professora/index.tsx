@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
-import { Plus, School, Users, ArrowRight, ClipboardList, Palette, FileSpreadsheet, CalendarRange, Hash } from "lucide-react";
+import { Plus, School, Users, ArrowRight, ClipboardList, Palette, CalendarRange, Hash } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,8 @@ import { meQuery, teacherClassesQuery } from "@/lib/queries";
 import { plural } from "@/lib/format";
 import { TeacherInvitesDialog } from "@/components/teacher-invites";
 import { normalizeClassLabel } from "@/lib/project-code";
+import { NumberingSheetButton } from "@/components/sheet-downloads";
+import { FairCountdown } from "@/components/fair-countdown";
 
 export const Route = createFileRoute("/_authenticated/professora/")({
   head: () => ({
@@ -62,11 +64,7 @@ function TeacherHome() {
                 <ClipboardList /> Notas do bimestre
               </Link>
             </Button>
-            <Button variant="outline" asChild>
-              <Link to="/professora/exportar">
-                <FileSpreadsheet /> Exportar planilha
-              </Link>
-            </Button>
+            <NumberingSheetButton />
             <Button variant="outline" asChild>
               <Link to="/professora/banner" search={{}}>
                 <Palette /> Modelo do banner
@@ -77,6 +75,7 @@ function TeacherHome() {
           </div>
         }
       />
+      {me && <FairCountdown classes={classes} teacherId={me.id} />}
       {classes.length === 0 ? (
         <EmptyState
           icon={<School className="size-5" />}
