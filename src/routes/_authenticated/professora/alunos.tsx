@@ -11,6 +11,7 @@ import { buildRoster, filterRoster } from "@/lib/roster";
 import { PHASE_COUNT, phaseMeta } from "@/lib/phases";
 import { formatPoints, type PhaseInfo } from "@/lib/penalty";
 import { plural } from "@/lib/format";
+import { StudentGradesSheetButton } from "@/components/sheet-downloads";
 
 export const Route = createFileRoute("/_authenticated/professora/alunos")({
   head: () => ({
@@ -46,6 +47,7 @@ function RosterPage() {
         eyebrow="Painel da professora"
         title="Alunos"
         description="Todos os alunos das suas turmas, com grupo, etapas entregues e atrasos. As entregas são do grupo, então os integrantes de um mesmo grupo têm os mesmos números."
+        actions={rows.length > 0 && <StudentGradesSheetButton />}
       />
 
       {rows.length === 0 ? (

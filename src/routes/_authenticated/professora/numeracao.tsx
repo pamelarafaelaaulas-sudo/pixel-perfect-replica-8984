@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { teacherNumberingQuery } from "@/lib/queries";
 import { numberProjects, projectCode } from "@/lib/project-code";
 import { plural } from "@/lib/format";
+import { NumberingSheetButton } from "@/components/sheet-downloads";
 
 export const Route = createFileRoute("/_authenticated/professora/numeracao")({
   head: () => ({
@@ -94,9 +95,12 @@ function NumberingPage() {
         description="Todas as suas turmas seguem uma só contagem, a partir do 01. Escolha a turma que começa e a ordem das outras; dentro de cada turma, vale a ordem de cadastro dos grupos."
         actions={
           classes.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+            <NumberingSheetButton />
             <Button onClick={() => apply.mutate()} disabled={apply.isPending || (!changed && !orderChanged)}>
               <Hash /> {apply.isPending ? "Aplicando…" : "Aplicar numeração"}
             </Button>
+            </div>
           )
         }
       />
