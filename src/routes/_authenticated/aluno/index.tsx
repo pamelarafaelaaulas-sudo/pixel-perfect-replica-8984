@@ -13,6 +13,7 @@ import { meQuery, myGroupsQuery } from "@/lib/queries";
 import { PHASES, phaseMeta } from "@/lib/phases";
 import { fmtAgo } from "@/lib/format";
 import { AreaSelect, ProjectCodeTag } from "@/components/project-code";
+import { FairCountdown } from "@/components/fair-countdown";
 
 export const Route = createFileRoute("/_authenticated/aluno/")({
   head: () => ({
@@ -40,6 +41,10 @@ function StudentHome() {
         eyebrow="Área do aluno"
         title={`Olá, ${firstName}`}
         description="Aqui ficam os projetos dos seus grupos. Para entrar numa turma nova, use o código que a professora passou."
+      />
+
+      <FairCountdown
+        classes={memberships.flatMap((m) => (m.groups?.classes ? [m.groups.classes] : []))}
       />
 
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">

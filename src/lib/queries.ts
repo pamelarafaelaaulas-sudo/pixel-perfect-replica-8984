@@ -120,7 +120,7 @@ export const myGroupsQuery = (userId: string) =>
         .select(
           `id, group_id,
           groups(id, group_name,
-            classes!groups_class_id_fkey(id, name, class_code, code_label),
+            classes!groups_class_id_fkey(id, name, class_code, code_label, fair_at, fair_name),
             group_members(id),
             projects(id, current_phase, updated_at, area_code, code_number)
           )`,

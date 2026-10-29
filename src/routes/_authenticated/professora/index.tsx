@@ -14,6 +14,7 @@ import { plural } from "@/lib/format";
 import { TeacherInvitesDialog } from "@/components/teacher-invites";
 import { normalizeClassLabel } from "@/lib/project-code";
 import { NumberingSheetButton } from "@/components/sheet-downloads";
+import { FairCountdown } from "@/components/fair-countdown";
 
 export const Route = createFileRoute("/_authenticated/professora/")({
   head: () => ({
@@ -74,6 +75,7 @@ function TeacherHome() {
           </div>
         }
       />
+      {me && <FairCountdown classes={classes} teacherId={me.id} />}
       {classes.length === 0 ? (
         <EmptyState
           icon={<School className="size-5" />}
