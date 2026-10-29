@@ -131,36 +131,62 @@ async function newWorkbook(title: string) {
   return { addSheet, finish };
 }
 
-/** One sheet per class: student name, group, project code, final grade per bimestre and the average (live formula). */
+/**
+ * First sheet "Todos os alunos" lists every student (full name, class, group, code, final grade per bimestre, average),
+ * then one sheet per class that has students. Classes with no students yet are left out so the file never opens empty.
+ */
 export async function buildStudentGradesWorkbook(
   blocks: ReturnType<typeof buildStudentGrades>,
   bimesterTitles: string[],
 ): Promise<Blob> {
   const { addSheet, finish } = await newWorkbook("Notas dos alunos por turma");
-  const first = 4;
-  const last = first + bimesterTitles.length - 1;
   const colL = (n: number) => String.fromCharCode(64 + n);
-  for (const block of blocks.length ? blocks : [{ className: "Alunos", rows: [] }]) {
-    const ws = addSheet(block.className, [
-      { header: "Aluno", key: "name", width: 30 },
-      { header: "Grupo", key: "groupName", width: 24 },
-      { header: "Código do projeto", key: "projectCode", width: 16 },
-      ...bimesterTitles.map((t, i) => ({ header: t, key: `b${i}`, width: 14, fmt: "0.0" })),
-      { header: "Média", key: "avg", width: 10, fmt: "0.0" },
-    ]);
-    block.rows.forEach((r, i) => {
+  const gradeCols = bimesterTitles.map((t, i) => ({ header: t, key: `b${i}`, width: 14, fmt: "0.0" }));
+
+  const fill = (
+    ws: ReturnType<typeof addSheet>,
+    first: number,
+    rows: { r: (typeof blocks)[number]["rows"][number]; className: string }[],
+  ) => {
+    const last = first + bimesterTitles.length - 1;
+    rows.forEach(({ r, className }, i) => {
       const n = i + 2;
       const filled = r.totals.filter((t): t is number => t !== null);
       const avg = filled.length ? Math.round((filled.reduce((s, x) => s + x, 0) / filled.length) * 10) / 10 : "";
       const range = `${colL(first)}${n}:${colL(last)}${n}`;
       ws.addRow({
         name: r.name,
+        className,
         groupName: r.groupName,
         projectCode: r.projectCode,
         ...Object.fromEntries(r.totals.map((t, j) => [`b${j}`, t])),
         avg: { formula: `IF(COUNT(${range})=0,"",ROUND(AVERAGE(${range}),1))`, result: avg },
       });
     });
+  };
+
+  const all = addSheet("Todos os alunos", [
+    { header: "Nome completo", key: "name", width: 34 },
+    { header: "Turma", key: "className", width: 20 },
+    { header: "Grupo", key: "groupName", width: 24 },
+    { header: "Código do projeto", key: "projectCode", width: 16 },
+    ...gradeCols,
+    { header: "Média", key: "avg", width: 10, fmt: "0.0" },
+  ]);
+  const allRows = blocks.flatMap((b) => b.rows.map((r) => ({ r, className: b.className })));
+  if (allRows.length) fill(all, 5, allRows);
+  else all.addRow({ name: "Nenhum aluno entrou em um grupo ainda." });
+
+  for (const block of blocks) {
+    if (!block.rows.length) continue;
+    const ws = addSheet(block.className, [
+      { header: "Nome completo", key: "name", width: 34 },
+      { header: "Grupo", key: "groupName", width: 24 },
+      { header: "Código do projeto", key: "projectCode", width: 16 },
+      ...gradeCols,
+      { header: "Média", key: "avg", width: 10, fmt: "0.0" },
+    ]);
+    fill(ws, 4, block.rows.map((r) => ({ r, className: block.className })));
   }
   return finish();
 }
