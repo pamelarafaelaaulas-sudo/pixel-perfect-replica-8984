@@ -100,7 +100,7 @@ function RemindersPage() {
   });
 
   const o = overview.data;
-  const tpl = TEMPLATE_LABEL[o?.templateStatus ?? "UNKNOWN"] ?? TEMPLATE_LABEL.UNKNOWN!;
+  const tpl = TEMPLATE_LABEL[o?.templateStatus ?? "UNKNOWN"] ?? TEMPLATE_LABEL["UNKNOWN"]!;
   const approved = o?.templateStatus === "APPROVED";
   const sample = o?.reminders[0];
 
@@ -194,8 +194,8 @@ function RemindersPage() {
                   disabled={saveSettings.isPending || Number(interval) === data.settings.interval_days}
                   onClick={() => {
                     const n = Math.round(Number(interval));
-                    if (!(n >= 1 && n <= 30)) return toast.error("Escolha de 1 a 30 dias.");
-                    saveSettings.mutate({ interval_days: n });
+                    if (n >= 1 && n <= 30) saveSettings.mutate({ interval_days: n });
+                    else toast.error("Escolha de 1 a 30 dias.");
                   }}
                 >
                   Salvar
