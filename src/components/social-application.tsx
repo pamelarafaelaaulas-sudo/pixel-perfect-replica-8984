@@ -22,7 +22,7 @@ export function SocialApplicationCard({
   value: string | null;
   projectId?: string;
   groupId?: string;
-  studentId?: string;
+  studentId?: string | undefined;
   editable?: boolean;
   hint?: string;
   onSaved?: (v: string) => void;
