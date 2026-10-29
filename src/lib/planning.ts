@@ -52,7 +52,7 @@ export function planningOverview(args: {
         schedules: args.schedules,
         submissions: g.submissions,
         perDay: 0,
-        now: args.now,
+        now: args.now ?? new Date(),
       });
       return { id: g.id, name: g.name, currentPhase: g.currentPhase, delivered: phases.filter((p) => p.state === "delivered").length, phases };
     })
