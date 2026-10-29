@@ -125,6 +125,7 @@ export type Database = {
           banner_template_url: string | null
           class_code: string
           code_label: string | null
+          code_order: number | null
           created_at: string
           id: string
           late_penalty_per_day: number
@@ -138,6 +139,7 @@ export type Database = {
           banner_template_url?: string | null
           class_code?: string
           code_label?: string | null
+          code_order?: number | null
           created_at?: string
           id?: string
           late_penalty_per_day?: number
@@ -151,6 +153,7 @@ export type Database = {
           banner_template_url?: string | null
           class_code?: string
           code_label?: string | null
+          code_order?: number | null
           created_at?: string
           id?: string
           late_penalty_per_day?: number
@@ -451,6 +454,7 @@ export type Database = {
           banner_canva_url: string | null
           banner_file_name: string | null
           banner_file_path: string | null
+          code_number: number | null
           conclusion: string | null
           current_phase: number
           general_objective: string | null
@@ -478,6 +482,7 @@ export type Database = {
           banner_canva_url?: string | null
           banner_file_name?: string | null
           banner_file_path?: string | null
+          code_number?: number | null
           conclusion?: string | null
           current_phase?: number
           general_objective?: string | null
@@ -505,6 +510,7 @@ export type Database = {
           banner_canva_url?: string | null
           banner_file_name?: string | null
           banner_file_path?: string | null
+          code_number?: number | null
           conclusion?: string | null
           current_phase?: number
           general_objective?: string | null
@@ -719,6 +725,7 @@ export type Database = {
         Args: { _authors: string; _lines: string[]; _year: string }
         Returns: boolean
       }
+      renumber_projects: { Args: { _class_ids: string[] }; Returns: number }
       shares_group_with: { Args: { _other: string }; Returns: boolean }
       submit_phase: { Args: { _project_id: string }; Returns: number }
       teaches_class: { Args: { _class_id: string }; Returns: boolean }
