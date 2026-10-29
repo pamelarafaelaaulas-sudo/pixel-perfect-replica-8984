@@ -64,6 +64,11 @@ function TeacherHome() {
               </Link>
             </Button>
             <Button variant="outline" asChild>
+              <Link to="/professora/lembretes">
+                <MessageCircle /> Lembretes WhatsApp
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
               <Link to="/professora/banner" search={{}}>
                 <Palette /> Modelo do banner
               </Link>
