@@ -27,15 +27,43 @@ export function normalizeClassLabel(raw: string) {
 }
 
 /**
- * Project code: AREA-CLASSLABEL-000. The number is the site-wide registration order.
+ * Project code: AREA-CLASSLABEL-01. The number is one count per teacher across all her classes
+ * (class order she chose, then group registration order), at least 2 digits.
  * Missing class label shows as "???" so the code is still recognizable; missing area or number → null.
  */
 export function projectCode(
   area: string | null | undefined,
   classLabel: string | null | undefined,
-  seq: number | null | undefined,
+  num: number | null | undefined,
 ) {
-  if (!area || seq == null) return null;
-  const n = String(seq).padStart(3, "0");
+  if (!area || num == null) return null;
+  const n = String(num).padStart(2, "0");
   return `${area}-${classLabel || "???"}-${n}`;
+}
+
+export type NumberingClass = {
+  id: string;
+  created_at: string;
+  groups: { id: string; created_at: string }[];
+};
+
+/**
+ * Mirrors SQL `renumber_projects`: classes in the chosen order (unlisted ones after, by creation),
+ * groups by registration inside each class, numbered 1, 2, 3… in one shared count.
+ */
+export function numberProjects(classes: NumberingClass[], order: string[]) {
+  const pos = new Map(order.map((id, i) => [id, i]));
+  const sorted = [...classes].sort((a, b) => {
+    const pa = pos.get(a.id) ?? Infinity;
+    const pb = pos.get(b.id) ?? Infinity;
+    if (pa !== pb) return pa - pb;
+    return a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id);
+  });
+  const result = new Map<string, number>();
+  let n = 0;
+  for (const c of sorted) {
+    const groups = [...c.groups].sort((a, b) => a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id));
+    for (const g of groups) result.set(g.id, ++n);
+  }
+  return result;
 }
