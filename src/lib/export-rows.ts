@@ -221,12 +221,12 @@ export function buildStudentGrades(classes: ExportInput["classes"], now: Date = 
 
 export type NumberingInputClass = {
   name: string;
-  code_label: string | null;
+  code_label?: string | null | undefined;
   groups:
     | {
         group_name: string;
         group_members?: { profiles: { name: string } | null }[] | null;
-        projects: { area_code: string | null; code_number: number | null } | null;
+        projects: { area_code?: string | null | undefined; code_number?: number | null | undefined } | null;
       }[]
     | null;
 };
@@ -248,7 +248,7 @@ export function buildNumberingRows(classes: NumberingInputClass[], areaName: (co
     for (const g of c.groups ?? []) {
       if (!g.projects) continue;
       rows.push({
-        number: g.projects.code_number,
+        number: g.projects.code_number ?? null,
         projectCode: projectCode(g.projects.area_code, c.code_label, g.projects.code_number) ?? "",
         className: c.name,
         classLabel: c.code_label ?? "",
