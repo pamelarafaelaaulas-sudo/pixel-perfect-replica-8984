@@ -70,7 +70,7 @@ function StudentHome() {
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="text-2xl font-semibold">{g.group_name}</h2>
-                    <ProjectCodeTag area={g.projects?.area_code} classLabel={g.classes?.code_label} seq={g.projects?.project_seq} />
+                    <ProjectCodeTag area={g.projects?.area_code} classLabel={g.classes?.code_label} seq={g.projects?.code_number} />
                   </div>
                   <div className="flex gap-1.5">
                     {PHASES.map((p) => (

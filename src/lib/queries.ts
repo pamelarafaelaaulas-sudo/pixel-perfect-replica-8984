@@ -64,7 +64,7 @@ export const classDetailQuery = (classId: string) =>
           groups!groups_class_id_fkey(
             id, group_name, created_at,
             group_members(id, student_id, whatsapp, profiles(name)),
-            projects(id, current_phase, updated_at, area_code, project_seq, phase_submissions(phase_number, submitted_at)),
+            projects(id, current_phase, updated_at, area_code, code_number, phase_submissions(phase_number, submitted_at)),
             grades(trimester, score)
           )`,
         )
@@ -122,7 +122,7 @@ export const myGroupsQuery = (userId: string) =>
           groups(id, group_name,
             classes!groups_class_id_fkey(id, name, class_code, code_label),
             group_members(id),
-            projects(id, current_phase, updated_at, area_code, project_seq)
+            projects(id, current_phase, updated_at, area_code, code_number)
           )`,
         )
         .eq("student_id", userId)
@@ -304,7 +304,7 @@ export const teacherExportQuery = queryOptions({
           groups!groups_class_id_fkey(
             id, group_name,
             group_members(student_id, profiles(name)),
-            projects(current_phase, area_code, project_seq, phase_submissions(phase_number, submitted_at)),
+            projects(current_phase, area_code, code_number, phase_submissions(phase_number, submitted_at)),
             grades(trimester, score, feedback, is_reference_ten, created_at)
           )`,
         )
@@ -334,7 +334,7 @@ export const classBannersQuery = (classId: string) =>
         .select(
           `id, group_name,
           projects(
-            id, area_code, project_seq, banner_canva_url, banner_file_path, banner_file_name,
+            id, area_code, code_number, banner_canva_url, banner_file_path, banner_file_name,
             phase_submissions(phase_number, submitted_at),
             project_contributions(section_name, edited_at, profiles(name)),
             banner_drive_files(drive_file_id, synced_at)
@@ -346,3 +346,19 @@ export const classBannersQuery = (classId: string) =>
       return data ?? [];
     },
   });
+
+/** Teacher's classes with groups and current project numbers, for the numbering screen. */
+export const teacherNumberingQuery = queryOptions({
+  queryKey: ["teacher", "numbering"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("classes")
+      .select(
+        `id, name, code_label, code_order, created_at,
+        groups!groups_class_id_fkey(id, group_name, created_at, projects(id, area_code, code_number))`,
+      )
+      .order("created_at");
+    fail(error);
+    return data ?? [];
+  },
+});

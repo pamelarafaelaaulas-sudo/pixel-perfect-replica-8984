@@ -34,6 +34,7 @@ import { latestPerPhase, overallScore, type SavedAiEvaluation } from "@/lib/ai-s
 import { AiEvaluationView, scoreTone } from "@/components/ai-feedback";
 import { ProjectAreaPicker, ProjectCodeTag } from "@/components/project-code";
 import { ProjectDocxButton } from "@/components/project-docx";
+import { SocialApplicationCard } from "@/components/social-application";
 
 export const Route = createFileRoute("/_authenticated/professora/grupo/$groupId")({
   head: () => ({
@@ -154,7 +155,7 @@ function TeacherGroupPage() {
         description={
           project ? (
             <span className="flex flex-wrap items-center gap-3">
-              <ProjectCodeTag area={project.area_code} classLabel={cls.code_label} seq={project.project_seq} className="text-sm" />
+              <ProjectCodeTag area={project.area_code} classLabel={cls.code_label} seq={project.code_number} className="text-sm" />
               <ProjectAreaPicker projectId={project.id} groupId={group.id} value={project.area_code} />
               <span>Última edição {fmtAgo(project.updated_at)}</span>
             </span>
@@ -203,6 +204,12 @@ function TeacherGroupPage() {
           </div>
         ))}
       </section>
+
+      {project && (
+        <section className="mb-6">
+          <SocialApplicationCard value={project.social_application} hint="O grupo ainda não escreveu." />
+        </section>
+      )}
 
       <section className="mb-8">
         <PhaseTimeline phases={lateness.phases} />
