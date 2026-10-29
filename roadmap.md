@@ -23,5 +23,5 @@
 - [x] Aplicação ou intervenção social na etapa da Pergunta norteadora, obrigatória para entregar
 - [x] Tela de planejamento (professora): todas as etapas com prazos e o progresso de cada grupo
 - [x] Baixar o plano do projeto em Word ABNT (com a aplicação social) para cada grupo
-- [ ] Código do projeto: ÁREA-SIGLA-01, contagem única por professora em todas as turmas, começando pela turma que ela escolher
-- [ ] Campo da aplicação/intervenção social: aluno consegue escrever e aparece no painel da professora e do aluno
+- [x] Código do projeto: ÁREA-SIGLA-01, contagem única por professora em todas as turmas, começando pela turma que ela escolher
+- [x] Campo da aplicação/intervenção social: aluno consegue escrever e aparece no painel da professora e do aluno
