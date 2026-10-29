@@ -242,6 +242,13 @@ function StudentProjectPage() {
               authors={members.map((m) => m.profiles?.name ?? "").filter(Boolean)}
               cls={cls}
             />
+            <ProjectDocxButton
+              kind="plan"
+              project={project}
+              groupName={group.group_name}
+              authors={members.map((m) => m.profiles?.name ?? "").filter(Boolean)}
+              cls={cls}
+            />
             {members.length > 1 && (
               <Button asChild variant="outline">
                 <Link to="/aluno/avaliacao/$groupId" params={{ groupId }}>
