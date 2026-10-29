@@ -21,6 +21,7 @@ import { fmtDate, fmtDateTime, plural, whatsappLink } from "@/lib/format";
 import { formatPoints, projectLateness, type PhaseInfo } from "@/lib/penalty";
 import { latestPerPhase } from "@/lib/ai-score";
 import { studentSummary } from "@/lib/student-review";
+import { AdjustmentEditor } from "@/components/grade-adjustment";
 
 export const Route = createFileRoute("/_authenticated/professora/aluno/$studentId")({
   head: () => ({
@@ -131,6 +132,9 @@ function GroupReview({
     peers: data.peers
       .filter((p) => p.group_id === group.id)
       .map((p) => ({ trimester: p.trimester, score: Number(p.score) })),
+    adjustments: (group.student_grade_adjustments ?? [])
+      .filter((a) => a.student_id === studentId)
+      .map((a) => ({ bimester: a.bimester, points: Number(a.points), note: a.note })),
   });
   const contributions = project?.project_contributions ?? [];
   const groupChars = contributions.reduce((s, c) => s + c.char_count_added, 0);
@@ -231,7 +235,7 @@ function GroupReview({
         <div className="card-paper p-5">
           <h3 className="text-lg font-semibold">Bimestres</h3>
           <p className="mb-3 text-xs text-muted-foreground">
-            Nota final = sua nota − desconto de atraso das etapas daquele bimestre.
+            Nota final = nota do grupo − desconto de atraso das etapas daquele bimestre ± seu ajuste para este aluno (de 0 a 10).
           </p>
           <ul className="space-y-3">
             {summary.bimesters.map((t) => (
@@ -255,6 +259,12 @@ function GroupReview({
                         {" "}
                         − {formatPoints(t.penalty)}
                       </span>
+                    )}
+                    {t.adjustment !== 0 && (
+                      <span className={t.adjustment > 0 ? "text-success" : "text-destructive"}>
+                        {" "}
+                        {t.adjustment > 0 ? "+" : "−"} {formatPoints(Math.abs(t.adjustment))}
+                      </span>
                     )}{" "}
                     = <strong className="text-base">{formatPoints(t.final ?? 0)}</strong>
                     {t.reference && (
@@ -264,6 +274,13 @@ function GroupReview({
                     )}
                   </p>
                 )}
+                <AdjustmentEditor
+                  groupId={group.id}
+                  studentId={studentId}
+                  bimester={t.bimester}
+                  points={t.adjustment}
+                  note={t.adjustmentNote}
+                />
                 <p className="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground">
                   <Star className="size-3.5" />
                   {t.peerAverage === null
