@@ -184,15 +184,30 @@ export function buildExport(input: ExportInput, filters: ExportFilters = {}) {
   return { grades, ai, peers };
 }
 
+export type StudentGradeDetail = {
+  /** Group grade launched by the teacher; null = not launched. */
+  score: number | null;
+  /** Late penalty of that bimestre's stages. */
+  penalty: number;
+  /** Teacher's per-student adjustment (+/−). */
+  adjustment: number;
+  /** score − penalty + adjustment, between 0 and 10; null = not launched. */
+  final: number | null;
+};
+
 export type StudentGradeRow = {
   name: string;
   groupName: string;
   projectCode: string;
-  /** Final grade per bimestre (launched grade minus that bimestre's late penalty), in BIMESTER_NUMBERS order; null = not launched. */
+  /** Final grade per bimestre, in BIMESTER_NUMBERS order; null = not launched. */
   totals: (number | null)[];
+  details: StudentGradeDetail[];
 };
 
-/** One block per class (sorted by name), one row per student (sorted by name) with the group's final grade per bimestre. */
+/**
+ * One block per class (sorted by name), one row per student (sorted by name) with each bimestre's
+ * final grade: group grade − that bimestre's late penalty + the teacher's adjustment for that student.
+ */
 export function buildStudentGrades(classes: ExportInput["classes"], now: Date = new Date()) {
   return [...classes]
     .sort((a, b) => byText(a.name, b.name))
@@ -207,13 +222,23 @@ export function buildStudentGrades(classes: ExportInput["classes"], now: Date = 
           now,
         });
         const penalties = bimesterPenalties(phases);
-        const totals = BIMESTER_NUMBERS.map((b) => {
-          const grade = (g.grades ?? []).find((x) => x.trimester === b);
-          return grade ? gradeAfterPenalty(Number(grade.score), penalties[b] ?? 0) : null;
-        });
         const code = projectCode(g.projects?.area_code, c.code_label, g.projects?.code_number) ?? "";
         for (const m of g.group_members ?? []) {
-          rows.push({ name: m.profiles?.name ?? "", groupName: g.group_name, projectCode: code, totals });
+          const details = BIMESTER_NUMBERS.map((b): StudentGradeDetail => {
+            const grade = (g.grades ?? []).find((x) => x.trimester === b);
+            const adj = (g.student_grade_adjustments ?? []).find((x) => x.student_id === m.student_id && x.bimester === b);
+            const score = grade ? Number(grade.score) : null;
+            const penalty = penalties[b] ?? 0;
+            const adjustment = adj ? Number(adj.points) : 0;
+            return { score, penalty, adjustment, final: score === null ? null : finalGrade(score, penalty, adjustment) };
+          });
+          rows.push({
+            name: m.profiles?.name ?? "",
+            groupName: g.group_name,
+            projectCode: code,
+            totals: details.map((d) => d.final),
+            details,
+          });
         }
       }
       rows.sort((a, b) => byText(a.name, b.name));
