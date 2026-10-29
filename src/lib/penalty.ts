@@ -25,6 +25,14 @@ export function gradeAfterPenalty(score: number, totalPenalty: number): number {
   return Math.max(0, Math.round((score - totalPenalty) * 100) / 100);
 }
 
+/**
+ * A student's final bimestre grade: the group grade minus that bimestre's late penalty,
+ * plus the teacher's per-student adjustment (positive or negative), kept between 0 and 10.
+ */
+export function finalGrade(score: number, penalty: number, adjustment = 0): number {
+  return Math.min(10, Math.max(0, Math.round((score - penalty + adjustment) * 100) / 100));
+}
+
 export function formatPoints(n: number): string {
   return n.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 2 });
 }

@@ -579,6 +579,51 @@ export type Database = {
           },
         ]
       }
+      student_grade_adjustments: {
+        Row: {
+          bimester: number
+          group_id: string
+          id: string
+          note: string | null
+          points: number
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          bimester: number
+          group_id: string
+          id?: string
+          note?: string | null
+          points: number
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          bimester?: number
+          group_id?: string
+          id?: string
+          note?: string | null
+          points?: number
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_grade_adjustments_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_grade_adjustments_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       teacher_invites: {
         Row: {
           code: string
@@ -642,11 +687,178 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_messages: {
+        Row: {
+          class_id: string | null
+          created_at: string
+          days_left: number | null
+          delivered_at: string | null
+          due_date: string | null
+          error: string | null
+          failed_at: string | null
+          group_id: string | null
+          id: string
+          phase_number: number
+          phone: string
+          read_at: string | null
+          sent_at: string | null
+          status: string
+          student_id: string | null
+          student_name: string
+          teacher_id: string
+          trigger: string
+          wa_message_id: string | null
+        }
+        Insert: {
+          class_id?: string | null
+          created_at?: string
+          days_left?: number | null
+          delivered_at?: string | null
+          due_date?: string | null
+          error?: string | null
+          failed_at?: string | null
+          group_id?: string | null
+          id?: string
+          phase_number: number
+          phone: string
+          read_at?: string | null
+          sent_at?: string | null
+          status?: string
+          student_id?: string | null
+          student_name?: string
+          teacher_id: string
+          trigger: string
+          wa_message_id?: string | null
+        }
+        Update: {
+          class_id?: string | null
+          created_at?: string
+          days_left?: number | null
+          delivered_at?: string | null
+          due_date?: string | null
+          error?: string | null
+          failed_at?: string | null
+          group_id?: string | null
+          id?: string
+          phase_number?: number
+          phone?: string
+          read_at?: string | null
+          sent_at?: string | null
+          status?: string
+          student_id?: string | null
+          student_name?: string
+          teacher_id?: string
+          trigger?: string
+          wa_message_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_messages_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_messages_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_messages_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_messages_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_settings: {
+        Row: {
+          auto_enabled: boolean
+          interval_days: number
+          last_auto_run_at: string | null
+          teacher_id: string
+          updated_at: string
+        }
+        Insert: {
+          auto_enabled?: boolean
+          interval_days?: number
+          last_auto_run_at?: string | null
+          teacher_id: string
+          updated_at?: string
+        }
+        Update: {
+          auto_enabled?: boolean
+          interval_days?: number
+          last_auto_run_at?: string | null
+          teacher_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_settings_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_webhook_events: {
+        Row: {
+          attempts: number
+          delivery_id: string
+          event: string
+          id: string
+          last_attempt_at: string | null
+          payload: Json
+          processed_at: string | null
+          processing_error: string | null
+          received_at: string
+        }
+        Insert: {
+          attempts?: number
+          delivery_id: string
+          event: string
+          id?: string
+          last_attempt_at?: string | null
+          payload: Json
+          processed_at?: string | null
+          processing_error?: string | null
+          received_at?: string
+        }
+        Update: {
+          attempts?: number
+          delivery_id?: string
+          event?: string
+          id?: string
+          last_attempt_at?: string | null
+          payload?: Json
+          processed_at?: string | null
+          processing_error?: string | null
+          received_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      apply_whatsapp_status: {
+        Args: { _at: string; _error: string; _status: string; _wa_id: string }
+        Returns: boolean
+      }
       banner_group: { Args: { _name: string }; Returns: string }
       can_edit_banner: { Args: { _group_id: string }; Returns: boolean }
       canva_design_id: { Args: { _url: string }; Returns: string }

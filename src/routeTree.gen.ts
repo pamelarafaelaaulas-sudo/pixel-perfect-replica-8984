@@ -22,6 +22,7 @@ import { Route as AuthenticatedProfessoraAlunosRouteImport } from './routes/_aut
 import { Route as AuthenticatedProfessoraBannerRouteImport } from './routes/_authenticated/professora/banner'
 import { Route as AuthenticatedProfessoraBimestresRouteImport } from './routes/_authenticated/professora/bimestres'
 import { Route as AuthenticatedProfessoraExportarRouteImport } from './routes/_authenticated/professora/exportar'
+import { Route as AuthenticatedProfessoraLembretesRouteImport } from './routes/_authenticated/professora/lembretes'
 import { Route as AuthenticatedProfessoraNumeracaoRouteImport } from './routes/_authenticated/professora/numeracao'
 import { Route as AuthenticatedProfessoraPlanejamentoRouteImport } from './routes/_authenticated/professora/planejamento'
 import { Route as AuthenticatedAlunoAvaliacaoGroupIdRouteImport } from './routes/_authenticated/aluno/avaliacao.$groupId'
@@ -29,6 +30,8 @@ import { Route as AuthenticatedAlunoProjetoGroupIdRouteImport } from './routes/_
 import { Route as AuthenticatedProfessoraAlunoStudentIdRouteImport } from './routes/_authenticated/professora/aluno.$studentId'
 import { Route as AuthenticatedProfessoraGrupoGroupIdRouteImport } from './routes/_authenticated/professora/grupo.$groupId'
 import { Route as AuthenticatedProfessoraTurmaClassIdRouteImport } from './routes/_authenticated/professora/turma.$classId'
+import { Route as ApiPublicJobsWhatsappRemindersRouteImport } from './routes/api/public/jobs/whatsapp-reminders'
+import { Route as ApiPublicWhatsappWebhookRouteImport } from './routes/api/public/whatsapp/webhook'
 import { Route as AuthenticatedProfessoraTurmaClassIdPrazosRouteImport } from './routes/_authenticated/professora/turma.$classId_.prazos'
 
 const IndexRoute = IndexRouteImport.update({
@@ -101,6 +104,12 @@ const AuthenticatedProfessoraExportarRoute =
     path: '/exportar',
     getParentRoute: () => AuthenticatedProfessoraRouteRoute,
   } as any)
+const AuthenticatedProfessoraLembretesRoute =
+  AuthenticatedProfessoraLembretesRouteImport.update({
+    id: '/lembretes',
+    path: '/lembretes',
+    getParentRoute: () => AuthenticatedProfessoraRouteRoute,
+  } as any)
 const AuthenticatedProfessoraNumeracaoRoute =
   AuthenticatedProfessoraNumeracaoRouteImport.update({
     id: '/numeracao',
@@ -143,6 +152,18 @@ const AuthenticatedProfessoraTurmaClassIdRoute =
     path: '/turma/$classId',
     getParentRoute: () => AuthenticatedProfessoraRouteRoute,
   } as any)
+const ApiPublicJobsWhatsappRemindersRoute =
+  ApiPublicJobsWhatsappRemindersRouteImport.update({
+    id: '/api/public/jobs/whatsapp-reminders',
+    path: '/api/public/jobs/whatsapp-reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicWhatsappWebhookRoute =
+  ApiPublicWhatsappWebhookRouteImport.update({
+    id: '/api/public/whatsapp/webhook',
+    path: '/api/public/whatsapp/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedProfessoraTurmaClassIdPrazosRoute =
   AuthenticatedProfessoraTurmaClassIdPrazosRouteImport.update({
     id: '/turma/$classId_/prazos',
@@ -161,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/professora/banner': typeof AuthenticatedProfessoraBannerRoute
   '/professora/bimestres': typeof AuthenticatedProfessoraBimestresRoute
   '/professora/exportar': typeof AuthenticatedProfessoraExportarRoute
+  '/professora/lembretes': typeof AuthenticatedProfessoraLembretesRoute
   '/professora/numeracao': typeof AuthenticatedProfessoraNumeracaoRoute
   '/professora/planejamento': typeof AuthenticatedProfessoraPlanejamentoRoute
   '/aluno/': typeof AuthenticatedAlunoIndexRoute
@@ -170,6 +192,8 @@ export interface FileRoutesByFullPath {
   '/professora/aluno/$studentId': typeof AuthenticatedProfessoraAlunoStudentIdRoute
   '/professora/grupo/$groupId': typeof AuthenticatedProfessoraGrupoGroupIdRoute
   '/professora/turma/$classId': typeof AuthenticatedProfessoraTurmaClassIdRoute
+  '/api/public/jobs/whatsapp-reminders': typeof ApiPublicJobsWhatsappRemindersRoute
+  '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
   '/professora/turma/$classId/prazos': typeof AuthenticatedProfessoraTurmaClassIdPrazosRoute
 }
 export interface FileRoutesByTo {
@@ -181,6 +205,7 @@ export interface FileRoutesByTo {
   '/professora/banner': typeof AuthenticatedProfessoraBannerRoute
   '/professora/bimestres': typeof AuthenticatedProfessoraBimestresRoute
   '/professora/exportar': typeof AuthenticatedProfessoraExportarRoute
+  '/professora/lembretes': typeof AuthenticatedProfessoraLembretesRoute
   '/professora/numeracao': typeof AuthenticatedProfessoraNumeracaoRoute
   '/professora/planejamento': typeof AuthenticatedProfessoraPlanejamentoRoute
   '/aluno': typeof AuthenticatedAlunoIndexRoute
@@ -190,6 +215,8 @@ export interface FileRoutesByTo {
   '/professora/aluno/$studentId': typeof AuthenticatedProfessoraAlunoStudentIdRoute
   '/professora/grupo/$groupId': typeof AuthenticatedProfessoraGrupoGroupIdRoute
   '/professora/turma/$classId': typeof AuthenticatedProfessoraTurmaClassIdRoute
+  '/api/public/jobs/whatsapp-reminders': typeof ApiPublicJobsWhatsappRemindersRoute
+  '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
   '/professora/turma/$classId/prazos': typeof AuthenticatedProfessoraTurmaClassIdPrazosRoute
 }
 export interface FileRoutesById {
@@ -205,6 +232,7 @@ export interface FileRoutesById {
   '/_authenticated/professora/banner': typeof AuthenticatedProfessoraBannerRoute
   '/_authenticated/professora/bimestres': typeof AuthenticatedProfessoraBimestresRoute
   '/_authenticated/professora/exportar': typeof AuthenticatedProfessoraExportarRoute
+  '/_authenticated/professora/lembretes': typeof AuthenticatedProfessoraLembretesRoute
   '/_authenticated/professora/numeracao': typeof AuthenticatedProfessoraNumeracaoRoute
   '/_authenticated/professora/planejamento': typeof AuthenticatedProfessoraPlanejamentoRoute
   '/_authenticated/aluno/': typeof AuthenticatedAlunoIndexRoute
@@ -214,6 +242,8 @@ export interface FileRoutesById {
   '/_authenticated/professora/aluno/$studentId': typeof AuthenticatedProfessoraAlunoStudentIdRoute
   '/_authenticated/professora/grupo/$groupId': typeof AuthenticatedProfessoraGrupoGroupIdRoute
   '/_authenticated/professora/turma/$classId': typeof AuthenticatedProfessoraTurmaClassIdRoute
+  '/api/public/jobs/whatsapp-reminders': typeof ApiPublicJobsWhatsappRemindersRoute
+  '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
   '/_authenticated/professora/turma/$classId_/prazos': typeof AuthenticatedProfessoraTurmaClassIdPrazosRoute
 }
 export interface FileRouteTypes {
@@ -229,6 +259,7 @@ export interface FileRouteTypes {
     | '/professora/banner'
     | '/professora/bimestres'
     | '/professora/exportar'
+    | '/professora/lembretes'
     | '/professora/numeracao'
     | '/professora/planejamento'
     | '/aluno/'
@@ -238,6 +269,8 @@ export interface FileRouteTypes {
     | '/professora/aluno/$studentId'
     | '/professora/grupo/$groupId'
     | '/professora/turma/$classId'
+    | '/api/public/jobs/whatsapp-reminders'
+    | '/api/public/whatsapp/webhook'
     | '/professora/turma/$classId/prazos'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -249,6 +282,7 @@ export interface FileRouteTypes {
     | '/professora/banner'
     | '/professora/bimestres'
     | '/professora/exportar'
+    | '/professora/lembretes'
     | '/professora/numeracao'
     | '/professora/planejamento'
     | '/aluno'
@@ -258,6 +292,8 @@ export interface FileRouteTypes {
     | '/professora/aluno/$studentId'
     | '/professora/grupo/$groupId'
     | '/professora/turma/$classId'
+    | '/api/public/jobs/whatsapp-reminders'
+    | '/api/public/whatsapp/webhook'
     | '/professora/turma/$classId/prazos'
   id:
     | '__root__'
@@ -272,6 +308,7 @@ export interface FileRouteTypes {
     | '/_authenticated/professora/banner'
     | '/_authenticated/professora/bimestres'
     | '/_authenticated/professora/exportar'
+    | '/_authenticated/professora/lembretes'
     | '/_authenticated/professora/numeracao'
     | '/_authenticated/professora/planejamento'
     | '/_authenticated/aluno/'
@@ -281,6 +318,8 @@ export interface FileRouteTypes {
     | '/_authenticated/professora/aluno/$studentId'
     | '/_authenticated/professora/grupo/$groupId'
     | '/_authenticated/professora/turma/$classId'
+    | '/api/public/jobs/whatsapp-reminders'
+    | '/api/public/whatsapp/webhook'
     | '/_authenticated/professora/turma/$classId_/prazos'
   fileRoutesById: FileRoutesById
 }
@@ -289,6 +328,8 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ApiPublicJobsWhatsappRemindersRoute: typeof ApiPublicJobsWhatsappRemindersRoute
+  ApiPublicWhatsappWebhookRoute: typeof ApiPublicWhatsappWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -384,6 +425,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfessoraExportarRouteImport
       parentRoute: typeof AuthenticatedProfessoraRouteRoute
     }
+    '/_authenticated/professora/lembretes': {
+      id: '/_authenticated/professora/lembretes'
+      path: '/lembretes'
+      fullPath: '/professora/lembretes'
+      preLoaderRoute: typeof AuthenticatedProfessoraLembretesRouteImport
+      parentRoute: typeof AuthenticatedProfessoraRouteRoute
+    }
     '/_authenticated/professora/numeracao': {
       id: '/_authenticated/professora/numeracao'
       path: '/numeracao'
@@ -433,6 +481,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfessoraTurmaClassIdRouteImport
       parentRoute: typeof AuthenticatedProfessoraRouteRoute
     }
+    '/api/public/jobs/whatsapp-reminders': {
+      id: '/api/public/jobs/whatsapp-reminders'
+      path: '/api/public/jobs/whatsapp-reminders'
+      fullPath: '/api/public/jobs/whatsapp-reminders'
+      preLoaderRoute: typeof ApiPublicJobsWhatsappRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/whatsapp/webhook': {
+      id: '/api/public/whatsapp/webhook'
+      path: '/api/public/whatsapp/webhook'
+      fullPath: '/api/public/whatsapp/webhook'
+      preLoaderRoute: typeof ApiPublicWhatsappWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/professora/turma/$classId_/prazos': {
       id: '/_authenticated/professora/turma/$classId_/prazos'
       path: '/turma/$classId/prazos'
@@ -468,6 +530,7 @@ interface AuthenticatedProfessoraRouteRouteChildren {
   AuthenticatedProfessoraBannerRoute: typeof AuthenticatedProfessoraBannerRoute
   AuthenticatedProfessoraBimestresRoute: typeof AuthenticatedProfessoraBimestresRoute
   AuthenticatedProfessoraExportarRoute: typeof AuthenticatedProfessoraExportarRoute
+  AuthenticatedProfessoraLembretesRoute: typeof AuthenticatedProfessoraLembretesRoute
   AuthenticatedProfessoraNumeracaoRoute: typeof AuthenticatedProfessoraNumeracaoRoute
   AuthenticatedProfessoraPlanejamentoRoute: typeof AuthenticatedProfessoraPlanejamentoRoute
   AuthenticatedProfessoraIndexRoute: typeof AuthenticatedProfessoraIndexRoute
@@ -484,6 +547,8 @@ const AuthenticatedProfessoraRouteRouteChildren: AuthenticatedProfessoraRouteRou
     AuthenticatedProfessoraBimestresRoute:
       AuthenticatedProfessoraBimestresRoute,
     AuthenticatedProfessoraExportarRoute: AuthenticatedProfessoraExportarRoute,
+    AuthenticatedProfessoraLembretesRoute:
+      AuthenticatedProfessoraLembretesRoute,
     AuthenticatedProfessoraNumeracaoRoute:
       AuthenticatedProfessoraNumeracaoRoute,
     AuthenticatedProfessoraPlanejamentoRoute:
@@ -525,6 +590,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ApiPublicJobsWhatsappRemindersRoute: ApiPublicJobsWhatsappRemindersRoute,
+  ApiPublicWhatsappWebhookRoute: ApiPublicWhatsappWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

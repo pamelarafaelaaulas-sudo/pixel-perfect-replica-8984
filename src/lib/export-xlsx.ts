@@ -177,16 +177,42 @@ export async function buildStudentGradesWorkbook(
   if (allRows.length) fill(all, 5, allRows);
   else all.addRow({ name: "Nenhum aluno entrou em um grupo ainda." });
 
+  // Class sheets: the full calculation per bimestre (group grade, late penalty, teacher adjustment, final).
   for (const block of blocks) {
     if (!block.rows.length) continue;
     const ws = addSheet(block.className, [
       { header: "Nome completo", key: "name", width: 34 },
-      { header: "Grupo", key: "groupName", width: 24 },
-      { header: "Código do projeto", key: "projectCode", width: 16 },
-      ...gradeCols,
-      { header: "Média", key: "avg", width: 10, fmt: "0.0" },
+      { header: "Grupo", key: "groupName", width: 22 },
+      { header: "Código do projeto", key: "projectCode", width: 14 },
+      ...bimesterTitles.flatMap((t, i) => [
+        { header: `${t} — nota do grupo`, key: `s${i}`, width: 12, fmt: "0.0" },
+        { header: `${t} — desconto de atraso`, key: `p${i}`, width: 12, fmt: "0.0" },
+        { header: `${t} — ajuste da professora`, key: `a${i}`, width: 12, fmt: "+0.0;-0.0;0.0" },
+        { header: `${t} — nota final`, key: `f${i}`, width: 12, fmt: "0.0" },
+      ]),
+      { header: "Média final", key: "avg", width: 10, fmt: "0.0" },
     ]);
-    fill(ws, 4, block.rows.map((r) => ({ r, className: block.className })));
+    ws.getRow(1).height = 48;
+    block.rows.forEach((r, i) => {
+      const n = i + 2;
+      const finals = r.details.map((_, j) => `${colL(4 + j * 4 + 3)}${n}`).join(",");
+      const filled = r.totals.filter((t): t is number => t !== null);
+      const avg = filled.length ? Math.round((filled.reduce((s, x) => s + x, 0) / filled.length) * 10) / 10 : "";
+      ws.addRow({
+        name: r.name,
+        groupName: r.groupName,
+        projectCode: r.projectCode,
+        ...Object.fromEntries(
+          r.details.flatMap((d, j) => [
+            [`s${j}`, d.score],
+            [`p${j}`, d.score === null ? null : -d.penalty],
+            [`a${j}`, d.score === null && d.adjustment === 0 ? null : d.adjustment],
+            [`f${j}`, d.final],
+          ]),
+        ),
+        avg: { formula: `IF(COUNT(${finals})=0,"",ROUND(AVERAGE(${finals}),1))`, result: avg },
+      });
+    });
   }
   return finish();
 }

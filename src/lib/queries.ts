@@ -188,7 +188,8 @@ async function fetchStudentReview(studentId: string) {
               classes!groups_class_id_fkey(id, name, late_penalty_per_day, schedules(phase_number, due_date)),
               group_members(student_id),
               projects(id, current_phase, phase_submissions(phase_number, submitted_at), project_contributions(student_id, char_count_added)),
-              grades(trimester, score, feedback, is_reference_ten, created_at)
+              grades(trimester, score, feedback, is_reference_ten, created_at),
+              student_grade_adjustments(id, student_id, bimester, points, note)
             )`,
       )
       .eq("student_id", studentId)
@@ -305,7 +306,8 @@ export const teacherExportQuery = queryOptions({
             id, group_name,
             group_members(student_id, profiles(name)),
             projects(current_phase, area_code, code_number, phase_submissions(phase_number, submitted_at)),
-            grades(trimester, score, feedback, is_reference_ten, created_at)
+            grades(trimester, score, feedback, is_reference_ten, created_at),
+            student_grade_adjustments(student_id, bimester, points, note)
           )`,
         )
         .order("created_at", { ascending: false }),
@@ -360,5 +362,33 @@ export const teacherNumberingQuery = queryOptions({
       .order("created_at");
     fail(error);
     return data ?? [];
+  },
+});
+
+/* ---------------- Teacher: WhatsApp reminders ---------------- */
+
+export const whatsappRemindersQuery = queryOptions({
+  queryKey: ["teacher", "whatsapp"],
+  queryFn: async () => {
+    const { data: auth } = await supabase.auth.getUser();
+    const uid = auth.user?.id ?? "";
+    const [settings, messages, classes] = await Promise.all([
+      supabase.from("whatsapp_settings").select("auto_enabled, interval_days, last_auto_run_at").eq("teacher_id", uid).maybeSingle(),
+      supabase
+        .from("whatsapp_messages")
+        .select("id, student_name, phone, phase_number, days_left, due_date, trigger, status, error, created_at, delivered_at, read_at")
+        .order("created_at", { ascending: false })
+        .limit(60),
+      supabase.from("classes").select("id, name, schedules(phase_number, due_date)").eq("teacher_id", uid).order("name"),
+    ]);
+    fail(settings.error);
+    fail(messages.error);
+    fail(classes.error);
+    return {
+      teacherId: uid,
+      settings: settings.data ?? { auto_enabled: false, interval_days: 3, last_auto_run_at: null },
+      messages: messages.data ?? [],
+      classes: classes.data ?? [],
+    };
   },
 });
