@@ -21,8 +21,10 @@ function useNow() {
   return now;
 }
 
-const fmtFair = (d: Date) =>
-  d.toLocaleString("pt-BR", { weekday: "long", day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+const fmtFair = (d: Date) => {
+  const t = d.toLocaleString("pt-BR", { weekday: "long", day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  return t.charAt(0).toUpperCase() + t.slice(1);
+};
 
 /** Countdown to the science fair. Teachers (`teacherId`) can set the date for all their classes. */
 export function FairCountdown({ classes, teacherId }: { classes: FairClass[]; teacherId?: string }) {
@@ -56,7 +58,7 @@ export function FairCountdown({ classes, teacherId }: { classes: FairClass[]; te
   return (
     <section
       aria-label={`Contagem regressiva para a ${fair.name}`}
-      className="mb-6 overflow-hidden rounded-2xl bg-gradient-to-r from-primary to-secondary p-5 text-primary-foreground shadow-lift md:p-6"
+      className="mb-6 overflow-hidden rounded-2xl bg-brand-gradient p-5 text-primary-foreground shadow-lift md:p-6"
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -65,7 +67,7 @@ export function FairCountdown({ classes, teacherId }: { classes: FairClass[]; te
             {left?.started ? <PartyPopper className="size-6 text-highlight" /> : <CalendarClock className="size-6 text-highlight" />}
             {left?.started ? `A ${fair.name} começou!` : fair.name}
           </h2>
-          <p className="text-sm capitalize opacity-90">{fmtFair(fair.at)}</p>
+          <p className="text-sm opacity-90">{fmtFair(fair.at)}</p>
         </div>
         {left && !left.started && (
           <div className="flex gap-2" role="timer" aria-live="off">
