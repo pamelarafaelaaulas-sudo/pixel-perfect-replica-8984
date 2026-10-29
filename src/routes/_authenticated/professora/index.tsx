@@ -13,7 +13,6 @@ import { meQuery, teacherClassesQuery } from "@/lib/queries";
 import { plural } from "@/lib/format";
 import { TeacherInvitesDialog } from "@/components/teacher-invites";
 import { normalizeClassLabel } from "@/lib/project-code";
-import { NumberingSheetButton } from "@/components/sheet-downloads";
 import { FairCountdown } from "@/components/fair-countdown";
 
 export const Route = createFileRoute("/_authenticated/professora/")({
@@ -64,7 +63,6 @@ function TeacherHome() {
                 <ClipboardList /> Notas do bimestre
               </Link>
             </Button>
-            <NumberingSheetButton />
             <Button variant="outline" asChild>
               <Link to="/professora/banner" search={{}}>
                 <Palette /> Modelo do banner
