@@ -43,6 +43,29 @@ const classes: ExportInput["classes"] = [
 ];
 
 describe("student grades spreadsheet", () => {
+  it("adds the teacher's adjustment for that student only, after the late discount", () => {
+    const withAdj: ExportInput["classes"] = [
+      {
+        ...classes[1]!,
+        groups: [
+          {
+            ...classes[1]!.groups![0]!,
+            group_members: [
+              { student_id: "s1", profiles: { name: "Ana" } },
+              { student_id: "s4", profiles: { name: "Davi" } },
+            ],
+            student_grade_adjustments: [{ student_id: "s1", bimester: 1, points: 1, note: "Participação" }],
+          },
+        ],
+      },
+    ];
+    const [block] = buildStudentGrades(withAdj, now);
+    // 9 − 1.5 (3 days late × 0.5) + 1 = 8.5 for Ana; Davi keeps 7.5
+    expect(block!.rows.find((r) => r.name === "Ana")!.totals[0]).toBe(8.5);
+    expect(block!.rows.find((r) => r.name === "Ana")!.details[0]).toEqual({ score: 9, penalty: 1.5, adjustment: 1, final: 8.5 });
+    expect(block!.rows.find((r) => r.name === "Davi")!.totals[0]).toBe(7.5);
+  });
+
   it("has one block per class, sorted by class name, with each student's name", () => {
     const blocks = buildStudentGrades(classes, now);
     expect(blocks.map((b) => b.className)).toEqual(["9A", "9B"]);
