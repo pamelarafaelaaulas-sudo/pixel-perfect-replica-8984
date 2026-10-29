@@ -188,7 +188,8 @@ async function fetchStudentReview(studentId: string) {
               classes!groups_class_id_fkey(id, name, late_penalty_per_day, schedules(phase_number, due_date)),
               group_members(student_id),
               projects(id, current_phase, phase_submissions(phase_number, submitted_at), project_contributions(student_id, char_count_added)),
-              grades(trimester, score, feedback, is_reference_ten, created_at)
+              grades(trimester, score, feedback, is_reference_ten, created_at),
+              student_grade_adjustments(id, student_id, bimester, points, note)
             )`,
       )
       .eq("student_id", studentId)
@@ -305,7 +306,8 @@ export const teacherExportQuery = queryOptions({
             id, group_name,
             group_members(student_id, profiles(name)),
             projects(current_phase, area_code, code_number, phase_submissions(phase_number, submitted_at)),
-            grades(trimester, score, feedback, is_reference_ten, created_at)
+            grades(trimester, score, feedback, is_reference_ten, created_at),
+            student_grade_adjustments(student_id, bimester, points, note)
           )`,
         )
         .order("created_at", { ascending: false }),
