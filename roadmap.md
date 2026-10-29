@@ -26,4 +26,4 @@
 - [x] Código do projeto: ÁREA-SIGLA-01, contagem única por professora em todas as turmas, começando pela turma que ela escolher
 - [x] Campo da aplicação/intervenção social: aluno consegue escrever e aparece no painel da professora e do aluno
 - [x] Menu: tirar "Exportar planilha" e pôr a planilha da numeração; na aba Alunos, planilha com nome e nota de cada aluno por turma
-- [ ] Relógio de contagem regressiva até a FECITI/MS no painel da professora e dos alunos
+- [x] Relógio de contagem regressiva até a FECITI/MS no painel da professora e dos alunos
