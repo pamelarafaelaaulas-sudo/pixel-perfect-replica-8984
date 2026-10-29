@@ -346,3 +346,19 @@ export const classBannersQuery = (classId: string) =>
       return data ?? [];
     },
   });
+
+/** Teacher's classes with groups and current project numbers, for the numbering screen. */
+export const teacherNumberingQuery = queryOptions({
+  queryKey: ["teacher", "numbering"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("classes")
+      .select(
+        `id, name, code_label, code_order, created_at,
+        groups!groups_class_id_fkey(id, group_name, created_at, projects(id, area_code, code_number))`,
+      )
+      .order("created_at");
+    fail(error);
+    return data ?? [];
+  },
+});
