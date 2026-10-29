@@ -34,6 +34,7 @@ export type WordLimit = { min: number; max: number | null };
 export const WORD_LIMITS: Partial<Record<string, WordLimit>> = {
   theme: { min: 1, max: null },
   guiding_question: { min: 1, max: null },
+  social_application: { min: 1, max: null },
   title: { min: 1, max: null },
   general_objective: { min: 1, max: 50 },
   specific_objectives: { min: 1, max: 100 },
@@ -148,6 +149,7 @@ export function phaseProblems(
       break;
     case 3:
       checkWords("guiding_question", "Pergunta norteadora");
+      checkWords("social_application", "Aplicação ou intervenção social");
       break;
     case 4:
       checkWords("title", "Título");

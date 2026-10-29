@@ -58,6 +58,11 @@ describe("delivery rules", () => {
     expect(countWords("")).toBe(0);
   });
 
+  it("blocks the guiding-question stage without a social application", () => {
+    expect(phaseProblems(3, { guiding_question: "Por quê?" }, 0)).toEqual(["Preencha: Aplicação ou intervenção social."]);
+    expect(phaseProblems(3, { guiding_question: "Por quê?", social_application: "Campanha no bairro" }, 0)).toEqual([]);
+  });
+
   it("blocks a general objective over 50 words", () => {
     expect(phaseProblems(5, { general_objective: words(51) }, 0)).toHaveLength(1);
     expect(phaseProblems(5, { general_objective: words(50) }, 0)).toEqual([]);

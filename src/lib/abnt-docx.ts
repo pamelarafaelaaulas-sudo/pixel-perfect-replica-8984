@@ -74,15 +74,15 @@ export async function buildProjectDocx(model: AbntModel): Promise<Blob> {
     centered(t.year),
   ];
 
-  const abstract = [
+  const abstract = !model.abstract ? [] : [
     new Paragraph({
       pageBreakBefore: true,
       alignment: AlignmentType.CENTER,
       spacing: { ...oneAndHalf, after: 360 },
       children: [run("RESUMO", { bold: true })],
     }),
-    ...(model.abstract.paragraphs.length
-      ? model.abstract.paragraphs.map(
+    ...(model.abstract!.paragraphs.length
+      ? model.abstract!.paragraphs.map(
           (p) => new Paragraph({ alignment: AlignmentType.JUSTIFIED, spacing: { ...single }, children: [run(p)] }),
         )
       : [new Paragraph({ spacing: single, children: [run(PLACEHOLDER, { italics: true })] })]),
@@ -90,7 +90,7 @@ export async function buildProjectDocx(model: AbntModel): Promise<Blob> {
       spacing: { ...single, before: 360 },
       children: [
         run("Palavras-chave: ", { bold: true }),
-        run(model.abstract.keywords.length ? `${model.abstract.keywords.join("; ")}.` : PLACEHOLDER),
+        run(model.abstract!.keywords.length ? `${model.abstract!.keywords.join("; ")}.` : PLACEHOLDER),
       ],
     }),
   ];
@@ -100,8 +100,8 @@ export async function buildProjectDocx(model: AbntModel): Promise<Blob> {
   model.sections.forEach((s, i) => {
     text.push(
       new Paragraph({
-        pageBreakBefore: s.level === 1 && i > 0,
-        spacing: { ...oneAndHalf, before: s.level === 2 ? 360 : 0, after: 360 },
+        pageBreakBefore: model.breakSections && s.level === 1 && i > 0,
+        spacing: { ...oneAndHalf, before: s.level === 2 || (!model.breakSections && i > 0) ? 360 : 0, after: 360 },
         keepNext: true,
         children: [run(`${s.number} ${s.title}`, { bold: s.level === 1 })],
       }),
@@ -120,7 +120,7 @@ export async function buildProjectDocx(model: AbntModel): Promise<Blob> {
       );
     } else if (s.paragraphs.length) {
       s.paragraphs.forEach((p) => text.push(body(p)));
-    } else if (s.number !== "2") {
+    } else if (s.title !== "OBJETIVOS") {
       text.push(placeholder());
     }
   });
