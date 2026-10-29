@@ -58,6 +58,7 @@ import { bimesterPenalties, formatPoints, gradeAfterPenalty, projectLateness } f
 import { BannerStage } from "@/components/banner-stage";
 import { bannerBrief } from "@/lib/banner";
 import { ProjectAreaPicker, ProjectCodeTag } from "@/components/project-code";
+import { SocialApplicationCard } from "@/components/social-application";
 import { ProjectDocxButton } from "@/components/project-docx";
 
 export const Route = createFileRoute("/_authenticated/aluno/projeto/$groupId")({
@@ -398,6 +399,20 @@ function StudentProjectPage() {
         </section>
 
         <aside className="space-y-4">
+          <SocialApplicationCard
+            key={project.social_application ?? ""}
+            value={project.social_application}
+            projectId={project.id}
+            groupId={groupId}
+            studentId={me?.id}
+            editable={project.current_phase > 3}
+            hint={
+              project.current_phase > 3
+                ? "Ainda não escrita. Clique em Escrever."
+                : "Escreva na etapa 3, logo abaixo da pergunta norteadora."
+            }
+            onSaved={(v) => set("social_application", v)}
+          />
           <div className="card-paper p-5">
             <h3 className="mb-3 text-lg font-semibold">Notas</h3>
             <ul className="space-y-3">
