@@ -465,6 +465,7 @@ export type Database = {
           references_list: string | null
           results_discussion: string | null
           scientific_articles: Json
+          social_application: string | null
           specific_objectives: string | null
           theme: string | null
           title: string | null
@@ -491,6 +492,7 @@ export type Database = {
           references_list?: string | null
           results_discussion?: string | null
           scientific_articles?: Json
+          social_application?: string | null
           specific_objectives?: string | null
           theme?: string | null
           title?: string | null
@@ -517,6 +519,7 @@ export type Database = {
           references_list?: string | null
           results_discussion?: string | null
           scientific_articles?: Json
+          social_application?: string | null
           specific_objectives?: string | null
           theme?: string | null
           title?: string | null
