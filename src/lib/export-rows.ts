@@ -10,7 +10,7 @@ type InputGroup = {
   projects: {
     current_phase: number;
     area_code?: string | null;
-    project_seq?: number | null;
+    code_number?: number | null;
     phase_submissions: { phase_number: number; submitted_at: string }[] | null } | null;
   /** `trimester` holds the bimestre number (database column name). */
   grades:
@@ -129,7 +129,7 @@ export function buildExport(input: ExportInput, filters: ExportFilters = {}) {
         grades.push({
           className: c.name,
           groupName: g.group_name,
-          projectCode: projectCode(g.projects?.area_code, c.code_label, g.projects?.project_seq) ?? "",
+          projectCode: projectCode(g.projects?.area_code, c.code_label, g.projects?.code_number) ?? "",
           members: [...names.values()].filter(Boolean).sort(byText).join(", "),
           bimester: bimLabel(b),
           score,

@@ -63,7 +63,7 @@ export function GroupBanners({
     return {
       id: g.id,
       name: g.group_name,
-      code: p ? projectCode(p.area_code, codeLabel, p.project_seq) : null,
+      code: p ? projectCode(p.area_code, codeLabel, p.code_number) : null,
       canvaUrl: p?.banner_canva_url ?? null,
       filePath: p?.banner_file_path ?? null,
       fileName: p?.banner_file_name ?? null,

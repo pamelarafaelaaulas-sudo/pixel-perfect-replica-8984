@@ -161,7 +161,7 @@ function ClassPage() {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2 font-medium text-foreground">
                           {g.group_name}
-                          <ProjectCodeTag area={project?.area_code} classLabel={cls.code_label} seq={project?.project_seq} />
+                          <ProjectCodeTag area={project?.area_code} classLabel={cls.code_label} seq={project?.code_number} />
                           {project && !project.area_code && <Badge variant="warning">Sem área</Badge>}
                         </div>
                         <p className="truncate text-sm text-muted-foreground">

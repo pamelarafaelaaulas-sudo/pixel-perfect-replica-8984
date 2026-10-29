@@ -154,7 +154,7 @@ function TeacherGroupPage() {
         description={
           project ? (
             <span className="flex flex-wrap items-center gap-3">
-              <ProjectCodeTag area={project.area_code} classLabel={cls.code_label} seq={project.project_seq} className="text-sm" />
+              <ProjectCodeTag area={project.area_code} classLabel={cls.code_label} seq={project.code_number} className="text-sm" />
               <ProjectAreaPicker projectId={project.id} groupId={group.id} value={project.area_code} />
               <span>Última edição {fmtAgo(project.updated_at)}</span>
             </span>

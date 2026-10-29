@@ -213,7 +213,7 @@ function StudentProjectPage() {
         description={
           <span className="flex flex-wrap items-center gap-x-4 gap-y-1">
             {project.area_code ? (
-              <ProjectCodeTag area={project.area_code} classLabel={cls.code_label} seq={project.project_seq} className="text-sm" />
+              <ProjectCodeTag area={project.area_code} classLabel={cls.code_label} seq={project.code_number} className="text-sm" />
             ) : (
               <span className="inline-flex items-center gap-2 text-sm">
                 Escolha a área para gerar o código do projeto:

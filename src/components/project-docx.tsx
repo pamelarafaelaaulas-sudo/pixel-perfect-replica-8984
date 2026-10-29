@@ -46,7 +46,7 @@ function DocxPanel({ project, groupName, authors, cls, kind = "project" }: Props
       try {
         const teacher = await supabase.rpc("find_class", { _code: cls.class_code });
         // Only print the code once the class abbreviation exists (no "???" in the document).
-        const code = cls.code_label ? projectCode(project.area_code, cls.code_label, project.project_seq) : null;
+        const code = cls.code_label ? projectCode(project.area_code, cls.code_label, project.code_number) : null;
         const input = {
           ...project,
           authors: [...authors].sort((a, b) => a.localeCompare(b, "pt-BR")),

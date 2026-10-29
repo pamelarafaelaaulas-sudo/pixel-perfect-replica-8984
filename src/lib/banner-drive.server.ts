@@ -111,7 +111,7 @@ export async function syncProjectBanner(admin: Admin, projectId: string, ownerEm
   const { data: p, error } = await admin
     .from("projects")
     .select(
-      "id, group_id, area_code, project_seq, banner_file_path, banner_file_name, groups!projects_group_id_fkey(group_name, classes!groups_class_id_fkey(id, name, code_label, profiles!classes_teacher_id_fkey(email)))",
+      "id, group_id, area_code, code_number, banner_file_path, banner_file_name, groups!projects_group_id_fkey(group_name, classes!groups_class_id_fkey(id, name, code_label, profiles!classes_teacher_id_fkey(email)))",
     )
     .eq("id", projectId)
     .single();
@@ -135,7 +135,7 @@ export async function syncProjectBanner(admin: Admin, projectId: string, ownerEm
   if (dlError || !blob) throw new Error("Não foi possível ler o arquivo do banner.");
   const mime = blob.type || "application/pdf";
   const ext = (p.banner_file_name ?? p.banner_file_path).split(".").pop()?.toLowerCase() || "pdf";
-  const code = projectCode(p.area_code, cls.code_label, p.project_seq);
+  const code = projectCode(p.area_code, cls.code_label, p.code_number);
   const name = `${code ? `${code} — ` : ""}${group.group_name}.${ext}`;
   const bytes = await blob.arrayBuffer();
 
