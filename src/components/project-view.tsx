@@ -50,6 +50,8 @@ export function ProjectView({ project }: { project: Project }) {
       </Section>
       <Section n={3} title={PHASES[2].name}>
         <Text value={project.guiding_question} />
+        <p className="mt-4 text-sm font-semibold text-foreground">Aplicação ou intervenção social</p>
+        <Text value={project.social_application} />
       </Section>
       <Section n={4} title="Projeto escrito">
         <div className="space-y-5">

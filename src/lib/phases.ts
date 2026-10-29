@@ -83,6 +83,7 @@ export const bimesterPhases = (b: number) => PHASES.filter((p) => p.bimester ===
 export type TextFieldKey =
   | "theme"
   | "guiding_question"
+  | "social_application"
   | "title"
   | "institution"
   | "area_subarea"
@@ -99,6 +100,7 @@ export type TextFieldKey =
 export const TEXT_FIELDS: TextFieldKey[] = [
   "theme",
   "guiding_question",
+  "social_application",
   "title",
   "institution",
   "area_subarea",
@@ -130,6 +132,12 @@ export const PHASE_FORM: Record<number, FormField[]> = {
       label: "Pergunta norteadora",
       rows: 4,
       placeholder: "Ex.: De que forma o descarte de óleo de cozinha afeta a qualidade da água do bairro?",
+    },
+    {
+      key: "social_application",
+      label: "Aplicação ou intervenção social",
+      rows: 4,
+      placeholder: "Ex.: Criar pontos de coleta de óleo na escola e uma campanha com os moradores do bairro.",
     },
   ],
   4: [
