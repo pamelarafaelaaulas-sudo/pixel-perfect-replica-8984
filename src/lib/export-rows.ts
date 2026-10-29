@@ -181,3 +181,82 @@ export function buildExport(input: ExportInput, filters: ExportFilters = {}) {
 
   return { grades, ai, peers };
 }
+
+export type StudentGradeRow = {
+  name: string;
+  groupName: string;
+  projectCode: string;
+  /** Final grade per bimestre (launched grade minus that bimestre's late penalty), in BIMESTER_NUMBERS order; null = not launched. */
+  totals: (number | null)[];
+};
+
+/** One block per class (sorted by name), one row per student (sorted by name) with the group's final grade per bimestre. */
+export function buildStudentGrades(classes: ExportInput["classes"], now: Date = new Date()) {
+  return [...classes]
+    .sort((a, b) => byText(a.name, b.name))
+    .map((c) => {
+      const rows: StudentGradeRow[] = [];
+      for (const g of c.groups ?? []) {
+        const { phases } = projectLateness({
+          currentPhase: g.projects?.current_phase ?? 1,
+          schedules: c.schedules ?? [],
+          submissions: g.projects?.phase_submissions ?? [],
+          perDay: Number(c.late_penalty_per_day),
+          now,
+        });
+        const penalties = bimesterPenalties(phases);
+        const totals = BIMESTER_NUMBERS.map((b) => {
+          const grade = (g.grades ?? []).find((x) => x.trimester === b);
+          return grade ? gradeAfterPenalty(Number(grade.score), penalties[b] ?? 0) : null;
+        });
+        const code = projectCode(g.projects?.area_code, c.code_label, g.projects?.code_number) ?? "";
+        for (const m of g.group_members ?? []) {
+          rows.push({ name: m.profiles?.name ?? "", groupName: g.group_name, projectCode: code, totals });
+        }
+      }
+      rows.sort((a, b) => byText(a.name, b.name));
+      return { className: c.name, rows };
+    });
+}
+
+export type NumberingInputClass = {
+  name: string;
+  code_label: string | null;
+  groups:
+    | {
+        group_name: string;
+        group_members?: { profiles: { name: string } | null }[] | null;
+        projects: { area_code: string | null; code_number: number | null } | null;
+      }[]
+    | null;
+};
+
+export type NumberingRow = {
+  number: number | null;
+  projectCode: string;
+  className: string;
+  classLabel: string;
+  groupName: string;
+  area: string;
+  members: string;
+};
+
+/** The teacher's projects in code-number order (projects without a number go last). */
+export function buildNumberingRows(classes: NumberingInputClass[], areaName: (code: string | null) => string | null) {
+  const rows: NumberingRow[] = [];
+  for (const c of classes) {
+    for (const g of c.groups ?? []) {
+      if (!g.projects) continue;
+      rows.push({
+        number: g.projects.code_number,
+        projectCode: projectCode(g.projects.area_code, c.code_label, g.projects.code_number) ?? "",
+        className: c.name,
+        classLabel: c.code_label ?? "",
+        groupName: g.group_name,
+        area: areaName(g.projects.area_code) ?? "",
+        members: (g.group_members ?? []).map((m) => m.profiles?.name ?? "").filter(Boolean).sort(byText).join(", "),
+      });
+    }
+  }
+  return rows.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity) || byText(a.groupName, b.groupName));
+}
