@@ -1,5 +1,5 @@
 import { AI_CRITERIA, latestPerPhase, parseSavedEvaluation } from "./ai-score";
-import { bimesterPenalties, gradeAfterPenalty, projectLateness } from "./penalty";
+import { bimesterPenalties, finalGrade, gradeAfterPenalty, projectLateness } from "./penalty";
 import { BIMESTER_NUMBERS, bimesterMeta, phaseMeta } from "./phases";
 import { projectCode } from "./project-code";
 
@@ -16,6 +16,8 @@ type InputGroup = {
   grades:
     | { trimester: number; score: number | string; feedback: string | null; is_reference_ten: boolean; created_at: string }[]
     | null;
+  /** Teacher's per-student adjustment of the bimestre grade. */
+  student_grade_adjustments?: { student_id: string; bimester: number; points: number | string; note: string | null }[] | null;
 };
 
 export type ExportInput = {
