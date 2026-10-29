@@ -29,6 +29,8 @@ import { Route as AuthenticatedAlunoProjetoGroupIdRouteImport } from './routes/_
 import { Route as AuthenticatedProfessoraAlunoStudentIdRouteImport } from './routes/_authenticated/professora/aluno.$studentId'
 import { Route as AuthenticatedProfessoraGrupoGroupIdRouteImport } from './routes/_authenticated/professora/grupo.$groupId'
 import { Route as AuthenticatedProfessoraTurmaClassIdRouteImport } from './routes/_authenticated/professora/turma.$classId'
+import { Route as ApiPublicJobsWhatsappRemindersRouteImport } from './routes/api/public/jobs/whatsapp-reminders'
+import { Route as ApiPublicWhatsappWebhookRouteImport } from './routes/api/public/whatsapp/webhook'
 import { Route as AuthenticatedProfessoraTurmaClassIdPrazosRouteImport } from './routes/_authenticated/professora/turma.$classId_.prazos'
 
 const IndexRoute = IndexRouteImport.update({
@@ -143,6 +145,18 @@ const AuthenticatedProfessoraTurmaClassIdRoute =
     path: '/turma/$classId',
     getParentRoute: () => AuthenticatedProfessoraRouteRoute,
   } as any)
+const ApiPublicJobsWhatsappRemindersRoute =
+  ApiPublicJobsWhatsappRemindersRouteImport.update({
+    id: '/api/public/jobs/whatsapp-reminders',
+    path: '/api/public/jobs/whatsapp-reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicWhatsappWebhookRoute =
+  ApiPublicWhatsappWebhookRouteImport.update({
+    id: '/api/public/whatsapp/webhook',
+    path: '/api/public/whatsapp/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedProfessoraTurmaClassIdPrazosRoute =
   AuthenticatedProfessoraTurmaClassIdPrazosRouteImport.update({
     id: '/turma/$classId_/prazos',
@@ -170,6 +184,8 @@ export interface FileRoutesByFullPath {
   '/professora/aluno/$studentId': typeof AuthenticatedProfessoraAlunoStudentIdRoute
   '/professora/grupo/$groupId': typeof AuthenticatedProfessoraGrupoGroupIdRoute
   '/professora/turma/$classId': typeof AuthenticatedProfessoraTurmaClassIdRoute
+  '/api/public/jobs/whatsapp-reminders': typeof ApiPublicJobsWhatsappRemindersRoute
+  '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
   '/professora/turma/$classId/prazos': typeof AuthenticatedProfessoraTurmaClassIdPrazosRoute
 }
 export interface FileRoutesByTo {
@@ -190,6 +206,8 @@ export interface FileRoutesByTo {
   '/professora/aluno/$studentId': typeof AuthenticatedProfessoraAlunoStudentIdRoute
   '/professora/grupo/$groupId': typeof AuthenticatedProfessoraGrupoGroupIdRoute
   '/professora/turma/$classId': typeof AuthenticatedProfessoraTurmaClassIdRoute
+  '/api/public/jobs/whatsapp-reminders': typeof ApiPublicJobsWhatsappRemindersRoute
+  '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
   '/professora/turma/$classId/prazos': typeof AuthenticatedProfessoraTurmaClassIdPrazosRoute
 }
 export interface FileRoutesById {
@@ -214,6 +232,8 @@ export interface FileRoutesById {
   '/_authenticated/professora/aluno/$studentId': typeof AuthenticatedProfessoraAlunoStudentIdRoute
   '/_authenticated/professora/grupo/$groupId': typeof AuthenticatedProfessoraGrupoGroupIdRoute
   '/_authenticated/professora/turma/$classId': typeof AuthenticatedProfessoraTurmaClassIdRoute
+  '/api/public/jobs/whatsapp-reminders': typeof ApiPublicJobsWhatsappRemindersRoute
+  '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
   '/_authenticated/professora/turma/$classId_/prazos': typeof AuthenticatedProfessoraTurmaClassIdPrazosRoute
 }
 export interface FileRouteTypes {
@@ -238,6 +258,8 @@ export interface FileRouteTypes {
     | '/professora/aluno/$studentId'
     | '/professora/grupo/$groupId'
     | '/professora/turma/$classId'
+    | '/api/public/jobs/whatsapp-reminders'
+    | '/api/public/whatsapp/webhook'
     | '/professora/turma/$classId/prazos'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -258,6 +280,8 @@ export interface FileRouteTypes {
     | '/professora/aluno/$studentId'
     | '/professora/grupo/$groupId'
     | '/professora/turma/$classId'
+    | '/api/public/jobs/whatsapp-reminders'
+    | '/api/public/whatsapp/webhook'
     | '/professora/turma/$classId/prazos'
   id:
     | '__root__'
@@ -281,6 +305,8 @@ export interface FileRouteTypes {
     | '/_authenticated/professora/aluno/$studentId'
     | '/_authenticated/professora/grupo/$groupId'
     | '/_authenticated/professora/turma/$classId'
+    | '/api/public/jobs/whatsapp-reminders'
+    | '/api/public/whatsapp/webhook'
     | '/_authenticated/professora/turma/$classId_/prazos'
   fileRoutesById: FileRoutesById
 }
@@ -289,6 +315,8 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ApiPublicJobsWhatsappRemindersRoute: typeof ApiPublicJobsWhatsappRemindersRoute
+  ApiPublicWhatsappWebhookRoute: typeof ApiPublicWhatsappWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -433,6 +461,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfessoraTurmaClassIdRouteImport
       parentRoute: typeof AuthenticatedProfessoraRouteRoute
     }
+    '/api/public/jobs/whatsapp-reminders': {
+      id: '/api/public/jobs/whatsapp-reminders'
+      path: '/api/public/jobs/whatsapp-reminders'
+      fullPath: '/api/public/jobs/whatsapp-reminders'
+      preLoaderRoute: typeof ApiPublicJobsWhatsappRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/whatsapp/webhook': {
+      id: '/api/public/whatsapp/webhook'
+      path: '/api/public/whatsapp/webhook'
+      fullPath: '/api/public/whatsapp/webhook'
+      preLoaderRoute: typeof ApiPublicWhatsappWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/professora/turma/$classId_/prazos': {
       id: '/_authenticated/professora/turma/$classId_/prazos'
       path: '/turma/$classId/prazos'
@@ -525,6 +567,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ApiPublicJobsWhatsappRemindersRoute: ApiPublicJobsWhatsappRemindersRoute,
+  ApiPublicWhatsappWebhookRoute: ApiPublicWhatsappWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
