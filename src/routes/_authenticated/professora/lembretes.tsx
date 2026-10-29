@@ -65,7 +65,7 @@ function RemindersPage() {
   const overviewFn = useServerFn(getReminderOverview);
   const sendFn = useServerFn(sendRemindersNow);
   const overview = useQuery({ queryKey: ["teacher", "whatsapp", "overview"], queryFn: () => overviewFn() });
-  const [interval, setInterval] = useState(String(data.settings.interval_days));
+  const [interval, setIntervalDays] = useState(String(data.settings.interval_days));
 
   const saveSettings = useMutation({
     mutationFn: async (patch: { auto_enabled?: boolean; interval_days?: number }) => {
@@ -185,7 +185,7 @@ function RemindersPage() {
                   max={30}
                   className="h-8 w-20"
                   value={interval}
-                  onChange={(e) => setInterval(e.target.value)}
+                  onChange={(e) => setIntervalDays(e.target.value)}
                 />
                 <span>dias</span>
                 <Button
