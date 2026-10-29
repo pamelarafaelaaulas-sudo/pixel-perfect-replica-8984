@@ -364,3 +364,31 @@ export const teacherNumberingQuery = queryOptions({
     return data ?? [];
   },
 });
+
+/* ---------------- Teacher: WhatsApp reminders ---------------- */
+
+export const whatsappRemindersQuery = queryOptions({
+  queryKey: ["teacher", "whatsapp"],
+  queryFn: async () => {
+    const { data: auth } = await supabase.auth.getUser();
+    const uid = auth.user?.id ?? "";
+    const [settings, messages, classes] = await Promise.all([
+      supabase.from("whatsapp_settings").select("auto_enabled, interval_days, last_auto_run_at").eq("teacher_id", uid).maybeSingle(),
+      supabase
+        .from("whatsapp_messages")
+        .select("id, student_name, phone, phase_number, days_left, due_date, trigger, status, error, created_at, delivered_at, read_at")
+        .order("created_at", { ascending: false })
+        .limit(60),
+      supabase.from("classes").select("id, name, schedules(phase_number, due_date)").eq("teacher_id", uid).order("name"),
+    ]);
+    fail(settings.error);
+    fail(messages.error);
+    fail(classes.error);
+    return {
+      teacherId: uid,
+      settings: settings.data ?? { auto_enabled: false, interval_days: 3, last_auto_run_at: null },
+      messages: messages.data ?? [],
+      classes: classes.data ?? [],
+    };
+  },
+});
