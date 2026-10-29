@@ -34,6 +34,7 @@ import { latestPerPhase, overallScore, type SavedAiEvaluation } from "@/lib/ai-s
 import { AiEvaluationView, scoreTone } from "@/components/ai-feedback";
 import { ProjectAreaPicker, ProjectCodeTag } from "@/components/project-code";
 import { ProjectDocxButton } from "@/components/project-docx";
+import { SocialApplicationCard } from "@/components/social-application";
 
 export const Route = createFileRoute("/_authenticated/professora/grupo/$groupId")({
   head: () => ({
@@ -203,6 +204,12 @@ function TeacherGroupPage() {
           </div>
         ))}
       </section>
+
+      {project && (
+        <section className="mb-6">
+          <SocialApplicationCard value={project.social_application} hint="O grupo ainda não escreveu." />
+        </section>
+      )}
 
       <section className="mb-8">
         <PhaseTimeline phases={lateness.phases} />
