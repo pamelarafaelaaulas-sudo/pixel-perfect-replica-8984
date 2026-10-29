@@ -112,7 +112,10 @@ function FairDateDialog({ teacherId, current }: { teacherId: string; current: { 
     const f = new FormData(e.currentTarget);
     const raw = String(f.get("at") ?? "");
     const d = new Date(raw);
-    if (!raw || Number.isNaN(d.getTime())) return toast.error("Escolha a data e o horário da feira");
+    if (!raw || Number.isNaN(d.getTime())) {
+      toast.error("Escolha a data e o horário da feira");
+      return;
+    }
     save.mutate({ at: d.toISOString(), name: String(f.get("name") ?? "").trim() || "FECITI/MS" });
   }
 
