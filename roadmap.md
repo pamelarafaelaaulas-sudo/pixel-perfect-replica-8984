@@ -21,5 +21,5 @@
 - [x] Baixar o projeto em Word nas normas ABNT (professora e alunos)
 - [x] Banner: cada grupo com sua própria cópia do modelo do Canva + pasta no Google Drive da professora com todos os banners e situação de cada grupo
 - [x] Aplicação ou intervenção social na etapa da Pergunta norteadora, obrigatória para entregar
-- [ ] Tela de planejamento (professora): todas as etapas com prazos e o progresso de cada grupo
-- [ ] Baixar o plano do projeto em Word ABNT (com a aplicação social) para cada grupo
+- [x] Tela de planejamento (professora): todas as etapas com prazos e o progresso de cada grupo
+- [x] Baixar o plano do projeto em Word ABNT (com a aplicação social) para cada grupo
