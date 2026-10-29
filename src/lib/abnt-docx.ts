@@ -120,7 +120,7 @@ export async function buildProjectDocx(model: AbntModel): Promise<Blob> {
       );
     } else if (s.paragraphs.length) {
       s.paragraphs.forEach((p) => text.push(body(p)));
-    } else if (s.number !== "2") {
+    } else if (s.title !== "OBJETIVOS") {
       text.push(placeholder());
     }
   });
