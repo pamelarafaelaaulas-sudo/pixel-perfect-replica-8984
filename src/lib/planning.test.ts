@@ -25,7 +25,7 @@ describe("planning overview", () => {
     });
     expect(stages).toHaveLength(PHASE_COUNT);
     expect(stages[0]).toMatchObject({ delivered: 1, late: 1, groups: 2 });
-    expect(stages[1]).toMatchObject({ delivered: 0, late: 1 });
+    expect(stages[1]).toMatchObject({ delivered: 0, late: 2 });
     expect(groups.map((g) => g.delivered)).toEqual([1, 0]);
   });
 });

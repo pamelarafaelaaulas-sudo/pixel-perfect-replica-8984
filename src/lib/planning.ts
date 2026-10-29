@@ -13,8 +13,8 @@ export function daysUntil(due: string | Date, now: Date = new Date()): number {
 export function deadlineLabel(due: string | null, now: Date = new Date()): string {
   if (!due) return "sem prazo";
   const d = daysUntil(due, now);
-  if (d === 0 || d === 1) return d === 0 ? "venceu agora" : "vence em 1 dia";
-  if (d > 1) return `vence em ${d} dias`;
+  if (d === 0) return "vence agora";
+  if (d > 0) return d === 1 ? "vence em 1 dia" : `vence em ${d} dias`;
   return d === -1 ? "venceu há 1 dia" : `venceu há ${-d} dias`;
 }
 
