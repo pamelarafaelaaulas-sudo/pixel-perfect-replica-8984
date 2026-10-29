@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
-import { Plus, School, Users, ArrowRight, ClipboardList, Palette, CalendarRange, Hash } from "lucide-react";
+import { Plus, School, Users, ArrowRight, ClipboardList, Palette, CalendarRange, Hash, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
