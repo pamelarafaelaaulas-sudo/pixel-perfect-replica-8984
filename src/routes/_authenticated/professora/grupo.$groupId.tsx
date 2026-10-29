@@ -134,6 +134,7 @@ function TeacherGroupPage() {
         title={group.group_name}
         actions={
           project && (
+            <div className="flex flex-wrap gap-2">
             <ProjectDocxButton
               project={project}
               groupName={group.group_name}
@@ -147,6 +148,7 @@ function TeacherGroupPage() {
               authors={members.map((m) => m.profiles?.name ?? "").filter(Boolean)}
               cls={cls}
             />
+            </div>
           )
         }
         description={

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ABNT, buildAbntModel, cmToTwip, docxFileName, sortReferences, splitInstitution, type AbntInput } from "./abnt-doc";
+import { ABNT, buildAbntModel, buildPlanModel, cmToTwip, docxFileName, sortReferences, splitInstitution, type AbntInput } from "./abnt-doc";
 
 const base: AbntInput = {
   title: "Plantas da escola",
@@ -86,5 +86,36 @@ describe("ABNT document content", () => {
   it("builds a safe file name", () => {
     expect(docxFileName("BIO-2B-001", "Grupo", "Água: uso?")).toBe("BIO-2B-001 - Água uso.docx");
     expect(docxFileName(null, "Plantas", null)).toBe("Plantas - Projeto.docx");
+  });
+});
+
+describe("project plan document", () => {
+  const plan = {
+    theme: "Óleo de cozinha",
+    guiding_question: "Como o óleo afeta a água?",
+    social_application: "Pontos de coleta de óleo na escola.",
+    title: "Óleo e água",
+    institution: "Escola X, Cuiabá - MT",
+    general_objective: "Analisar.",
+    specific_objectives: "Medir\nComparar",
+    methodology: "Método.",
+    scientific_articles: [{ title: "Artigo", url: "", source_type: "Artigo", abnt_citation: "SILVA, A. Óleo. 2020." }],
+    authors: ["Ana"],
+    teacherName: "Pâmela Prado",
+    areaLabel: null,
+    projectCode: null,
+    year: 2026,
+  };
+
+  it("includes the social application right after the guiding question", () => {
+    const m = buildPlanModel(plan);
+    expect(m.sections.map((s) => s.title).slice(0, 3)).toEqual(["TEMA", "PERGUNTA NORTEADORA", "APLICAÇÃO OU INTERVENÇÃO SOCIAL"]);
+    expect(m.sections[2]!.paragraphs).toEqual(["Pontos de coleta de óleo na escola."]);
+    expect(m.abstract).toBeNull();
+    expect(m.references).toEqual(["SILVA, A. Óleo. 2020."]);
+  });
+
+  it("lists an empty social application as missing", () => {
+    expect(buildPlanModel({ ...plan, social_application: "" }).missing).toContain("Aplicação ou intervenção social");
   });
 });
