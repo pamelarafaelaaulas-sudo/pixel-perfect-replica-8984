@@ -78,6 +78,66 @@ export type Database = {
           },
         ]
       }
+      banner_diagnoses: {
+        Row: {
+          axes: Json
+          created_at: string
+          critical: boolean
+          feedback: Json
+          file_name: string | null
+          file_path: string | null
+          group_id: string
+          id: string
+          project_id: string
+          requested_by: string | null
+          total: number
+          version: number
+        }
+        Insert: {
+          axes?: Json
+          created_at?: string
+          critical?: boolean
+          feedback?: Json
+          file_name?: string | null
+          file_path?: string | null
+          group_id: string
+          id?: string
+          project_id: string
+          requested_by?: string | null
+          total?: number
+          version?: number
+        }
+        Update: {
+          axes?: Json
+          created_at?: string
+          critical?: boolean
+          feedback?: Json
+          file_name?: string | null
+          file_path?: string | null
+          group_id?: string
+          id?: string
+          project_id?: string
+          requested_by?: string | null
+          total?: number
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "banner_diagnoses_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banner_diagnoses_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       banner_drive_files: {
         Row: {
           drive_file_id: string
@@ -112,6 +172,81 @@ export type Database = {
             foreignKeyName: "banner_drive_files_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: true
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      banner_reviews: {
+        Row: {
+          annotated_file_name: string | null
+          annotated_file_path: string | null
+          created_at: string
+          group_id: string
+          id: string
+          notes: string
+          project_id: string
+          resubmit_due_at: string
+          resubmitted_at: string | null
+          resubmitted_by: string | null
+          resubmitted_file_name: string | null
+          resubmitted_file_path: string | null
+          reviewed_file_name: string | null
+          reviewed_file_path: string | null
+          round: number
+          teacher_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          annotated_file_name?: string | null
+          annotated_file_path?: string | null
+          created_at?: string
+          group_id: string
+          id?: string
+          notes?: string
+          project_id: string
+          resubmit_due_at: string
+          resubmitted_at?: string | null
+          resubmitted_by?: string | null
+          resubmitted_file_name?: string | null
+          resubmitted_file_path?: string | null
+          reviewed_file_name?: string | null
+          reviewed_file_path?: string | null
+          round?: number
+          teacher_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          annotated_file_name?: string | null
+          annotated_file_path?: string | null
+          created_at?: string
+          group_id?: string
+          id?: string
+          notes?: string
+          project_id?: string
+          resubmit_due_at?: string
+          resubmitted_at?: string | null
+          resubmitted_by?: string | null
+          resubmitted_file_name?: string | null
+          resubmitted_file_path?: string | null
+          reviewed_file_name?: string | null
+          reviewed_file_path?: string | null
+          round?: number
+          teacher_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "banner_reviews_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banner_reviews_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
@@ -458,6 +593,7 @@ export type Database = {
           area_code: string | null
           area_subarea: string | null
           banner_canva_url: string | null
+          banner_file_hash: string | null
           banner_file_name: string | null
           banner_file_path: string | null
           code_number: number | null
@@ -486,6 +622,7 @@ export type Database = {
           area_code?: string | null
           area_subarea?: string | null
           banner_canva_url?: string | null
+          banner_file_hash?: string | null
           banner_file_name?: string | null
           banner_file_path?: string | null
           code_number?: number | null
@@ -514,6 +651,7 @@ export type Database = {
           area_code?: string | null
           area_subarea?: string | null
           banner_canva_url?: string | null
+          banner_file_hash?: string | null
           banner_file_name?: string | null
           banner_file_path?: string | null
           code_number?: number | null
@@ -900,6 +1038,17 @@ export type Database = {
           tips: Json
         }[]
       }
+      group_banner_diagnoses: {
+        Args: { _group_id: string }
+        Returns: {
+          created_at: string
+          feedback: Json
+          file_name: string
+          file_path: string
+          id: string
+          version: number
+        }[]
+      }
       has_author_date_citation: { Args: { _t: string }; Returns: boolean }
       has_role: {
         Args: {
@@ -944,6 +1093,15 @@ export type Database = {
         Returns: boolean
       }
       renumber_projects: { Args: { _class_ids: string[] }; Returns: number }
+      resubmit_banner: {
+        Args: {
+          _hash: string
+          _name: string
+          _path: string
+          _review_id: string
+        }
+        Returns: string
+      }
       shares_group_with: { Args: { _other: string }; Returns: boolean }
       submit_phase: { Args: { _project_id: string }; Returns: number }
       teaches_class: { Args: { _class_id: string }; Returns: boolean }
