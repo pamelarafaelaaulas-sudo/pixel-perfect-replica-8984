@@ -55,8 +55,7 @@ function Index() {
               Da curiosidade à <span className="marker">pergunta científica</span>, em grupo.
             </h1>
             <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-              Os alunos formam grupos de até 3 integrantes, escrevem o projeto etapa por etapa, montam o
-              banner e apresentam na feira. A professora acompanha prazos, vê quem contribuiu e lança as
+              Vocês, alunos de educação científica da Prof. Pâmela, podem formar grupos de até 3 integrantes, escrever o projeto etapa por etapa, montar o banner e apresentar na feira. A professora acompanha prazos, vê quem contribuiu e lança as
               notas de cada bimestre.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
