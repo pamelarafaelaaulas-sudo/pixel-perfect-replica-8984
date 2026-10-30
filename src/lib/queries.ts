@@ -64,7 +64,7 @@ export const classDetailQuery = (classId: string) =>
           groups!groups_class_id_fkey(
             id, group_name, created_at,
             group_members(id, student_id, whatsapp, profiles(name)),
-            projects(id, current_phase, updated_at, area_code, code_number, phase_submissions(phase_number, submitted_at)),
+            projects(id, current_phase, updated_at, area_code, code_number, phase_submissions(phase_number, submitted_at), banner_reviews(resubmit_due_at, resubmitted_at)),
             grades(trimester, score)
           )`,
         )
@@ -85,7 +85,7 @@ export const groupDetailQuery = (groupId: string) =>
           `*,
           classes!groups_class_id_fkey(id, name, class_code, code_label, late_penalty_per_day, banner_template_url, banner_size, banner_sections, banner_instructions, schedules(*)),
           group_members(id, student_id, whatsapp, profiles(name, email)),
-          projects(*, phase_submissions(*), project_contributions(*)),
+          projects(*, phase_submissions(*), project_contributions(*), banner_reviews(*)),
           grades(*)`,
         )
         .eq("id", groupId)
@@ -187,7 +187,7 @@ async function fetchStudentReview(studentId: string) {
             groups(id, group_name,
               classes!groups_class_id_fkey(id, name, late_penalty_per_day, schedules(phase_number, due_date)),
               group_members(student_id),
-              projects(id, current_phase, phase_submissions(phase_number, submitted_at), project_contributions(student_id, char_count_added)),
+              projects(id, current_phase, phase_submissions(phase_number, submitted_at), project_contributions(student_id, char_count_added), banner_reviews(resubmit_due_at, resubmitted_at)),
               grades(trimester, score, feedback, is_reference_ten, created_at),
               student_grade_adjustments(id, student_id, bimester, points, note)
             )`,
@@ -259,7 +259,7 @@ export const teacherRosterQuery = queryOptions({
         groups!groups_class_id_fkey(
           id, group_name,
           group_members(student_id, profiles(name, email)),
-          projects(current_phase, phase_submissions(phase_number, submitted_at))
+          projects(current_phase, phase_submissions(phase_number, submitted_at), banner_reviews(resubmit_due_at, resubmitted_at))
         )`,
       )
       .order("created_at", { ascending: false });
@@ -281,7 +281,7 @@ export const teacherBimesterQuery = queryOptions({
         groups!groups_class_id_fkey(
           id, group_name,
           group_members(profiles(name)),
-          projects(current_phase, phase_submissions(phase_number, submitted_at)),
+          projects(current_phase, phase_submissions(phase_number, submitted_at), banner_reviews(resubmit_due_at, resubmitted_at)),
           grades(trimester, score, feedback, is_reference_ten)
         )`,
       )
@@ -305,7 +305,7 @@ export const teacherExportQuery = queryOptions({
           groups!groups_class_id_fkey(
             id, group_name,
             group_members(student_id, profiles(name)),
-            projects(current_phase, area_code, code_number, phase_submissions(phase_number, submitted_at)),
+            projects(current_phase, area_code, code_number, phase_submissions(phase_number, submitted_at), banner_reviews(resubmit_due_at, resubmitted_at)),
             grades(trimester, score, feedback, is_reference_ten, created_at),
             student_grade_adjustments(student_id, bimester, points, note)
           )`,
@@ -334,12 +334,14 @@ export const classBannersQuery = (classId: string) =>
       const { data, error } = await supabase
         .from("groups")
         .select(
-          `id, group_name,
+          `id, group_name, classes!groups_class_id_fkey(late_penalty_per_day),
           projects(
             id, area_code, code_number, banner_canva_url, banner_file_path, banner_file_name,
             phase_submissions(phase_number, submitted_at),
             project_contributions(section_name, edited_at, profiles(name)),
-            banner_drive_files(drive_file_id, synced_at)
+            banner_drive_files(drive_file_id, synced_at),
+            banner_reviews(id, round, resubmit_due_at, resubmitted_at),
+            banner_diagnoses(id, version, total, critical, feedback, created_at)
           )`,
         )
         .eq("class_id", classId)
