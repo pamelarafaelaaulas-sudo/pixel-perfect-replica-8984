@@ -25,7 +25,7 @@ type RosterClass = {
         id: string;
         group_name: string;
         group_members: { student_id: string; profiles: { name: string; email: string } | null }[] | null;
-        projects: { current_phase: number; phase_submissions: { phase_number: number; submitted_at: string }[] | null } | null;
+        projects: { current_phase: number; phase_submissions: { phase_number: number; submitted_at: string }[] | null; banner_reviews?: { resubmit_due_at: string; resubmitted_at: string | null }[] | null } | null;
       }[]
     | null;
 };
@@ -44,7 +44,8 @@ export function buildRoster(classes: RosterClass[], now: Date = new Date()): Ros
     for (const g of c.groups ?? []) {
       const currentPhase = g.projects?.current_phase ?? 1;
       const submissions = g.projects?.phase_submissions ?? [];
-      const { phases, totalPenalty } = projectLateness({ currentPhase, schedules, submissions, perDay, now });
+      const bannerReviews = g.projects?.banner_reviews ?? [];
+      const { phases, totalPenalty } = projectLateness({ currentPhase, schedules, submissions, perDay, bannerReviews, now });
       const delivered = phases.filter((p) => p.state === "delivered").length;
       const daysLate = phases.reduce((s, p) => s + p.daysLate, 0);
       for (const m of g.group_members ?? []) {
