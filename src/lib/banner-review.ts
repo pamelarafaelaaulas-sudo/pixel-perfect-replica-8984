@@ -1,5 +1,3 @@
-import { daysLate, phasePenalty } from "./penalty";
-
 /** Guide shown before the banner upload (from the teacher's FETEC/MS · FECITMS orientation). */
 export const BANNER_GUIDE = [
   {
@@ -154,32 +152,7 @@ export function mermaidFromSteps(steps: string[]): string {
   return lines.join("\n");
 }
 
-export type ReviewRound = { resubmit_due_at: string; resubmitted_at: string | null };
-
-export type ResubmitLateness = {
-  /** One entry per feedback round, oldest first. */
-  rounds: { dueAt: string; at: string | null; days: number; penalty: number }[];
-  days: number;
-  penalty: number;
-};
-
-/**
- * Late resubmission of the banner after the teacher's feedback:
- * Nota final = Nota bruta − (dias de atraso × desconto por dia). A round still waiting keeps counting.
- */
-export function resubmitLateness(reviews: ReviewRound[], perDay: number, now: Date = new Date()): ResubmitLateness {
-  const rounds = [...reviews]
-    .sort((a, b) => a.resubmit_due_at.localeCompare(b.resubmit_due_at))
-    .map((r) => {
-      const days = daysLate(r.resubmit_due_at, r.resubmitted_at, now);
-      return { dueAt: r.resubmit_due_at, at: r.resubmitted_at, days, penalty: phasePenalty(days, perDay) };
-    });
-  return {
-    rounds,
-    days: rounds.reduce((s, r) => s + r.days, 0),
-    penalty: Math.round(rounds.reduce((s, r) => s + r.penalty, 0) * 100) / 100,
-  };
-}
+export { resubmitLateness, type ResubmitLateness, type ReviewRound } from "./penalty";
 
 const str = (v: unknown) => (typeof v === "string" ? v : "");
 const strs = (v: unknown) => (Array.isArray(v) ? v.map(str).filter(Boolean) : []);
