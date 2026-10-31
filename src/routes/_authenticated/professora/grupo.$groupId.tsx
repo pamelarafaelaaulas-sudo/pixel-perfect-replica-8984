@@ -117,6 +117,7 @@ function TeacherGroupPage() {
     currentPhase: project?.current_phase ?? 1,
     schedules: cls.schedules ?? [],
     submissions: project?.phase_submissions ?? [],
+    bannerReviews: project?.banner_reviews ?? [],
     perDay,
   });
   const penalties = bimesterPenalties(lateness.phases);

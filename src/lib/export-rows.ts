@@ -11,7 +11,9 @@ type InputGroup = {
     current_phase: number;
     area_code?: string | null;
     code_number?: number | null;
-    phase_submissions: { phase_number: number; submitted_at: string }[] | null } | null;
+    phase_submissions: { phase_number: number; submitted_at: string }[] | null;
+    banner_reviews?: { resubmit_due_at: string; resubmitted_at: string | null }[] | null;
+  } | null;
   /** `trimester` holds the bimestre number (database column name). */
   grades:
     | { trimester: number; score: number | string; feedback: string | null; is_reference_ten: boolean; created_at: string }[]
@@ -119,6 +121,7 @@ export function buildExport(input: ExportInput, filters: ExportFilters = {}) {
         currentPhase: g.projects?.current_phase ?? 1,
         schedules: c.schedules ?? [],
         submissions: g.projects?.phase_submissions ?? [],
+        bannerReviews: g.projects?.banner_reviews ?? [],
         perDay,
         now,
       });
@@ -218,6 +221,7 @@ export function buildStudentGrades(classes: ExportInput["classes"], now: Date = 
           currentPhase: g.projects?.current_phase ?? 1,
           schedules: c.schedules ?? [],
           submissions: g.projects?.phase_submissions ?? [],
+          bannerReviews: g.projects?.banner_reviews ?? [],
           perDay: Number(c.late_penalty_per_day),
           now,
         });
