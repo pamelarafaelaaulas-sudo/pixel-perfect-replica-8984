@@ -10,10 +10,28 @@ import { Label } from "@/components/ui/label";
 import { TEMPLATE_LINK_PROBLEM, isCanvaUrl, isTemplateLink } from "@/lib/phase-rules";
 import { syncBannerToDrive } from "@/lib/banner-drive.functions";
 import type { BannerBrief } from "@/lib/banner";
+import { checklistComplete, fileFingerprint } from "@/lib/banner-review";
+import { BannerChecklist, BannerGuide, type ChecklistState } from "@/components/banner-checklist";
+import { DiagnosisRunning, useDiagnoseBanner } from "@/components/banner-diagnosis";
 
-const BUCKET = "banners";
-const MAX_BYTES = 25 * 1024 * 1024;
-const ACCEPT = "application/pdf,image/png,image/jpeg";
+export const BUCKET = "banners";
+export const MAX_BYTES = 25 * 1024 * 1024;
+export const ACCEPT = "application/pdf,image/png,image/jpeg";
+
+/** Storage-safe file name, keeping the end (and the extension) of long names. */
+export function safeFileName(name: string) {
+  return name
+    .normalize("NFD")
+    .replace(/[^\w.-]+/g, "_")
+    .slice(-80);
+}
+
+/** Message for a file that can't be a banner, or null when it is fine. */
+export function bannerFileProblem(file: File): string | null {
+  if (!ACCEPT.split(",").includes(file.type)) return "Envie o banner em PDF, PNG ou JPG.";
+  if (file.size > MAX_BYTES) return "O arquivo passa de 25 MB. Exporte com qualidade menor.";
+  return null;
+}
 
 /** Opens a private banner file in a new tab through a short-lived signed link. */
 export function BannerFileLink({ path, name }: { path: string; name: string | null }) {
@@ -131,6 +149,9 @@ export function BannerStage({
 }) {
   const qc = useQueryClient();
   const copyToDrive = useServerFn(syncBannerToDrive);
+  const diagnose = useDiagnoseBanner(groupId);
+  const [checklist, setChecklist] = useState<ChecklistState>({});
+  const checklistDone = checklistComplete(checklist);
   const [link, setLink] = useState(canvaUrl ?? "");
   const [savingLink, setSavingLink] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -168,20 +189,18 @@ export function BannerStage({
   }
 
   async function upload(file: File) {
-    if (!ACCEPT.split(",").includes(file.type)) {
-      toast.error("Envie o banner em PDF, PNG ou JPG.");
+    const problem = bannerFileProblem(file);
+    if (problem) {
+      toast.error(problem);
       return;
     }
-    if (file.size > MAX_BYTES) {
-      toast.error("O arquivo passa de 25 MB. Exporte com qualidade menor.");
+    if (!checklistDone) {
+      toast.error("Marque todos os itens do checklist antes de enviar.");
       return;
     }
     setUploading(true);
-    const safe = file.name
-      .normalize("NFD")
-      .replace(/[^\w.-]+/g, "_")
-      .slice(-80);
-    const path = `${groupId}/${Date.now()}-${safe}`;
+    const hash = await fileFingerprint(file);
+    const path = `${groupId}/${Date.now()}-${safeFileName(file.name)}`;
     const up = await supabase.storage.from(BUCKET).upload(path, file, { contentType: file.type });
     if (up.error) {
       setUploading(false);
@@ -192,7 +211,7 @@ export function BannerStage({
     }
     const { error } = await supabase
       .from("projects")
-      .update({ banner_file_path: path, banner_file_name: file.name })
+      .update({ banner_file_path: path, banner_file_name: file.name, banner_file_hash: hash })
       .eq("id", projectId);
     if (error) {
       await supabase.storage.from(BUCKET).remove([path]);
@@ -205,8 +224,10 @@ export function BannerStage({
     if (filePath) await supabase.storage.from(BUCKET).remove([filePath]);
     await logContribution("banner_file_path", file.size > 0 ? 1000 : 0);
     setUploading(false);
-    toast.success("Arquivo do banner enviado");
+    toast.success("Arquivo do banner enviado. A IA vai fazer o diagnóstico.");
+    setChecklist({});
     qc.invalidateQueries({ queryKey: ["group", groupId] });
+    diagnose.mutate();
     // A copy also goes to the teacher's Google Drive folder; the upload already succeeded, so failures stay quiet.
     copyToDrive({ data: { groupId } }).catch((e) => console.warn("Banner Drive copy failed", e));
   }
@@ -245,8 +266,14 @@ export function BannerStage({
         </p>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         <Label>Arquivo final do banner</Label>
+        {editable && (
+          <>
+            <BannerGuide defaultOpen={!filePath} />
+            <BannerChecklist idPrefix={`v1-${projectId}`} value={checklist} onChange={setChecklist} />
+          </>
+        )}
         <div className="flex flex-wrap items-center gap-3">
           {filePath ? (
             <BannerFileLink path={filePath} name={fileName} />
@@ -271,7 +298,7 @@ export function BannerStage({
                 type="button"
                 variant="secondary"
                 onClick={() => fileInput.current?.click()}
-                disabled={uploading}
+                disabled={uploading || !checklistDone}
               >
                 {uploading ? <Loader2 className="animate-spin" /> : <FileUp />}{" "}
                 {filePath ? "Trocar arquivo" : "Enviar arquivo"}
@@ -280,8 +307,9 @@ export function BannerStage({
           )}
         </div>
         <p className="text-xs text-muted-foreground">
-          No Canva: Compartilhar → Baixar → PDF para impressão (ou PNG/JPG). Até 25 MB.
+          No Canva: Compartilhar → Baixar → PDF para impressão (ou PNG/JPG). Até 25 MB. A IA lê arquivos de até 20 MB.
         </p>
+        <DiagnosisRunning groupId={groupId} />
       </div>
     </div>
   );
