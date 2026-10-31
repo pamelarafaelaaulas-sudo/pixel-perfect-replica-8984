@@ -53,9 +53,11 @@ export const diagnoseBanner = createServerFn({ method: "POST" })
     const version = answered.length + 1;
     const lastAnswered = answered.at(-1);
 
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     let previous: string | null = null;
     if (lastAnswered && lastAnswered.resubmitted_file_path === p.banner_file_path) {
-      const { data: prevDiag } = await sb
+      // Caller already verified as member/teacher; students can't read diagnoses themselves, so the server reads it.
+      const { data: prevDiag } = await supabaseAdmin
         .from("banner_diagnoses")
         .select("feedback")
         .eq("group_id", data.groupId)
@@ -63,7 +65,6 @@ export const diagnoseBanner = createServerFn({ method: "POST" })
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
-      // Students cannot read diagnoses directly; the teacher's notes are enough context then.
       const prevNotes = prevDiag
         ? parseBannerFeedback(prevDiag.feedback)
             .annotations.filter((a) => a.severity !== "destaque")
@@ -106,7 +107,6 @@ export const diagnoseBanner = createServerFn({ method: "POST" })
       previous,
     });
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error: saveError } = await supabaseAdmin.from("banner_diagnoses").insert({
       project_id: p.id,
       group_id: group.id,
