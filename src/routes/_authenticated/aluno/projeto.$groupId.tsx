@@ -301,7 +301,7 @@ function StudentProjectPage() {
             />
           )}
           <fieldset disabled={!editable} className="space-y-5">
-            {isBanner ? null            ) : selected === 2 ? (
+            {isBanner ? null : selected === 2 ? (
               <ArticlesEditor value={draft.scientific_articles} onChange={(v) => set("scientific_articles", v)} editable={editable} />
             ) : (
               (PHASE_FORM[selected] ?? []).map((f) => (
