@@ -56,6 +56,7 @@ import { CITATION_EXAMPLES, checkCitations } from "@/lib/citations";
 import { fmtDateTime, whatsappLink } from "@/lib/format";
 import { bimesterPenalties, formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
 import { BannerStage } from "@/components/banner-stage";
+import { StudentBannerCorrector } from "@/components/banner-cycle";
 import { bannerBrief } from "@/lib/banner";
 import { ProjectAreaPicker, ProjectCodeTag } from "@/components/project-code";
 import { SocialApplicationCard } from "@/components/social-application";
@@ -286,20 +287,21 @@ function StudentProjectPage() {
             )}
           </div>
 
+          {isBanner && (
+            <BannerStage
+              key={project.id}
+              groupId={groupId}
+              projectId={project.id}
+              studentId={me!.id}
+              brief={bannerBrief(cls)}
+              canvaUrl={project.banner_canva_url}
+              filePath={project.banner_file_path}
+              fileName={project.banner_file_name}
+              editable={editable}
+            />
+          )}
           <fieldset disabled={!editable} className="space-y-5">
-            {isBanner ? (
-              <BannerStage
-                key={project.id}
-                groupId={groupId}
-                projectId={project.id}
-                studentId={me!.id}
-                brief={bannerBrief(cls)}
-                canvaUrl={project.banner_canva_url}
-                filePath={project.banner_file_path}
-                fileName={project.banner_file_name}
-                editable={editable}
-              />
-            ) : selected === 2 ? (
+            {isBanner ? null            ) : selected === 2 ? (
               <ArticlesEditor value={draft.scientific_articles} onChange={(v) => set("scientific_articles", v)} editable={editable} />
             ) : (
               (PHASE_FORM[selected] ?? []).map((f) => (
@@ -381,6 +383,10 @@ function StudentProjectPage() {
                 )}
               </div>
             </div>
+          )}
+
+          {isBanner && (
+            <StudentBannerCorrector groupId={groupId} project={project} perDay={Number(cls.late_penalty_per_day)} />
           )}
 
           {!isBanner && (
