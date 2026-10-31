@@ -175,6 +175,34 @@ export const aiSuggestionsForGroupQuery = (groupId: string) =>
     },
   });
 
+/* ---------------- Banner corrector ---------------- */
+
+/** Teacher: every AI diagnosis of the group's banner, with the suggested grade. */
+export const bannerDiagnosesQuery = (groupId: string) =>
+  queryOptions({
+    queryKey: ["banner", "diagnoses", groupId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("banner_diagnoses")
+        .select("id, version, file_path, file_name, total, axes, feedback, critical, created_at")
+        .eq("group_id", groupId)
+        .order("created_at", { ascending: false });
+      fail(error);
+      return data ?? [];
+    },
+  });
+
+/** Student: the written guidance of each diagnosis, never the scores. */
+export const bannerGuidanceQuery = (groupId: string) =>
+  queryOptions({
+    queryKey: ["banner", "guidance", groupId],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("group_banner_diagnoses", { _group_id: groupId });
+      fail(error);
+      return data ?? [];
+    },
+  });
+
 /* ---------------- Teacher: per-student review ---------------- */
 
 async function fetchStudentReview(studentId: string) {

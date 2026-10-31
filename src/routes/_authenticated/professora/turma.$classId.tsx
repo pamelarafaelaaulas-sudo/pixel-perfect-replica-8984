@@ -148,6 +148,7 @@ function ClassPage() {
                   currentPhase: project?.current_phase ?? 1,
                   schedules,
                   submissions: project?.phase_submissions ?? [],
+                  bannerReviews: project?.banner_reviews ?? [],
                   perDay: Number(cls.late_penalty_per_day),
                 });
                 const grades = g.grades ?? [];
