@@ -30,3 +30,6 @@
 - [ ] Mensagem teste no WhatsApp para as alunas — aguardando o WhatsApp aprovar a mensagem
 - [x] Planilha de notas com a nota final (atraso + ajuste da professora por aluno)
 - [x] Lembretes WhatsApp dentro do PamLab: prazos de cada etapa, envio automático a cada 3 dias e botão de envio
+- [x] Bloco 1 — Corretor de banner: guia + checklist que trava o envio, diagnóstico da IA (matriz 3,5/2,5/2,0/2,0, coerência com o projeto, 5 perguntas da banca, fluxograma, prompts do Canva, títulos), filtro de atenção crítica, devolutiva da professora (banner anotado, observações, prazo V2) e desconto por atraso no reenvio
+- [ ] Bloco 2 — Feiras externas (FETEC/MS, FECINTEC) e triagem ética/TCLE na Metodologia
+- [ ] Bloco 3 — Diário de bordo no 3º bimestre e trilha de vídeos
