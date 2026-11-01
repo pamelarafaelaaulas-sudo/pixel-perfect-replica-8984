@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TeacherBannerPanel } from "@/components/banner-cycle";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   AlertDialog,
@@ -254,6 +255,7 @@ function TeacherGroupPage() {
           <TabsTrigger value="projeto">Projeto</TabsTrigger>
           <TabsTrigger value="contrib">Quem escreveu</TabsTrigger>
           <TabsTrigger value="pares">Avaliação dos colegas</TabsTrigger>
+          <TabsTrigger value="banner">Corretor de banner</TabsTrigger>
           <TabsTrigger value="notas">Notas</TabsTrigger>
           <TabsTrigger value="ia">Avaliação da IA</TabsTrigger>
         </TabsList>
@@ -300,6 +302,20 @@ function TeacherGroupPage() {
               </div>
             );
           })}
+        </TabsContent>
+
+        <TabsContent value="banner" className="card-paper p-6 md:p-8">
+          {project ? (
+            <TeacherBannerPanel
+              groupId={groupId}
+              project={project}
+              perDay={perDay}
+              grade={(group.grades ?? []).find((g) => g.trimester === 3) ?? null}
+              delivered={(project.phase_submissions ?? []).some((s) => s.phase_number === BANNER_PHASE)}
+            />
+          ) : (
+            <p>Sem projeto.</p>
+          )}
         </TabsContent>
 
         <TabsContent value="notas">

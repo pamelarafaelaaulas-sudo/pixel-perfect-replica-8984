@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ExternalLink, FolderOpen, Loader2, Palette, UploadCloud } from "lucide-react";
@@ -12,6 +14,9 @@ import { isCanvaUrl, isTemplateLink } from "@/lib/phase-rules";
 import { BANNER_PHASE } from "@/lib/phases";
 import { projectCode } from "@/lib/project-code";
 import { fmtAgo, fmtDateTime } from "@/lib/format";
+import { Switch } from "@/components/ui/switch";
+import { criticalReasons, parseBannerFeedback } from "@/lib/banner-review";
+import { daysLate, formatPoints } from "@/lib/penalty";
 
 const BANNER_SECTIONS = ["banner_canva_url", "banner_file_path"];
 
@@ -53,14 +58,21 @@ export function GroupBanners({
     onError: (e: Error) => toast.error(`Não foi possível enviar ao Drive. ${e.message}`),
   });
 
-  const rows = (groups.data ?? []).map((g) => {
+  const [onlyCritical, setOnlyCritical] = useState(false);
+  const allRows = (groups.data ?? []).map((g) => {
     const p = g.projects;
     const delivered = !!p?.phase_submissions.some((s) => s.phase_number === BANNER_PHASE);
     const last = (p?.project_contributions ?? [])
       .filter((c) => BANNER_SECTIONS.includes(c.section_name))
       .sort((a, b) => b.edited_at.localeCompare(a.edited_at))[0];
     const driveCopy = p?.banner_drive_files ?? null;
+    const diag = [...(p?.banner_diagnoses ?? [])].sort((a, b) => b.created_at.localeCompare(a.created_at))[0] ?? null;
+    const reasons = diag ? criticalReasons(parseBannerFeedback(diag.feedback)) : [];
+    const review = [...(p?.banner_reviews ?? [])].sort((a, b) => b.round - a.round)[0] ?? null;
     return {
+      diag,
+      reasons,
+      review,
       id: g.id,
       name: g.group_name,
       code: p ? projectCode(p.area_code, codeLabel, p.code_number) : null,
@@ -77,6 +89,8 @@ export function GroupBanners({
       driveCopy,
     };
   });
+  const criticalCount = allRows.filter((r) => r.reasons.length > 0).length;
+  const rows = onlyCritical ? allRows.filter((r) => r.reasons.length > 0) : allRows;
 
   return (
     <section className="card-paper mt-6 space-y-5 p-6">
@@ -114,21 +128,30 @@ export function GroupBanners({
         </div>
       </div>
 
+      <label className="flex w-fit items-center gap-3 rounded-lg bg-muted px-3 py-2 text-sm">
+        <Switch checked={onlyCritical} onCheckedChange={setOnlyCritical} />
+        Só atenção crítica
+        <Badge variant={criticalCount > 0 ? "destructive" : "muted"}>{criticalCount}</Badge>
+      </label>
+
       {groups.isPending ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="size-4 animate-spin" /> Carregando grupos…
         </p>
       ) : rows.length === 0 ? (
-        <p className="text-sm italic text-muted-foreground">Nenhum grupo nesta turma ainda.</p>
+        <p className="text-sm italic text-muted-foreground">
+          {onlyCritical ? "Nenhum banner com erro grave no último diagnóstico." : "Nenhum grupo nesta turma ainda."}
+        </p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] text-sm">
+          <table className="w-full min-w-[900px] text-sm">
             <thead>
               <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
                 <th className="py-2 pr-3 font-medium">Grupo</th>
                 <th className="py-2 pr-3 font-medium">Situação</th>
                 <th className="py-2 pr-3 font-medium">Cópia no Canva</th>
                 <th className="py-2 pr-3 font-medium">Arquivo final</th>
+                <th className="py-2 pr-3 font-medium">Corretor</th>
                 <th className="py-2 font-medium">Última atividade</th>
               </tr>
             </thead>
@@ -136,7 +159,13 @@ export function GroupBanners({
               {rows.map((r) => (
                 <tr key={r.id} className="border-b border-border/60 align-top last:border-0">
                   <td className="py-3 pr-3">
-                    <p className="font-medium text-foreground">{r.name}</p>
+                    <Link
+                      to="/professora/grupo/$groupId"
+                      params={{ groupId: r.id }}
+                      className="font-medium text-foreground hover:text-primary hover:underline"
+                    >
+                      {r.name}
+                    </Link>
                     {r.code && <p className="font-mono text-xs text-muted-foreground">{r.code}</p>}
                   </td>
                   <td className="py-3 pr-3">
@@ -175,6 +204,29 @@ export function GroupBanners({
                     ) : (
                       <span className="text-xs italic text-muted-foreground">Não enviado</span>
                     )}
+                  </td>
+                  <td className="space-y-1 py-3 pr-3 text-xs">
+                    {r.diag ? (
+                      <p className="text-foreground">
+                        IA v{r.diag.version}: <strong>{formatPoints(Number(r.diag.total))}</strong>
+                        {r.diag.file_path !== r.filePath && <span className="text-muted-foreground"> (arquivo mudou)</span>}
+                      </p>
+                    ) : (
+                      <p className="italic text-muted-foreground">Sem diagnóstico</p>
+                    )}
+                    {r.reasons.length > 0 && (
+                      <Badge variant="destructive" className="whitespace-normal" title={r.reasons.join(" · ")}>
+                        Atenção: {r.reasons.join(" · ")}
+                      </Badge>
+                    )}
+                    {r.review &&
+                      (r.review.resubmitted_at ? (
+                        <p className="text-muted-foreground">V{r.review.round + 1} enviada {fmtAgo(r.review.resubmitted_at)}</p>
+                      ) : (
+                        <p className={daysLate(r.review.resubmit_due_at, null) > 0 ? "text-destructive" : "text-muted-foreground"}>
+                          Aguardando V{r.review.round + 1} até {fmtDateTime(r.review.resubmit_due_at)}
+                        </p>
+                      ))}
                   </td>
                   <td className="py-3 text-xs text-muted-foreground">
                     {r.last ? (

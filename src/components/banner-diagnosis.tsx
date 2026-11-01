@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -151,7 +150,6 @@ export function DiagnosisView({
   total?: number;
 }) {
   const reasons = criticalReasons(f);
-  const [openTip, setOpenTip] = useState<string | undefined>(undefined);
   const axisComment = (key: string) => f.axisComments.find((a) => a.key === key)?.comment ?? "";
   const sortedNotes = [...f.annotations].sort(
     (a, b) => ["critico", "atencao", "destaque"].indexOf(a.severity) - ["critico", "atencao", "destaque"].indexOf(b.severity),
@@ -273,7 +271,7 @@ export function DiagnosisView({
 
       {f.bancaQuestions.length > 0 && (
         <Block icon={Star} title="Simulador da banca: 5 perguntas prováveis">
-          <Accordion type="single" collapsible value={openTip} onValueChange={setOpenTip}>
+          <Accordion type="single" collapsible>
             {f.bancaQuestions.map((q, i) => (
               <AccordionItem key={`${i}-${q.question}`} value={String(i)}>
                 <AccordionTrigger className="text-left text-sm">
