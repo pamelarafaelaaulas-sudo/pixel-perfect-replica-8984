@@ -369,7 +369,7 @@ export const classBannersQuery = (classId: string) =>
             project_contributions(section_name, edited_at, profiles(name)),
             banner_drive_files(drive_file_id, synced_at),
             banner_reviews(id, round, resubmit_due_at, resubmitted_at),
-            banner_diagnoses(id, version, total, critical, feedback, created_at)
+            banner_diagnoses(id, version, file_path, total, critical, feedback, created_at)
           )`,
         )
         .eq("class_id", classId)
