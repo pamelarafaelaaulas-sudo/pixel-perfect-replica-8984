@@ -134,6 +134,13 @@
       "when": 1793651754870,
       "tag": "0018_logbook_and_video_trail",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1793653501361,
+      "tag": "0019_whatsapp_custom_messages",
+      "breakpoints": true
     }
   ]
 }
