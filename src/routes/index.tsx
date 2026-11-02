@@ -57,8 +57,7 @@ function Index() {
               Transformando a curiosidade em ciência, juntos.
             </h1>
             <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-              Vocês, alunos de educação científica da Prof. Pâmela, podem formar grupos de até 3 integrantes, escrever o projeto etapa por etapa, montar o banner e apresentar na feira. A professora acompanha prazos, vê quem contribuiu e lança as
-              notas de cada bimestre.
+              Monte a sua equipe de até 3 integrantes e desenvolva seu projeto passo a passo — da escrita do texto à apresentação do banner na feira. Acompanhe os prazos, colabore com seu grupo e construa sua nota bimestre a bimestre.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
