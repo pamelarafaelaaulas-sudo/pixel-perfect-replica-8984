@@ -1,13 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
-import { Plus, School, Users, ArrowRight, ClipboardList, Palette, CalendarRange, Hash, MessageCircle } from "lucide-react";
+import { Plus, School, Users, ArrowRight, ClipboardList, Palette, CalendarRange, Hash, MessageCircle, ListChecks, CalendarClock, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { meQuery, teacherClassesQuery } from "@/lib/queries";
 import { plural } from "@/lib/format";
@@ -50,6 +51,30 @@ function TeacherHome() {
                 <CalendarRange /> Planejamento
               </Link>
             </Button>
+            <Button variant="outline" asChild>
+              <Link to="/professora/progresso" search={{}}>
+                <ListChecks /> Progresso dos grupos
+              </Link>
+            </Button>
+            {classes.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    <CalendarClock /> Prazos e descontos <ChevronDown />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuLabel>Escolha a turma</DropdownMenuLabel>
+                  {classes.map((c) => (
+                    <DropdownMenuItem key={c.id} asChild>
+                      <Link to="/professora/turma/$classId/prazos" params={{ classId: c.id }}>
+                        {c.name}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
             <Button variant="outline" asChild>
               <Link to="/professora/numeracao">
                 <Hash /> Numeração
