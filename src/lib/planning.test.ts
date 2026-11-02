@@ -55,7 +55,7 @@ describe("group progress", () => {
     });
     expect(g!.missing[0]).toMatchObject({ phase: 2, status: "late_open", daysLate: 2 });
     expect(g!.missing.map((m) => m.phase)).toEqual(Array.from({ length: PHASE_COUNT - 1 }, (_, i) => i + 2));
-    expect(g!.lateOpen).toBe(1);
+    expect(g!.lateOpen).toBe(2); // Artigos and Introdução are both past their deadline
     const b1 = g!.bimesters.find((b) => b.bimester === 1)!;
     expect(b1).toMatchObject({ delivered: 1, daysLate: 4, penalty: 2 });
     // Introdução (2º bimestre) is overdue too, but it costs only the 2º bimestre.
