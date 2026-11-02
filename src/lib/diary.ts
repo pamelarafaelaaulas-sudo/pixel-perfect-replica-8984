@@ -19,7 +19,7 @@ export const DIARY_MAX_BACKDATE_DAYS = 7;
 export const HIGHLIGHT_COLORS = [
   { color: "Amarelo", token: "highlight", meaning: "Problema de pesquisa e objetivos" },
   { color: "Verde", token: "success", meaning: "Metodologia e materiais" },
-  { color: "Azul", token: "secondary", meaning: "Resultados e conclusões" },
+  { color: "Azul", token: "info", meaning: "Resultados e conclusões" },
 ] as const;
 
 /** Built-in pre-highlighted model article, used when the teacher did not set her own. */
