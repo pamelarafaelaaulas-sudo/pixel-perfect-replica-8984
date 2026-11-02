@@ -94,10 +94,10 @@ export function EthicsScreening({
     save.mutate({ ethics_collection: next });
   }
 
-  async function download(build: (i: EthicsDocInput) => EthicsDoc) {
-    const doc = build(await docInput(project, cls, students));
-    setBusyDoc(doc.fileName);
+  async function download(build: (i: EthicsDocInput) => EthicsDoc, key: string) {
+    setBusyDoc(key);
     try {
+      const doc = build(await docInput(project, cls, students));
       const { buildEthicsDocx } = await import("@/lib/ethics-docx");
       downloadBlob(await buildEthicsDocx(doc), doc.fileName);
     } catch (e) {
@@ -228,11 +228,11 @@ export function EthicsScreening({
                 tudo na pasta do projeto.
               </p>
               <div className="flex flex-wrap gap-2">
-                <Button type="button" variant="outline" size="sm" onClick={() => download(tcleDocument)} disabled={!!busyDoc}>
-                  {busyDoc === "TCLE.docx" ? <Loader2 className="animate-spin" /> : <FileDown />} TCLE (.docx)
+                <Button type="button" variant="outline" size="sm" onClick={() => download(tcleDocument, "tcle")} disabled={!!busyDoc}>
+                  {busyDoc === "tcle" ? <Loader2 className="animate-spin" /> : <FileDown />} TCLE (.docx)
                 </Button>
-                <Button type="button" variant="outline" size="sm" onClick={() => download(imageConsentDocument)} disabled={!!busyDoc}>
-                  {busyDoc === "Termo-de-uso-de-imagem.docx" ? <Loader2 className="animate-spin" /> : <FileDown />} Termo de uso de imagem (.docx)
+                <Button type="button" variant="outline" size="sm" onClick={() => download(imageConsentDocument, "imagem")} disabled={!!busyDoc}>
+                  {busyDoc === "imagem" ? <Loader2 className="animate-spin" /> : <FileDown />} Termo de uso de imagem (.docx)
                 </Button>
               </div>
             </div>

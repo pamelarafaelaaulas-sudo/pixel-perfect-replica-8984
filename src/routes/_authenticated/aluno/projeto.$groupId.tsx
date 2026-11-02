@@ -57,6 +57,8 @@ import { fmtDateTime, whatsappLink } from "@/lib/format";
 import { bimesterPenalties, formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
 import { BannerStage } from "@/components/banner-stage";
 import { StudentBannerCorrector } from "@/components/banner-cycle";
+import { EthicsScreening } from "@/components/ethics-screening";
+import { ExternalFairsCard } from "@/components/external-fairs";
 import { bannerBrief } from "@/lib/banner";
 import { ProjectAreaPicker, ProjectCodeTag } from "@/components/project-code";
 import { SocialApplicationCard } from "@/components/social-application";
@@ -340,6 +342,19 @@ function StudentProjectPage() {
             )}
           </fieldset>
 
+          {selected === 7 && (
+            <div className="mt-5">
+              <EthicsScreening
+                project={project}
+                cls={cls}
+                groupId={groupId}
+                studentId={me!.id}
+                students={members.map((m) => m.profiles?.name ?? "").filter(Boolean)}
+                editable={editable}
+              />
+            </div>
+          )}
+
           {editable && selected === project.current_phase && problems.length > 0 && (
             <div className="mt-6 rounded-lg border border-warning/40 bg-warning/10 p-4 text-sm">
               <p className="font-medium text-foreground">Para entregar esta etapa, falta:</p>
@@ -412,6 +427,12 @@ function StudentProjectPage() {
         </section>
 
         <aside className="space-y-4">
+          <ExternalFairsCard
+            projectId={project.id}
+            groupId={groupId}
+            interest={project.external_fairs_interest}
+            fairs={project.external_fairs}
+          />
           <SocialApplicationCard
             key={project.social_application ?? ""}
             value={project.social_application}
