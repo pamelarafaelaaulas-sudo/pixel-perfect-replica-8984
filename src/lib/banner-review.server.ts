@@ -79,10 +79,11 @@ Os alunos lerão tudo, exceto as notas: nunca escreva notas, pontos ou números 
 function friendlyError(failure: unknown): Error {
   console.error("Banner diagnosis error", failure);
   const status = (failure as { statusCode?: number } | undefined)?.statusCode;
-  if (status === 429) return new Error("Muitos pedidos agora. Tente de novo em alguns minutos.");
-  if (status === 402 || status === 403) return new Error("Os créditos de IA acabaram. Avise a professora.");
-  if (status === 400 || status === 413) return new Error("A IA não conseguiu ler este arquivo. Exporte o banner em PDF ou PNG menor e tente de novo.");
-  return new Error("Não foi possível gerar o diagnóstico agora.");
+  if (status === 413) return new Error("A IA não conseguiu ler este arquivo. Exporte o banner em PDF ou PNG menor e tente de novo.");
+  return new Error(
+    geminiErrorMessage(failure, "Não foi possível gerar o diagnóstico agora.") ??
+      "A IA não conseguiu ler este arquivo. Exporte o banner em PDF ou PNG menor e tente de novo.",
+  );
 }
 
 const clean = (xs: string[], max: number) => xs.map((x) => x.trim()).filter(Boolean).slice(0, max);

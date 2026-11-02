@@ -33,10 +33,8 @@ Os alunos verão os comentários, o resumo e as dicas, mas não as notas: nunca 
 
 function friendlyError(failure: unknown): Error {
   console.error("AI evaluation error", failure);
-  const status = (failure as { statusCode?: number } | undefined)?.statusCode;
-  if (status === 429) return new Error("Muitos pedidos agora. Tente de novo em alguns minutos.");
-  if (status === 402 || status === 403) return new Error("Os créditos de IA acabaram. Avise a professora.");
-  return new Error("Não foi possível gerar a avaliação agora.");
+  const fallback = "Não foi possível gerar a avaliação agora.";
+  return new Error(geminiErrorMessage(failure, fallback) ?? fallback);
 }
 
 const cleanTips = (tips: string[]) => tips.map((t) => t.trim()).filter(Boolean).slice(0, 4);
