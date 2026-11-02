@@ -80,6 +80,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      // The app is already in Portuguese; browser auto-translation rewrites
+      // text nodes React owns and crashes the page ("removeChild" error).
+      { name: "google", content: "notranslate" },
       { title: "PamLab — Projeto científico escolar" },
       {
         name: "description",
@@ -107,7 +110,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" translate="no" className="notranslate">
       <head>
         <HeadContent />
       </head>
