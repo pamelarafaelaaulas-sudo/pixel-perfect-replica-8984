@@ -20,7 +20,7 @@ const cls = (projects: ReturnType<typeof project>[]): FairListInput => ({
   name: "9º A",
   code_label: "9A",
   ethics_form_template_url: "https://forms.gle/modelo",
-  groups: projects.map((p, i) => ({ id: `g${i}`, group_name: `G${i}`, group_members: [], projects: [p as never] })),
+  groups: projects.map((p, i) => ({ id: `g${i}`, group_name: `G${i}`, group_members: [], projects: p as never })),
 });
 
 describe("external fair list", () => {

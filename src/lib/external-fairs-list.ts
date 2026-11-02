@@ -31,7 +31,7 @@ export type FairListInput = {
           ethics_human_research: boolean | null;
           ethics_collection: string[];
           ethics_form_url: string | null;
-        }[]
+        }
       | null;
   }[] | null;
 };
@@ -55,7 +55,7 @@ export function externalFairRows(classes: FairListInput[]): FairListRow[] {
   const rows: FairListRow[] = [];
   for (const c of classes) {
     for (const g of c.groups ?? []) {
-      const p = g.projects?.[0];
+      const p = g.projects;
       if (!p?.external_fairs_interest) continue;
       const ethics: EthicsStatus =
         p.ethics_human_research == null
