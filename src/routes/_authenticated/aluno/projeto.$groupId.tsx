@@ -63,7 +63,6 @@ import { DiaryVideoStep, ReferencesVideoStep } from "@/components/video-trail";
 import { DiaryCard } from "@/components/diary";
 import { bannerBrief } from "@/lib/banner";
 import { ProjectAreaPicker, ProjectCodeTag } from "@/components/project-code";
-import { SocialApplicationCard } from "@/components/social-application";
 import { ProjectDocxButton } from "@/components/project-docx";
 
 export const Route = createFileRoute("/_authenticated/aluno/projeto/$groupId")({
