@@ -67,7 +67,7 @@ MENTORIA:
 - summary: 2 a 3 frases encorajadoras com a visão geral.
 - rewrite_suggestions: exatamente 3 sugestões de reescrita acadêmica em 3ª pessoa para a discussão dos resultados.
 - visual_ideas: 2 a 4 ideias de recursos visuais (infográfico, mapa mental, gráfico) adequadas à área do trabalho.
-- canva_prompts: exatamente 2 prompts detalhados em português para o grupo gerar elementos visuais no Canva.
+- canva_prompts: exatamente 2 prompts detalhados para o grupo gerar elementos visuais no Canva, escritos SEMPRE em português do Brasil (nunca em inglês).
 - flowchart_steps: 4 a 8 passos curtos (até 8 palavras cada) da metodologia, em ordem, para um fluxograma.
 - banca_questions: exatamente 5 perguntas prováveis dos avaliadores da FETEC/FECITMS sobre ESTE trabalho, cada uma com "tip" dizendo como a equipe deve responder no dia da feira.
 - title_suggestions: exatamente 3 opções de título acadêmico que mantêm a essência do trabalho.
