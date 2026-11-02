@@ -14,6 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TeacherBannerPanel } from "@/components/banner-cycle";
+import { ExternalFairsTag } from "@/components/external-fairs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   AlertDialog,
@@ -159,6 +160,7 @@ function TeacherGroupPage() {
             <span className="flex flex-wrap items-center gap-3">
               <ProjectCodeTag area={project.area_code} classLabel={cls.code_label} seq={project.code_number} className="text-sm" />
               <ProjectAreaPicker projectId={project.id} groupId={group.id} value={project.area_code} />
+              <ExternalFairsTag interest={project.external_fairs_interest} fairs={project.external_fairs} />
               <span>Última edição {fmtAgo(project.updated_at)}</span>
             </span>
           ) : undefined

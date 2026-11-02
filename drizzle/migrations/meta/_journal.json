@@ -120,6 +120,13 @@
       "when": 1793319122059,
       "tag": "0016_banner_corrector_v1_v2",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1793577986274,
+      "tag": "0017_external_fairs_and_ethics_screening",
+      "breakpoints": true
     }
   ]
 }

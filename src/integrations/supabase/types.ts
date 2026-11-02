@@ -262,6 +262,7 @@ export type Database = {
           code_label: string | null
           code_order: number | null
           created_at: string
+          ethics_form_template_url: string | null
           fair_at: string | null
           fair_name: string
           id: string
@@ -278,6 +279,7 @@ export type Database = {
           code_label?: string | null
           code_order?: number | null
           created_at?: string
+          ethics_form_template_url?: string | null
           fair_at?: string | null
           fair_name?: string
           id?: string
@@ -294,6 +296,7 @@ export type Database = {
           code_label?: string | null
           code_order?: number | null
           created_at?: string
+          ethics_form_template_url?: string | null
           fair_at?: string | null
           fair_name?: string
           id?: string
@@ -599,6 +602,11 @@ export type Database = {
           code_number: number | null
           conclusion: string | null
           current_phase: number
+          ethics_collection: string[]
+          ethics_form_url: string | null
+          ethics_human_research: boolean | null
+          external_fairs: string[]
+          external_fairs_interest: boolean
           general_objective: string | null
           group_id: string
           guiding_question: string | null
@@ -628,6 +636,11 @@ export type Database = {
           code_number?: number | null
           conclusion?: string | null
           current_phase?: number
+          ethics_collection?: string[]
+          ethics_form_url?: string | null
+          ethics_human_research?: boolean | null
+          external_fairs?: string[]
+          external_fairs_interest?: boolean
           general_objective?: string | null
           group_id: string
           guiding_question?: string | null
@@ -657,6 +670,11 @@ export type Database = {
           code_number?: number | null
           conclusion?: string | null
           current_phase?: number
+          ethics_collection?: string[]
+          ethics_form_url?: string | null
+          ethics_human_research?: boolean | null
+          external_fairs?: string[]
+          external_fairs_interest?: boolean
           general_objective?: string | null
           group_id?: string
           guiding_question?: string | null
@@ -1058,6 +1076,7 @@ export type Database = {
         Returns: boolean
       }
       is_class_student: { Args: { _class_id: string }; Returns: boolean }
+      is_google_form_url: { Args: { _url: string }; Returns: boolean }
       is_group_member: { Args: { _group_id: string }; Returns: boolean }
       is_teacher: { Args: never; Returns: boolean }
       join_group: {
