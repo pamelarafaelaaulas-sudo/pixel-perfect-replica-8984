@@ -64,7 +64,7 @@ describe("consent documents", () => {
   it("fills the TCLE with the project data and signature lines", () => {
     const d = tcleDocument(input);
     expect(d.paragraphs.join(" ")).toContain("Água da chuva (código BIO-9A-01)");
-    expect(d.paragraphs.join(" ")).toContain("Ana, Bia");
+    expect(d.paragraphs.join(" ")).toContain("Bia, Ana");
     expect(d.signatures.length).toBeGreaterThanOrEqual(2);
   });
   it("has an image and voice authorization", () => {
