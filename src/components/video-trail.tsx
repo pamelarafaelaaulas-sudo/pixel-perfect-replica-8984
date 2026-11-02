@@ -93,15 +93,15 @@ export function DiaryVideoStep({
 const SWATCH: Record<(typeof HIGHLIGHT_COLORS)[number]["token"], string> = {
   highlight: "bg-highlight",
   success: "bg-success/40",
-  secondary: "bg-secondary/50",
+  info: "bg-info/50",
 };
 
 /** End of the research (Referências): video on organizing the references folder + highlight colors + model article. */
 export function ReferencesVideoStep({ url, articleUrl }: { url: string | null; articleUrl: string | null }) {
   return (
-    <section className="space-y-3 rounded-lg border border-secondary/40 bg-secondary/5 p-4">
+    <section className="space-y-3 rounded-lg border border-info/40 bg-info/5 p-4">
       <p className="flex items-center gap-2 font-medium text-foreground">
-        <Highlighter className="size-5 text-secondary" /> Organize a pasta de referências e de campo
+        <Highlighter className="size-5 text-info" /> Organize a pasta de referências e de campo
       </p>
       {url ? (
         <VideoFrame url={url} title="Como organizar a pasta de referências" />
