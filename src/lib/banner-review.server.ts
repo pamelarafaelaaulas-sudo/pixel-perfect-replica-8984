@@ -1,6 +1,6 @@
 import { Output, streamText } from "ai";
 import { z } from "zod";
-import { geminiErrorMessage, geminiModel } from "./gemini.server";
+import { GEMINI_OPTIONS, geminiErrorMessage, geminiModel } from "./gemini.server";
 import {
   BANNER_AXES,
   bannerTotal,
@@ -120,7 +120,8 @@ export async function generateBannerDiagnosis(args: {
       },
     ],
     output: Output.object({ schema }),
-    maxRetries: 0,
+    maxRetries: 1,
+    providerOptions: GEMINI_OPTIONS,
     onError: ({ error }) => {
       failure = error;
     },

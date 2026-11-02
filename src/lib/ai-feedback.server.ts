@@ -1,6 +1,6 @@
 import { NoObjectGeneratedError, Output, streamText } from "ai";
 import { z } from "zod";
-import { geminiErrorMessage, geminiModel } from "./gemini.server";
+import { GEMINI_OPTIONS, geminiErrorMessage, geminiModel } from "./gemini.server";
 import { AI_CRITERIA, clampScore, overallScore, type AiEvaluation } from "./ai-score";
 
 const criterion = z.object({ score: z.number(), comment: z.string() });
@@ -47,7 +47,8 @@ export async function generateEvaluation(phaseName: string, phaseGuide: string, 
     system: INSTRUCTIONS,
     messages: [{ role: "user", content: `Etapa: ${phaseName}\nO que a professora pede nesta etapa: ${phaseGuide}\n\nTexto do grupo:\n${text}` }],
     output: Output.object({ schema: evaluationSchema }),
-    maxRetries: 0,
+    maxRetries: 1,
+    providerOptions: GEMINI_OPTIONS,
     onError: ({ error }) => {
       failure = error;
     },
