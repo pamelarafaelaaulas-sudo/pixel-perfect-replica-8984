@@ -487,6 +487,11 @@ function GradeForm({
         </div>
         {existing && <Badge variant="success">Lançada</Badge>}
       </div>
+      {bimester === 3 && (
+        <p className="rounded-md bg-muted p-2 text-xs text-muted-foreground">
+          Nota do banner (vale 60%). Os outros 40% são a nota do diário de bordo de cada aluno, lançada na aba Diário de bordo.
+        </p>
+      )}
       {bimester === 4 && (
         <p className="rounded-md bg-muted p-2 text-xs text-muted-foreground">
           Nota da feira. Os detalhes da feira ainda serão adicionados; por enquanto, lance só a nota.

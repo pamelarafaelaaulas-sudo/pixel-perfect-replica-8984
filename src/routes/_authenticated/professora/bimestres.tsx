@@ -45,7 +45,9 @@ function BimesterPage() {
         eyebrow="Painel da professora"
         title={`Notas do ${b}º bimestre · ${bimesterMeta(b).title}`}
         description={
-          b === 4
+          b === 3
+            ? "Todas as turmas, com a nota do banner de cada grupo, o desconto de atraso e o total. A nota final de cada aluno no 3º bimestre é 60% banner + 40% diário de bordo dele (veja na planilha de notas ou na página do aluno)."
+            : b === 4
             ? "Todas as turmas, com a nota da feira de cada grupo. A feira não tem desconto de atraso. Cada grupo de alunos vê só a própria linha."
             : "Todas as turmas, com a nota lançada, o desconto de atraso das etapas deste bimestre e o total de cada grupo. Cada grupo de alunos vê só a própria linha."
         }

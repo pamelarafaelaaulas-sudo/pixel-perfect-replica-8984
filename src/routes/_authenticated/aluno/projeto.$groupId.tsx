@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { ArrowLeft, CheckCircle2, Lock, MessageCircle, Plus, Save, Send, Star, Trash2, XCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -26,7 +26,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import type { Database } from "@/integrations/supabase/types";
-import { aiSuggestionsForGroupQuery, groupDetailQuery, meQuery } from "@/lib/queries";
+import { aiSuggestionsForGroupQuery, diaryGradesQuery, groupDetailQuery, meQuery } from "@/lib/queries";
 import { latestPerPhase } from "@/lib/ai-score";
 import {
   PHASE_COUNT,
@@ -54,7 +54,7 @@ import {
 } from "@/lib/phase-rules";
 import { CITATION_EXAMPLES, checkCitations } from "@/lib/citations";
 import { fmtDateTime, whatsappLink } from "@/lib/format";
-import { bimesterPenalties, formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
+import { bimesterBase, bimesterPenalties, formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
 import { BannerStage } from "@/components/banner-stage";
 import { StudentBannerCorrector } from "@/components/banner-cycle";
 import { EthicsScreening } from "@/components/ethics-screening";
@@ -121,6 +121,8 @@ function StudentProjectPage() {
   const { data: group } = useSuspenseQuery(groupDetailQuery(groupId));
   const { data: aiEvaluations } = useSuspenseQuery(aiSuggestionsForGroupQuery(groupId));
   const aiByPhase = useMemo(() => latestPerPhase(aiEvaluations), [aiEvaluations]);
+  const diaryGrades = useQuery(diaryGradesQuery(groupId));
+  const myDiary = (diaryGrades.data ?? []).find((d) => d.student_id === me?.id);
   const qc = useQueryClient();
   const project = group?.projects ?? null;
 
@@ -476,7 +478,9 @@ function StudentProjectPage() {
               {BIMESTERS.map(({ number: t, title }) => {
                 const g = grades.find((x) => x.trimester === t);
                 const penalty = penalties[t] ?? 0;
-                const total = g ? gradeAfterPenalty(Number(g.score), penalty) : null;
+                const diary = t === 3 && myDiary ? Number(myDiary.score) : null;
+                const base = bimesterBase(t, g ? Number(g.score) : null, diary);
+                const total = base === null ? null : gradeAfterPenalty(base, penalty);
                 return (
                   <li key={t} className="rounded-lg bg-muted p-3">
                     <div className="flex items-center justify-between gap-2">
@@ -487,7 +491,9 @@ function StudentProjectPage() {
                     </div>
                     {g ? (
                       <p className="mt-1 text-xs text-muted-foreground">
-                        Nota {formatPoints(Number(g.score))}
+                        {t === 3
+                          ? `Banner ${formatPoints(Number(g.score))} (60%) + diário ${diary === null ? "aguardando nota" : `${formatPoints(diary)} (40%)`}`
+                          : `Nota ${formatPoints(Number(g.score))}`}
                         {penalty > 0 && ` − ${formatPoints(penalty)} de atraso`}
                       </p>
                     ) : (
