@@ -41,7 +41,9 @@ function Index() {
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <Brand />
         <Button asChild variant={signedIn ? "default" : "outline"}>
-          <Link to={signedIn ? "/painel" : "/auth"}>{signedIn ? "Ir para o painel" : "Entrar"}</Link>
+          <Link to={signedIn ? "/painel" : "/auth"}>
+            <span key={signedIn ? "in" : "out"}>{signedIn ? "Ir para o painel" : "Entrar"}</span>
+          </Link>
         </Button>
       </header>
 
@@ -61,7 +63,7 @@ function Index() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
                 <Link to={signedIn ? "/painel" : "/auth"}>
-                  {signedIn ? "Abrir o PamLab" : "Começar agora"} <ArrowRight />
+                  <span key={signedIn ? "in" : "out"}>{signedIn ? "Abrir o PamLab" : "Começar agora"}</span> <ArrowRight />
                 </Link>
               </Button>
             </div>
