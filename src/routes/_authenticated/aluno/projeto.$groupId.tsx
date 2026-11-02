@@ -458,20 +458,6 @@ function StudentProjectPage() {
             interest={project.external_fairs_interest}
             fairs={project.external_fairs}
           />
-          <SocialApplicationCard
-            key={project.social_application ?? ""}
-            value={project.social_application}
-            projectId={project.id}
-            groupId={groupId}
-            studentId={me?.id}
-            editable={project.current_phase > 3}
-            hint={
-              project.current_phase > 3
-                ? "Ainda não escrita. Clique em Escrever."
-                : "Escreva na etapa 3, logo abaixo da pergunta norteadora."
-            }
-            onSaved={(v) => set("social_application", v)}
-          />
           <div className="card-paper p-5">
             <h3 className="mb-3 text-lg font-semibold">Notas</h3>
             <ul className="space-y-3">

@@ -27,9 +27,12 @@
 - [x] Campo da aplicação/intervenção social: aluno consegue escrever e aparece no painel da professora e do aluno
 - [x] Menu: tirar "Exportar planilha" e pôr a planilha da numeração; na aba Alunos, planilha com nome e nota de cada aluno por turma
 - [x] Relógio de contagem regressiva até a FECITI/MS no painel da professora e dos alunos
-- [ ] Mensagem teste no WhatsApp para as alunas — aguardando o WhatsApp aprovar a mensagem
+- [x] Mensagem teste no WhatsApp para as alunas — mensagem de lembrete aprovada
 - [x] Planilha de notas com a nota final (atraso + ajuste da professora por aluno)
 - [x] Lembretes WhatsApp dentro do PamLab: prazos de cada etapa, envio automático a cada 3 dias e botão de envio
 - [x] Bloco 1 — Corretor de banner: guia + checklist que trava o envio, diagnóstico da IA (matriz 3,5/2,5/2,0/2,0, coerência com o projeto, 5 perguntas da banca, fluxograma, prompts do Canva, títulos), filtro de atenção crítica, devolutiva da professora (banner anotado, observações, prazo V2) e desconto por atraso no reenvio
 - [x] Bloco 2 — Feiras externas (FETEC/MS, FECINTEC) e triagem ética/TCLE na Metodologia (modelo do Forms, link obrigatório, TCLE e termo de imagem em Word)
 - [x] Bloco 3 — Diário de bordo (registros dos alunos, avaliação 0–10 no 3º bimestre) e trilha de vídeos (Diário no Tema, referências e grifos com artigo modelo)
+- [x] Aplicação/intervenção social só dentro da etapa 3 (sem o quadro lateral), logo abaixo da pergunta norteadora e obrigatória
+- [ ] Recado personalizado no WhatsApp para alunos escolhidos ou todos — pronto; aguardando o WhatsApp aprovar a mensagem "recado_professora"
+- [x] IA do PamLab usando o Gemini com a chave da professora
