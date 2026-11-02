@@ -27,7 +27,9 @@ export const Route = createFileRoute("/_authenticated/professora/progresso")({
     typeof search["turma"] === "string" ? { turma: search["turma"] } : {},
   loader: ({ context }) => context.queryClient.ensureQueryData(teacherRosterQuery),
   component: ProgressPage,
-  errorComponent: ({ error }) => <div role="alert" className="card-paper p-5 text-destructive">{error.message}</div>,
+  errorComponent: ({ error }) => (
+    <div role="alert" className="card-paper p-5 text-destructive">{error instanceof Error ? error.message : String(error)}</div>
+  ),
   notFoundComponent: () => <div className="card-paper p-5">Página não encontrada.</div>,
 });
 
