@@ -97,7 +97,7 @@ function FairsPage() {
         </Button>
       </div>
       {rows.length === 0 ? (
-        <EmptyState icon={Trophy} title="Nenhum grupo ainda" description="Quando um grupo marcar interesse em feira externa, ele aparece aqui." />
+        <EmptyState icon={<Trophy />} title="Nenhum grupo ainda" text="Quando um grupo marcar interesse em feira externa, ele aparece aqui." />
       ) : (
         <div className="card-paper overflow-x-auto">
           <table className="w-full text-sm">
