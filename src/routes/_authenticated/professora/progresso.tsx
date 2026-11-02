@@ -46,7 +46,7 @@ function ProgressPage() {
   const { data: classes } = useSuspenseQuery(teacherRosterQuery);
   const { turma } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
-  const cls = classes.find((c) => c.id === turma) ?? classes[0];
+  const cls = classes.find((c) => c.id === turma) ?? classes.find((c) => (c.groups ?? []).length > 0) ?? classes[0];
   const perDay = Number(cls?.late_penalty_per_day ?? 0);
 
   const groups = useMemo(
