@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { externalFairRows, type FairListInput } from "./external-fairs-list";
 
-const project = (over: Partial<NonNullable<FairListInput["groups"]>[number]["projects"]>[number]> = {}) => ({
+const project = (over: Record<string, unknown> = {}) => ({
   title: "Título",
   theme: null,
   area_code: "BIO",
@@ -20,7 +20,7 @@ const cls = (projects: ReturnType<typeof project>[]): FairListInput => ({
   name: "9º A",
   code_label: "9A",
   ethics_form_template_url: "https://forms.gle/modelo",
-  groups: projects.map((p, i) => ({ id: `g${i}`, group_name: `G${i}`, group_members: [], projects: [p] })),
+  groups: projects.map((p, i) => ({ id: `g${i}`, group_name: `G${i}`, group_members: [], projects: [p as never] })),
 });
 
 describe("external fair list", () => {
