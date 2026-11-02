@@ -172,7 +172,7 @@ function NumberingPage() {
                   return (
                     <li key={g.id} className="py-2 text-sm">
                       {area !== prev && (
-                        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-secondary">{areaLabel(area) ?? "Sem área definida"}</p>
+                        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">{areaLabel(area) ?? "Sem área definida"}</p>
                       )}
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <span>{g.group_name} <span className="text-muted-foreground">· {c.name}</span></span>
