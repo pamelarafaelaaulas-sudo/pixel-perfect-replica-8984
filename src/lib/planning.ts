@@ -1,5 +1,5 @@
-import { projectLateness, type PhaseInfo } from "./penalty";
-import { PHASES } from "./phases";
+import { bimesterPenalties, projectLateness, type PhaseInfo } from "./penalty";
+import { BIMESTERS, PHASES } from "./phases";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -71,4 +71,98 @@ export function planningOverview(args: {
     };
   });
   return { stages, groups };
+}
+
+/* ---------------- Progress per group: what is missing and lateness per bimestre ---------------- */
+
+export type MissingStage = { phase: number; name: string; status: CellStatus; dueDate: string | null; daysLate: number };
+
+export type BimesterProgress = {
+  bimester: number;
+  title: string;
+  delivered: number;
+  total: number;
+  daysLate: number;
+  penalty: number;
+};
+
+export type GroupProgress = {
+  id: string;
+  name: string;
+  members: string[];
+  currentPhase: number;
+  delivered: number;
+  total: number;
+  /** Stages not delivered yet, in order (late ones first in each bimestre's natural order). */
+  missing: MissingStage[];
+  bimesters: BimesterProgress[];
+  totalPenalty: number;
+  lateOpen: number;
+};
+
+/**
+ * Each group's stage-by-stage progress: which stages still need delivering and, per bimestre,
+ * how many days late and how many points the late stages cost (the same math as the grade screens).
+ */
+export function groupProgress(args: {
+  schedules: { phase_number: number; due_date: string }[];
+  perDay: number;
+  groups: {
+    id: string;
+    name: string;
+    members?: string[];
+    currentPhase: number;
+    submissions: { phase_number: number; submitted_at: string }[];
+    bannerReviews?: { resubmit_due_at: string; resubmitted_at: string | null }[] | null;
+  }[];
+  now?: Date;
+}): GroupProgress[] {
+  const now = args.now ?? new Date();
+  return args.groups
+    .map((g) => {
+      const { phases, totalPenalty } = projectLateness({
+        currentPhase: g.currentPhase,
+        schedules: args.schedules,
+        submissions: g.submissions,
+        perDay: args.perDay,
+        bannerReviews: g.bannerReviews ?? null,
+        now,
+      });
+      const penalties = bimesterPenalties(phases);
+      const missing = phases
+        .filter((p) => p.state !== "delivered" && p.state !== "skipped")
+        .map((p) => ({
+          phase: p.phase,
+          name: PHASES[p.phase - 1]!.name,
+          status: cellStatus(p),
+          dueDate: p.dueDate,
+          daysLate: p.daysLate,
+        }));
+      const bimesters = BIMESTERS.filter((b) => PHASES.some((p) => p.bimester === b.number)).map((b) => {
+        const ps = phases.filter((p) => PHASES[p.phase - 1]!.bimester === b.number);
+        const counted = ps.filter((p) => p.state !== "skipped");
+        return {
+          bimester: b.number,
+          title: b.title,
+          delivered: counted.filter((p) => p.state === "delivered").length,
+          total: counted.length,
+          daysLate: ps.reduce((s, p) => s + p.daysLate + (p.resubmit?.days ?? 0), 0),
+          penalty: penalties[b.number] ?? 0,
+        };
+      });
+      const delivered = phases.filter((p) => p.state === "delivered").length;
+      return {
+        id: g.id,
+        name: g.name,
+        members: g.members ?? [],
+        currentPhase: g.currentPhase,
+        delivered,
+        total: phases.filter((p) => p.state !== "skipped").length,
+        missing,
+        bimesters,
+        totalPenalty,
+        lateOpen: missing.filter((m) => m.status === "late_open").length,
+      };
+    })
+    .sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
 }
