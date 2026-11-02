@@ -141,6 +141,13 @@
       "when": 1793653501361,
       "tag": "0019_whatsapp_custom_messages",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1793658779001,
+      "tag": "0020_numbering_grouped_by_area",
+      "breakpoints": true
     }
   ]
 }
