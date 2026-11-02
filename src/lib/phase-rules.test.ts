@@ -80,9 +80,9 @@ describe("delivery rules", () => {
   });
 
   it("requires 250–500 words in the introduction", () => {
-    const cite = " (Silva, 2020)."; // 2 words
-    expect(phaseProblems(8, { introduction: words(499) + cite }, 0)).toHaveLength(1);
-    expect(phaseProblems(8, { introduction: words(498) + cite }, 0)).toEqual([]);
+    const cite = " (Silva, 2020) (Souza, 2019) (Lima, 2018) (Costa, 2021) (Rocha, 2022)."; // 10 words
+    expect(phaseProblems(8, { introduction: words(491) + cite }, 0)).toHaveLength(1);
+    expect(phaseProblems(8, { introduction: words(490) + cite }, 0)).toEqual([]);
   });
 
   it("limits the conclusion to 150 words", () => {
