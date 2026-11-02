@@ -83,7 +83,7 @@ export const groupDetailQuery = (groupId: string) =>
         .from("groups")
         .select(
           `*,
-          classes!groups_class_id_fkey(id, name, class_code, code_label, late_penalty_per_day, banner_template_url, banner_size, banner_sections, banner_instructions, ethics_form_template_url, schedules(*)),
+          classes!groups_class_id_fkey(id, name, class_code, code_label, late_penalty_per_day, banner_template_url, banner_size, banner_sections, banner_instructions, ethics_form_template_url, diary_video_url, references_video_url, highlighted_article_url, diary_review_start, diary_review_end, schedules(*)),
           group_members(id, student_id, whatsapp, profiles(name, email)),
           projects(*, phase_submissions(*), project_contributions(*), banner_reviews(*)),
           grades(*)`,
@@ -172,6 +172,38 @@ export const aiSuggestionsForGroupQuery = (groupId: string) =>
       const { data, error } = await supabase.rpc("group_ai_suggestions", { _group_id: groupId });
       fail(error);
       return (data ?? []).map((r) => parseSavedEvaluation({ ...r, overall: 0, evaluated_text: "" }));
+    },
+  });
+
+/* ---------------- Diário de Bordo ---------------- */
+
+/** Every entry of the group's diary, oldest first (members and the class teacher). */
+export const diaryEntriesQuery = (groupId: string) =>
+  queryOptions({
+    queryKey: ["diary", "entries", groupId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("diary_entries")
+        .select("id, student_id, entry_date, kind, content, created_at")
+        .eq("group_id", groupId)
+        .order("entry_date", { ascending: true })
+        .order("created_at", { ascending: true });
+      fail(error);
+      return data ?? [];
+    },
+  });
+
+/** Diary grades of the group: the teacher sees everyone's, a student only their own. */
+export const diaryGradesQuery = (groupId: string) =>
+  queryOptions({
+    queryKey: ["diary", "grades", groupId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("diary_grades")
+        .select("id, student_id, score, feedback, updated_at")
+        .eq("group_id", groupId);
+      fail(error);
+      return data ?? [];
     },
   });
 

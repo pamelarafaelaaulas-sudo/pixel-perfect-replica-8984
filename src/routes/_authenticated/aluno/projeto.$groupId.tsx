@@ -197,6 +197,8 @@ function StudentProjectPage() {
           ethics_collection: project.ethics_collection,
           ethics_form_url: project.ethics_form_url,
           ethics_form_template_url: cls.ethics_form_template_url,
+          diary_video_url: cls.diary_video_url,
+          diary_video_watched_at: project.diary_video_watched_at,
         },
     draft.scientific_articles.length,
   );

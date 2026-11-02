@@ -5,6 +5,7 @@
  */
 import { checkCitations, citedWorks, missingReferences, workKey, type CitedWork } from "./citations";
 import { ethicsProblems } from "./ethics";
+import { diaryVideoProblems } from "./diary";
 
 /** Parts where ABNT in-text citations are mandatory. */
 export const CITATION_FIELDS: Record<string, string> = {
@@ -147,6 +148,12 @@ export function phaseProblems(
   switch (phase) {
     case 1:
       checkWords("theme", "Tema");
+      problems.push(
+        ...diaryVideoProblems({
+          diary_video_url: str(values["diary_video_url"]),
+          diary_video_watched_at: str(values["diary_video_watched_at"]) || null,
+        }),
+      );
       break;
     case 3:
       checkWords("guiding_question", "Pergunta norteadora");
