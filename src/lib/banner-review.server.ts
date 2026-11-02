@@ -1,6 +1,6 @@
-import { createOpenAI } from "@ai-sdk/openai";
 import { Output, streamText } from "ai";
 import { z } from "zod";
+import { geminiErrorMessage, geminiModel } from "./gemini.server";
 import {
   BANNER_AXES,
   bannerTotal,
@@ -9,19 +9,6 @@ import {
   type BannerAxisScore,
   type BannerFeedback,
 } from "./banner-review";
-
-const RUN_ID_HEADER = "X-Lovable-AIG-Run-ID";
-
-function createRunIdFetch() {
-  let runId: string | undefined;
-  return async (input: RequestInfo | URL, init?: RequestInit) => {
-    const headers = new Headers(init?.headers);
-    if (runId && !headers.has(RUN_ID_HEADER)) headers.set(RUN_ID_HEADER, runId);
-    const res = await fetch(input, { ...init, headers });
-    runId ??= res.headers.get(RUN_ID_HEADER)?.trim() || undefined;
-    return res;
-  };
-}
 
 const axis = z.object({ score: z.number(), comment: z.string() });
 
@@ -109,17 +96,10 @@ export async function generateBannerDiagnosis(args: {
   projectText: string;
   previous: string | null;
 }): Promise<BannerDiagnosis> {
-  const apiKey = process.env["LOVABLE_API_KEY"];
-  if (!apiKey) throw new Error("A IA não está configurada.");
-  const provider = createOpenAI({
-    baseURL: "https://ai.gateway.lovable.dev/v1",
-    apiKey,
-    headers: { "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
-    fetch: createRunIdFetch(),
-  });
+  const model = geminiModel();
   let failure: unknown;
   const result = streamText({
-    model: provider.responses("openai/gpt-6-astra"),
+    model,
     system: INSTRUCTIONS,
     messages: [
       {
@@ -142,15 +122,6 @@ export async function generateBannerDiagnosis(args: {
     maxRetries: 0,
     onError: ({ error }) => {
       failure = error;
-    },
-    providerOptions: {
-      openai: {
-        forceReasoning: true,
-        reasoningEffort: "low",
-        reasoningSummary: "auto",
-        store: false,
-        include: ["reasoning.encrypted_content"],
-      },
     },
   });
 
