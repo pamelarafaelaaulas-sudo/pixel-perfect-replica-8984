@@ -7,7 +7,9 @@ import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { teacherNumberingQuery } from "@/lib/queries";
-import { numberProjects, projectCode } from "@/lib/project-code";
+import { AREAS, DEFAULT_AREA_ORDER, areaLabel, numberProjects, projectCode } from "@/lib/project-code";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { plural } from "@/lib/format";
 import { NumberingSheetButton } from "@/components/sheet-downloads";
 
@@ -39,6 +41,13 @@ function NumberingPage() {
   const { data: classes } = useSuspenseQuery(teacherNumberingQuery);
   const qc = useQueryClient();
   const [order, setOrder] = useState<string[]>(() => savedOrder(classes));
+  const savedAreas = classes.find((c) => c.code_area_order?.length)?.code_area_order ?? null;
+  const [byArea, setByArea] = useState(!!savedAreas);
+  const [areaOrder, setAreaOrder] = useState<string[]>(() => {
+    const base = savedAreas ?? DEFAULT_AREA_ORDER;
+    return [...base, ...AREAS.map((a) => a.code).filter((c) => !base.includes(c))];
+  });
+  const activeAreas = byArea ? areaOrder : null;
 
   const byId = useMemo(() => new Map(classes.map((c) => [c.id, c])), [classes]);
   const preview = useMemo(
@@ -47,20 +56,36 @@ function NumberingPage() {
         classes.map((c) => ({
           id: c.id,
           created_at: c.created_at,
-          groups: (c.groups ?? []).filter((g) => g.projects).map((g) => ({ id: g.id, created_at: g.created_at })),
+          groups: (c.groups ?? []).filter((g) => g.projects).map((g) => ({ id: g.id, created_at: g.created_at, area_code: g.projects?.area_code ?? null })),
         })),
         order,
+        activeAreas,
       ),
-    [classes, order],
+    [classes, order, activeAreas],
   );
   const changed = classes.some((c) =>
     (c.groups ?? []).some((g) => g.projects && g.projects.code_number !== preview.get(g.id)),
   );
-  const orderChanged = order.join() !== savedOrder(classes).join();
+  const orderChanged =
+    order.join() !== savedOrder(classes).join() || (activeAreas ?? []).join() !== (savedAreas ?? []).join();
+  const flat = useMemo(
+    () =>
+      classes
+        .flatMap((c) => (c.groups ?? []).filter((g) => g.projects).map((g) => ({ g, c })))
+        .sort((a, b) => (preview.get(a.g.id) ?? 0) - (preview.get(b.g.id) ?? 0)),
+    [classes, preview],
+  );
+  function moveArea(i: number, d: -1 | 1) {
+    const j = i + d;
+    if (j < 0 || j >= areaOrder.length) return;
+    const next = [...areaOrder];
+    [next[i], next[j]] = [next[j]!, next[i]!];
+    setAreaOrder(next);
+  }
 
   const apply = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.rpc("renumber_projects", { _class_ids: order });
+      const { error } = await supabase.rpc("renumber_projects", { _class_ids: order, _area_codes: activeAreas ?? [] });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -114,6 +139,54 @@ function NumberingPage() {
               Esta é uma prévia. Os códigos só mudam para os grupos quando você clicar em <strong>Aplicar numeração</strong>.
             </p>
           )}
+          <section className="card-paper space-y-4 p-5">
+            <div className="flex items-center gap-3">
+              <Switch id="by-area" checked={byArea} onCheckedChange={setByArea} />
+              <Label htmlFor="by-area" className="text-base font-semibold">Agrupar por área</Label>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              A contagem continua única (01, 02, 03…), mas os trabalhos da mesma área ficam juntos, na ordem abaixo.
+              Dentro de cada área vale a ordem das turmas e, depois, a ordem de cadastro dos grupos. Grupos sem área ficam no final.
+            </p>
+            {byArea && (
+              <ol className="grid gap-1 sm:grid-cols-2">
+                {areaOrder.map((code, i) => (
+                  <li key={code} className="flex items-center justify-between gap-2 rounded-md border px-3 py-1.5 text-sm">
+                    <span><span className="mr-2 font-semibold text-primary">{i + 1}.</span>{areaLabel(code)} <span className="font-mono text-muted-foreground">({code})</span></span>
+                    <span className="flex">
+                      <Button size="icon" variant="ghost" aria-label={`Subir ${areaLabel(code)}`} disabled={i === 0} onClick={() => moveArea(i, -1)}><ArrowUp /></Button>
+                      <Button size="icon" variant="ghost" aria-label={`Descer ${areaLabel(code)}`} disabled={i === areaOrder.length - 1} onClick={() => moveArea(i, 1)}><ArrowDown /></Button>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </section>
+          {byArea && flat.length > 0 && (
+            <section className="card-paper p-5">
+              <h2 className="text-lg font-semibold">Ordem final por área</h2>
+              <ul className="mt-3 divide-y">
+                {flat.map(({ g, c }, i) => {
+                  const area = g.projects!.area_code;
+                  const prev = i > 0 ? flat[i - 1]!.g.projects!.area_code : undefined;
+                  return (
+                    <li key={g.id} className="py-2 text-sm">
+                      {area !== prev && (
+                        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">{areaLabel(area) ?? "Sem área definida"}</p>
+                      )}
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span>{g.group_name} <span className="text-muted-foreground">· {c.name}</span></span>
+                        <span className="rounded-md bg-highlight px-2 py-0.5 font-mono font-semibold text-highlight-foreground">
+                          {projectCode(area, c.code_label, preview.get(g.id)) ?? "sem área"}
+                        </span>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
+          <h2 className="pt-2 text-lg font-semibold">Ordem das turmas</h2>
           {order.map((id, i) => {
             const c = byId.get(id);
             if (!c) return null;

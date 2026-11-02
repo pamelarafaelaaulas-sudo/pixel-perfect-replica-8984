@@ -259,6 +259,7 @@ export type Database = {
           banner_size: string | null
           banner_template_url: string | null
           class_code: string
+          code_area_order: string[] | null
           code_label: string | null
           code_order: number | null
           created_at: string
@@ -281,6 +282,7 @@ export type Database = {
           banner_size?: string | null
           banner_template_url?: string | null
           class_code?: string
+          code_area_order?: string[] | null
           code_label?: string | null
           code_order?: number | null
           created_at?: string
@@ -303,6 +305,7 @@ export type Database = {
           banner_size?: string | null
           banner_template_url?: string | null
           class_code?: string
+          code_area_order?: string[] | null
           code_label?: string | null
           code_order?: number | null
           created_at?: string
@@ -1225,7 +1228,12 @@ export type Database = {
         Args: { _authors: string; _lines: string[]; _year: string }
         Returns: boolean
       }
-      renumber_projects: { Args: { _class_ids: string[] }; Returns: number }
+      renumber_projects:
+        | { Args: { _class_ids: string[] }; Returns: number }
+        | {
+            Args: { _area_codes: string[]; _class_ids: string[] }
+            Returns: number
+          }
       resubmit_banner: {
         Args: {
           _hash: string

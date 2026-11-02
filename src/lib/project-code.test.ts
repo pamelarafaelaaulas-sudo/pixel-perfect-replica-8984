@@ -48,4 +48,19 @@ describe("numbering across the teacher's classes", () => {
     const n = numberProjects(classes, ["C"]);
     expect([n.get("c1"), n.get("a1"), n.get("a2"), n.get("b1")]).toEqual([1, 2, 3, 4]);
   });
+
+  it("groups by area (Biológicas, then Saúde) keeping one continuous count", () => {
+    const cls = [
+      { id: "A", created_at: "2026-01-01", groups: [
+        { id: "a1", created_at: "2026-02-01", area_code: "SAU" },
+        { id: "a2", created_at: "2026-02-02", area_code: "BIO" },
+      ] },
+      { id: "B", created_at: "2026-01-02", groups: [
+        { id: "b1", created_at: "2026-01-15", area_code: "BIO" },
+        { id: "b2", created_at: "2026-01-16", area_code: null },
+      ] },
+    ];
+    const n = numberProjects(cls, ["A", "B"], ["BIO", "SAU"]);
+    expect([n.get("a2"), n.get("b1"), n.get("a1"), n.get("b2")]).toEqual([1, 2, 3, 4]);
+  });
 });

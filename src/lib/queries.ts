@@ -420,7 +420,7 @@ export const teacherNumberingQuery = queryOptions({
     const { data, error } = await supabase
       .from("classes")
       .select(
-        `id, name, code_label, code_order, created_at,
+        `id, name, code_label, code_order, code_area_order, created_at,
         groups!groups_class_id_fkey(id, group_name, created_at, group_members(profiles(name)), projects(id, area_code, code_number))`,
       )
       .order("created_at");
