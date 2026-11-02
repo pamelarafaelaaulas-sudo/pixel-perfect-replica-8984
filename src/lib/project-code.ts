@@ -44,14 +44,18 @@ export function projectCode(
 export type NumberingClass = {
   id: string;
   created_at: string;
-  groups: { id: string; created_at: string }[];
+  groups: { id: string; created_at: string; area_code?: string | null }[];
 };
 
+/** Default area order when grouping by area: Biológicas, then Saúde, then the others. */
+export const DEFAULT_AREA_ORDER: string[] = ["BIO", "SAU", ...AREAS.map((a) => a.code).filter((c) => c !== "BIO" && c !== "SAU")];
+
 /**
- * Mirrors SQL `renumber_projects`: classes in the chosen order (unlisted ones after, by creation),
- * groups by registration inside each class, numbered 1, 2, 3… in one shared count.
+ * Mirrors SQL `renumber_projects`: one shared count 1, 2, 3…
+ * With `areaOrder`, projects are grouped by area in that order first (no/unknown area last);
+ * then classes in the chosen order (unlisted ones after, by creation), then groups by registration.
  */
-export function numberProjects(classes: NumberingClass[], order: string[]) {
+export function numberProjects(classes: NumberingClass[], order: string[], areaOrder?: string[] | null) {
   const pos = new Map(order.map((id, i) => [id, i]));
   const sorted = [...classes].sort((a, b) => {
     const pa = pos.get(a.id) ?? Infinity;
@@ -59,11 +63,19 @@ export function numberProjects(classes: NumberingClass[], order: string[]) {
     if (pa !== pb) return pa - pb;
     return a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id);
   });
-  const result = new Map<string, number>();
-  let n = 0;
-  for (const c of sorted) {
-    const groups = [...c.groups].sort((a, b) => a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id));
-    for (const g of groups) result.set(g.id, ++n);
+  const items = sorted.flatMap((c, ci) =>
+    [...c.groups]
+      .sort((a, b) => a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id))
+      .map((g, gi) => ({ g, ci, gi })),
+  );
+  if (areaOrder?.length) {
+    const rank = (a: string | null | undefined) => {
+      const i = a ? areaOrder.indexOf(a) : -1;
+      return i < 0 ? Infinity : i;
+    };
+    items.sort((x, y) => rank(x.g.area_code) - rank(y.g.area_code) || x.ci - y.ci || x.gi - y.gi);
   }
+  const result = new Map<string, number>();
+  items.forEach(({ g }, i) => result.set(g.id, i + 1));
   return result;
 }
