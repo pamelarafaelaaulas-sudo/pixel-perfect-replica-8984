@@ -36,6 +36,6 @@
 - [x] Aplicação/intervenção social só dentro da etapa 3 (sem o quadro lateral), logo abaixo da pergunta norteadora e obrigatória
 - [ ] Recado personalizado no WhatsApp para alunos escolhidos ou todos — pronto; aguardando o WhatsApp aprovar a mensagem "recado_professora"
 - [x] IA do PamLab usando o Gemini com a chave da professora
-- [ ] Testar o corretor de banner com arquivo real (Gemini substitui as anotações antigas)
-- [ ] Tela de progresso de cada grupo por etapa: o que falta e atraso no bimestre
-- [ ] Tela de prazos e metas da turma: definir prazo de cada etapa e desconto por dia
+- [x] Testar o corretor de banner com arquivo real (Gemini substitui as anotações antigas)
+- [x] Tela de progresso de cada grupo por etapa: o que falta e atraso no bimestre
+- [x] Tela de prazos e metas da turma: definir prazo de cada etapa e desconto por dia
