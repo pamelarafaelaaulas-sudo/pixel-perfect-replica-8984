@@ -47,6 +47,7 @@ describe("numbering across the teacher's classes", () => {
   it("puts classes she didn't order after the chosen ones, oldest first", () => {
     const n = numberProjects(classes, ["C"]);
     expect([n.get("c1"), n.get("a1"), n.get("a2"), n.get("b1")]).toEqual([1, 2, 3, 4]);
+  });
 
   it("groups by area (Biológicas, then Saúde) keeping one continuous count", () => {
     const cls = [
@@ -62,5 +63,4 @@ describe("numbering across the teacher's classes", () => {
     const n = numberProjects(cls, ["A", "B"], ["BIO", "SAU"]);
     expect([n.get("a2"), n.get("b1"), n.get("a1"), n.get("b2")]).toEqual([1, 2, 3, 4]);
   });
-});
 });
