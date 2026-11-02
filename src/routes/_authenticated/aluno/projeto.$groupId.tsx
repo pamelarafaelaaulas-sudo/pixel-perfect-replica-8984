@@ -189,7 +189,13 @@ function StudentProjectPage() {
     selected,
     isBanner
       ? { banner_canva_url: project.banner_canva_url, banner_file_path: project.banner_file_path, banner_template_url: cls.banner_template_url }
-      : draft,
+      : {
+          ...draft,
+          ethics_human_research: project.ethics_human_research,
+          ethics_collection: project.ethics_collection,
+          ethics_form_url: project.ethics_form_url,
+          ethics_form_template_url: cls.ethics_form_template_url,
+        },
     draft.scientific_articles.length,
   );
   const grades = [...(group.grades ?? [])].sort((a, b) => a.trimester - b.trimester);

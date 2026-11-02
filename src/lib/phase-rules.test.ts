@@ -74,9 +74,9 @@ describe("delivery rules", () => {
   });
 
   it("requires 250–750 words in the methodology", () => {
-    expect(phaseProblems(7, { methodology: words(249) }, 0)).toHaveLength(1);
-    expect(phaseProblems(7, { methodology: words(250) }, 0)).toEqual([]);
-    expect(phaseProblems(7, { methodology: words(751) }, 0)).toHaveLength(1);
+    expect(phaseProblems(7, { methodology: words(249), ethics_human_research: false }, 0)).toHaveLength(1);
+    expect(phaseProblems(7, { methodology: words(250), ethics_human_research: false }, 0)).toEqual([]);
+    expect(phaseProblems(7, { methodology: words(751), ethics_human_research: false }, 0)).toHaveLength(1);
   });
 
   it("requires 250–500 words in the introduction", () => {

@@ -83,7 +83,7 @@ export const groupDetailQuery = (groupId: string) =>
         .from("groups")
         .select(
           `*,
-          classes!groups_class_id_fkey(id, name, class_code, code_label, late_penalty_per_day, banner_template_url, banner_size, banner_sections, banner_instructions, schedules(*)),
+          classes!groups_class_id_fkey(id, name, class_code, code_label, late_penalty_per_day, banner_template_url, banner_size, banner_sections, banner_instructions, ethics_form_template_url, schedules(*)),
           group_members(id, student_id, whatsapp, profiles(name, email)),
           projects(*, phase_submissions(*), project_contributions(*), banner_reviews(*)),
           grades(*)`,
