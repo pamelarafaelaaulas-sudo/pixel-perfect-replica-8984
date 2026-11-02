@@ -4,6 +4,7 @@
  * The database (phase_rule_problem in submit_phase) enforces the same word limits.
  */
 import { checkCitations, citedWorks, missingReferences, workKey, type CitedWork } from "./citations";
+import { ethicsProblems } from "./ethics";
 
 /** Parts where ABNT in-text citations are mandatory. */
 export const CITATION_FIELDS: Record<string, string> = {
@@ -166,6 +167,14 @@ export function phaseProblems(
     }
     case 7:
       checkWords("methodology", "Metodologia");
+      problems.push(
+        ...ethicsProblems({
+          ethics_human_research: values["ethics_human_research"] as boolean | null | undefined,
+          ethics_collection: (values["ethics_collection"] as string[] | null | undefined) ?? [],
+          ethics_form_url: str(values["ethics_form_url"]),
+          ethics_form_template_url: str(values["ethics_form_template_url"]),
+        }),
+      );
       break;
     case 8:
       checkWords("introduction", "Introdução");
