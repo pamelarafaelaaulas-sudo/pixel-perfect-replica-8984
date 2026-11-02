@@ -52,7 +52,7 @@ function Index() {
               <FlaskConical className="size-3.5" /> Projeto científico escolar
             </p>
             <h1 className="text-5xl font-semibold leading-[1.05] text-foreground md:text-6xl">
-              Da curiosidade à <span className="marker">pergunta científica</span>, em grupo.
+              Transformando a curiosidade em ciência, juntos.
             </h1>
             <p className="mt-6 max-w-xl text-lg text-muted-foreground">
               Vocês, alunos de educação científica da Prof. Pâmela, podem formar grupos de até 3 integrantes, escrever o projeto etapa por etapa, montar o banner e apresentar na feira. A professora acompanha prazos, vê quem contribuiu e lança as
