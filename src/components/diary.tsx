@@ -67,7 +67,7 @@ export function StatsLine({ s }: { s: DiaryStats }) {
 }
 
 /** Chronological history of diary entries, grouped by day. */
-export function DiaryTimeline({ entries, nameOf }: { entries: Entry[]; nameOf?: (id: string) => string }) {
+export function DiaryTimeline({ entries, nameOf }: { entries: Entry[]; nameOf?: ((id: string) => string) | undefined }) {
   if (entries.length === 0) return <p className="text-sm italic text-muted-foreground">Nenhum registro ainda.</p>;
   const days = [...new Set(entries.map((e) => e.entry_date))];
   return (
