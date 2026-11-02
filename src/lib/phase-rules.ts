@@ -30,6 +30,16 @@ export function referenceCheck(
   return unique.map((u) => ({ ...u, found: !missing.has(u.work) }));
 }
 
+/** Minimum distinct works cited per part (same author+year counts once). */
+export const MIN_CITED_WORKS: Record<string, number> = { introduction: 5, results_discussion: 1 };
+/** Minimum works listed in Referências (one per non-empty line). */
+export const MIN_REFERENCES = 5;
+
+export const distinctCitedWorks = (text: string | null | undefined) =>
+  new Set(citedWorks(text).map(workKey)).size;
+export const referenceLines = (text: string | null | undefined) =>
+  (text ?? "").split("\n").filter((l) => l.trim() !== "").length;
+
 export type WordLimit = { min: number; max: number | null };
 
 /** Word limits per field. min 1 = required. */
@@ -135,6 +145,12 @@ export function phaseProblems(
     const { citations, issues } = checkCitations(text);
     if (citations.length === 0)
       problems.push(`${label}: cite pelo menos um autor nas normas ABNT, por exemplo (Silva, 2020) ou Silva (2020).`);
+    else {
+      const min = MIN_CITED_WORKS[key] ?? 1;
+      const n = distinctCitedWorks(text);
+      if (n < min)
+        problems.push(`${label}: ${n} obra(s) diferente(s) citada(s), o mínimo é ${min}. Repetir o mesmo autor e ano conta uma vez só.`);
+    }
     for (const i of issues) problems.push(`Citação fora da ABNT: “${i.text}”. ${i.fix}`);
   };
   const checkWords = (key: string, label: string) => {
@@ -197,6 +213,11 @@ export function phaseProblems(
     case 11: {
       checkWords("references_list", "Referências");
       if (countWords(str(values["references_list"])) === 0) break;
+      {
+        const n = referenceLines(str(values["references_list"]));
+        if (n < MIN_REFERENCES)
+          problems.push(`Referências: ${n} obra(s) listada(s), o mínimo é ${MIN_REFERENCES} (uma por linha).`);
+      }
       for (const { work, label } of referenceCheck(values).filter((r) => !r.found))
         problems.push(`Falta nas Referências: ${work.citation}, citado em ${label}.`);
       break;

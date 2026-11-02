@@ -101,3 +101,18 @@ describe("delivery rules", () => {
     expect(keywordsInTitle(["Oleo", "solo"], "Descarte de óleo")).toEqual(["Oleo"]);
   });
 });
+
+describe("minimum citations and references", () => {
+  const words = (n: number) => Array(n).fill("palavra").join(" ");
+  it("introduction needs 5 distinct works; repeats count once", () => {
+    const four = `${words(260)} (Silva, 2020) (Silva, 2020) (Souza, 2019) (Lima, 2018) (Costa, 2021).`;
+    expect(phaseProblems(8, { introduction: four }, 0).some((p) => p.includes("o mínimo é 5"))).toBe(true);
+    const five = `${four} (Rocha, 2022).`;
+    expect(phaseProblems(8, { introduction: five }, 0).some((p) => p.includes("o mínimo é 5"))).toBe(false);
+  });
+  it("references need at least 5 lines", () => {
+    const four = "SILVA, A. X. 2020.\nSOUZA, B. Y. 2019.\nLIMA, C. 2018.\nCOSTA, D. 2021.";
+    expect(phaseProblems(11, { references_list: four }, 0).some((p) => p.includes("mínimo é 5"))).toBe(true);
+    expect(phaseProblems(11, { references_list: four + "\nROCHA, E. 2022." }, 0).some((p) => p.includes("mínimo é 5"))).toBe(false);
+  });
+});
