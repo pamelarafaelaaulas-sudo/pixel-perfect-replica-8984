@@ -33,6 +33,22 @@ export function finalGrade(score: number, penalty: number, adjustment = 0): numb
   return Math.min(10, Math.max(0, Math.round((score - penalty + adjustment) * 100) / 100));
 }
 
+/** The 3º bimestre mixes the group's banner grade with each student's Diário de Bordo grade. */
+export const DIARY_BIMESTER = 3;
+export const DIARY_WEIGHT = 0.4;
+
+/**
+ * Grade a student's bimestre starts from, before late discount and adjustment.
+ * 3º bimestre: 60% banner (group grade) + 40% the student's diary grade; pending (null) until both exist.
+ * Other bimestres: the group grade.
+ */
+export function bimesterBase(bimester: number, groupScore: number | null, diaryScore: number | null): number | null {
+  if (groupScore === null) return null;
+  if (bimester !== DIARY_BIMESTER) return groupScore;
+  if (diaryScore === null) return null;
+  return Math.round((groupScore * (1 - DIARY_WEIGHT) + diaryScore * DIARY_WEIGHT) * 100) / 100;
+}
+
 export function formatPoints(n: number): string {
   return n.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 2 });
 }

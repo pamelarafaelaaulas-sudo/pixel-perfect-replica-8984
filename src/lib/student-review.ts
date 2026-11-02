@@ -1,10 +1,15 @@
-import { bimesterPenalties, finalGrade, type PhaseInfo } from "./penalty";
+import { bimesterBase, bimesterPenalties, finalGrade, type PhaseInfo } from "./penalty";
 import { overallScore } from "./ai-score";
 import { BIMESTER_NUMBERS } from "./phases";
 
 export type BimesterRow = {
   bimester: number;
+  /** Group grade (banner grade in the 3º bimestre). */
   score: number | null;
+  /** 3º bimestre only: this student's Diário de Bordo grade (40%). */
+  diary: number | null;
+  /** Grade before discount/adjustment: group grade, or 60% banner + 40% diary in the 3º bimestre. */
+  base: number | null;
   /** Late penalty of this bimestre's stages only. */
   penalty: number;
   /** Teacher's adjustment for this student only (+/−). */
@@ -31,6 +36,8 @@ export function studentSummary(args: {
   grades: { trimester: number; score: number; is_reference_ten: boolean; created_at: string }[];
   peers: { trimester: number; score: number }[];
   adjustments?: { bimester: number; points: number; note: string | null }[];
+  /** This student's Diário de Bordo grade (counts 40% of the 3º bimestre). */
+  diaryScore?: number | null;
 }) {
   const phaseRows = args.phases.map((p) => ({ ...p, ai: args.aiByPhase[p.phase] ?? null }));
   const aiScores = phaseRows.map((p) => p.ai).filter((n): n is number => n !== null);
@@ -41,13 +48,18 @@ export function studentSummary(args: {
     const penalty = penalties[b] ?? 0;
     const adj = (args.adjustments ?? []).find((a) => a.bimester === b);
     const adjustment = adj ? Number(adj.points) : 0;
+    const score = g ? Number(g.score) : null;
+    const diary = b === 3 ? (args.diaryScore ?? null) : null;
+    const base = bimesterBase(b, score, diary);
     return {
       bimester: b,
-      score: g ? Number(g.score) : null,
+      score,
+      diary,
+      base,
       penalty,
       adjustment,
       adjustmentNote: adj?.note ?? null,
-      final: g ? finalGrade(Number(g.score), penalty, adjustment) : null,
+      final: base === null ? null : finalGrade(base, penalty, adjustment),
       reference: g?.is_reference_ten ?? false,
       launchedAt: g?.created_at ?? null,
       peerAverage: peerScores.length ? round1(peerScores.reduce((s, n) => s + n, 0) / peerScores.length) : null,
