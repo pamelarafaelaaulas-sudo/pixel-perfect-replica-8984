@@ -953,6 +953,7 @@ export type Database = {
       }
       whatsapp_messages: {
         Row: {
+          body: string | null
           class_id: string | null
           created_at: string
           days_left: number | null
@@ -962,6 +963,7 @@ export type Database = {
           failed_at: string | null
           group_id: string | null
           id: string
+          kind: string
           phase_number: number
           phone: string
           read_at: string | null
@@ -974,6 +976,7 @@ export type Database = {
           wa_message_id: string | null
         }
         Insert: {
+          body?: string | null
           class_id?: string | null
           created_at?: string
           days_left?: number | null
@@ -983,6 +986,7 @@ export type Database = {
           failed_at?: string | null
           group_id?: string | null
           id?: string
+          kind?: string
           phase_number: number
           phone: string
           read_at?: string | null
@@ -995,6 +999,7 @@ export type Database = {
           wa_message_id?: string | null
         }
         Update: {
+          body?: string | null
           class_id?: string | null
           created_at?: string
           days_left?: number | null
@@ -1004,6 +1009,7 @@ export type Database = {
           failed_at?: string | null
           group_id?: string | null
           id?: string
+          kind?: string
           phase_number?: number
           phone?: string
           read_at?: string | null

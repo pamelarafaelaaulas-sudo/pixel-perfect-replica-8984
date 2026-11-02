@@ -2,6 +2,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import {
   buildReminders,
+  CUSTOM_TEMPLATE,
+  customParams,
+  messageRecipients,
   REMINDER_LANGUAGE,
   REMINDER_TEMPLATE,
   reminderParams,
@@ -51,18 +54,21 @@ export function isWhatsappOwner(email: string | null | undefined) {
   return !!email && WHATSAPP_OWNER_EMAILS.includes(email.trim().toLowerCase());
 }
 
-/** Connected number and the reminder template's review status (APPROVED / PENDING / REJECTED / MISSING). */
+/** Connected number and the templates' review status (APPROVED / PENDING / REJECTED / MISSING). */
 export async function whatsappStatus() {
   const [phone, tpl] = await Promise.all([
     gateway("/phone_number?fields=display_phone_number,verified_name"),
-    gateway(`/message_templates?fields=name,status,rejected_reason&name=${REMINDER_TEMPLATE}`),
+    gateway(`/message_templates?fields=name,status,rejected_reason&limit=100`),
   ]);
   if (!phone.ok) console.error(`WhatsApp phone lookup failed [${phone.status}]: ${phone.text}`);
   if (!tpl.ok) console.error(`WhatsApp template lookup failed [${tpl.status}]: ${tpl.text}`);
   const p = (phone.json ?? {}) as { display_phone_number?: string; verified_name?: string };
   const list = ((tpl.json ?? {}) as { data?: { name: string; status: string; rejected_reason?: string }[] }).data ?? [];
   const t = list.find((x) => x.name === REMINDER_TEMPLATE);
+  const c = list.find((x) => x.name === CUSTOM_TEMPLATE);
   return {
+    customTemplateStatus: tpl.ok ? (c?.status ?? "MISSING") : "UNKNOWN",
+    customRejectedReason: c?.rejected_reason && c.rejected_reason !== "NONE" ? c.rejected_reason : null,
     connected: phone.ok,
     displayPhone: p.display_phone_number ?? null,
     verifiedName: p.verified_name ?? null,
@@ -145,6 +151,66 @@ export async function sendReminders(admin: Db, teacherId: string, trigger: "manu
   // Status callbacks may have arrived before the ids above were saved.
   await processPendingEvents(admin, 25);
   return { sent, failed, total: reminders.length, templateStatus: status.templateStatus };
+}
+
+/** Every student who can get a custom message from this teacher. */
+export async function previewRecipients(db: Db, teacherId: string, senderPhone: string | null) {
+  return messageRecipients(await loadReminderClasses(db, teacherId), { senderPhone });
+}
+
+/**
+ * Sends the teacher's own text to the chosen students (only ones in her classes) through the
+ * approved "recado_professora" template and records each attempt. Admin client: verify the teacher first.
+ */
+export async function sendCustomMessage(admin: Db, teacherId: string, studentIds: string[], text: string) {
+  const status = await whatsappStatus();
+  if (status.customTemplateStatus !== "APPROVED") {
+    return { sent: 0, failed: 0, total: 0, templateStatus: status.customTemplateStatus };
+  }
+  const wanted = new Set(studentIds);
+  const { recipients } = await previewRecipients(admin, teacherId, status.displayPhone);
+  const chosen = recipients.filter((r) => wanted.has(r.studentId));
+  let sent = 0;
+  let failed = 0;
+  for (const r of chosen) {
+    const params = customParams(r.studentName, text);
+    const res = await gateway("/messages", {
+      method: "POST",
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        to: r.phone,
+        type: "template",
+        template: {
+          name: CUSTOM_TEMPLATE,
+          language: { code: REMINDER_LANGUAGE },
+          components: [{ type: "body", parameters: params.map((t) => ({ type: "text", text: t })) }],
+        },
+      }),
+    });
+    const waId = res.ok ? ((res.json as { messages?: { id: string }[] } | null)?.messages?.[0]?.id ?? null) : null;
+    if (!res.ok) console.error(`WhatsApp custom send failed [${res.status}]: ${res.text}`);
+    const ins = await admin.from("whatsapp_messages").insert({
+      teacher_id: teacherId,
+      class_id: r.classId,
+      group_id: r.groupId,
+      student_id: r.studentId,
+      student_name: r.studentName,
+      phone: r.phone,
+      phase_number: r.phase,
+      trigger: "manual",
+      kind: "custom",
+      body: params[1]!,
+      wa_message_id: waId,
+      status: waId ? "accepted" : "failed",
+      error: waId ? null : `[${res.status}] ${res.text.slice(0, 500)}`,
+      failed_at: waId ? null : new Date().toISOString(),
+    });
+    if (ins.error) console.error(`Could not record WhatsApp message: ${ins.error.message}`);
+    if (waId) sent++;
+    else failed++;
+  }
+  await processPendingEvents(admin, 25);
+  return { sent, failed, total: chosen.length, templateStatus: status.customTemplateStatus };
 }
 
 type StatusItem = { id: string; status: string; timestamp?: string; errors?: { code?: number; title?: string; message?: string }[] };

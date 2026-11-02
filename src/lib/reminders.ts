@@ -154,3 +154,91 @@ export function autoRunDue(lastRun: string | null, intervalDays: number, now: Da
   if (!lastRun) return true;
   return now.getTime() - new Date(lastRun).getTime() >= intervalDays * DAY - 2 * 3_600_000;
 }
+
+/* ---------------- Custom message from the teacher ---------------- */
+
+/** WhatsApp template for the teacher's own text: "Olá, {{1}}! A professora Pâmela deixou um recado… {{2}} …". */
+export const CUSTOM_TEMPLATE = "recado_professora";
+export const CUSTOM_MAX_CHARS = 600;
+
+export type MessageRecipient = {
+  classId: string;
+  className: string;
+  groupId: string;
+  groupName: string;
+  studentId: string;
+  studentName: string;
+  phone: string;
+  phase: number;
+};
+
+/**
+ * Every student of the teacher's classes who can get a custom message (one per student),
+ * plus the ones left out with the reason (invalid number, the teacher's own number).
+ */
+export function messageRecipients(
+  classes: ReminderInputClass[],
+  opts: { senderPhone?: string | null } = {},
+): { recipients: MessageRecipient[]; skipped: SkippedReminder[] } {
+  const recipients: MessageRecipient[] = [];
+  const skipped: SkippedReminder[] = [];
+  const seen = new Set<string>();
+  for (const c of classes) {
+    for (const g of c.groups ?? []) {
+      for (const m of g.group_members ?? []) {
+        const studentName = m.profiles?.name ?? "";
+        if (seen.has(m.student_id)) continue;
+        seen.add(m.student_id);
+        const phone = normalizePhone(m.whatsapp);
+        if (!phone) {
+          skipped.push({ className: c.name, groupName: g.group_name, studentName, reason: "WhatsApp inválido" });
+          continue;
+        }
+        if (opts.senderPhone && samePhone(phone, opts.senderPhone)) {
+          skipped.push({ className: c.name, groupName: g.group_name, studentName, reason: "É o número da professora" });
+          continue;
+        }
+        recipients.push({
+          classId: c.id,
+          className: c.name,
+          groupId: g.id,
+          groupName: g.group_name,
+          studentId: m.student_id,
+          studentName,
+          phone,
+          phase: g.projects?.current_phase ?? 1,
+        });
+      }
+    }
+  }
+  recipients.sort((a, b) => a.className.localeCompare(b.className, "pt-BR") || a.studentName.localeCompare(b.studentName, "pt-BR"));
+  return { recipients, skipped };
+}
+
+/**
+ * WhatsApp refuses template values with line breaks, tabs or more than 4 spaces in a row:
+ * line breaks become " · " and runs of spaces collapse.
+ */
+export function cleanCustomText(raw: string): string {
+  return raw
+    .split(/\r?\n/)
+    .map((l) => l.replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .join(" · ");
+}
+
+/** Why the custom message cannot be sent yet. Empty = OK. */
+export function customMessageProblems(raw: string, selected: number): string[] {
+  const text = cleanCustomText(raw);
+  const problems: string[] = [];
+  if (!text) problems.push("Escreva a mensagem.");
+  else if (text.length > CUSTOM_MAX_CHARS) problems.push(`A mensagem tem ${text.length} caracteres; o máximo é ${CUSTOM_MAX_CHARS}.`);
+  if (selected === 0) problems.push("Escolha pelo menos um aluno.");
+  return problems;
+}
+
+/** The two template values: first name, then the teacher's text. */
+export function customParams(studentName: string, raw: string): string[] {
+  const first = studentName.trim().split(/\s+/)[0] || "aluno(a)";
+  return [first, cleanCustomText(raw)];
+}

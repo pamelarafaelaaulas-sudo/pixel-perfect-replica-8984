@@ -440,7 +440,7 @@ export const whatsappRemindersQuery = queryOptions({
       supabase.from("whatsapp_settings").select("auto_enabled, interval_days, last_auto_run_at").eq("teacher_id", uid).maybeSingle(),
       supabase
         .from("whatsapp_messages")
-        .select("id, student_name, phone, phase_number, days_left, due_date, trigger, status, error, created_at, delivered_at, read_at")
+        .select("id, student_name, phone, phase_number, days_left, due_date, trigger, kind, body, status, error, created_at, delivered_at, read_at")
         .order("created_at", { ascending: false })
         .limit(60),
       supabase.from("classes").select("id, name, schedules(phase_number, due_date)").eq("teacher_id", uid).order("name"),

@@ -1,6 +1,6 @@
-import { createOpenAI } from "@ai-sdk/openai";
 import { Output, streamText } from "ai";
 import { z } from "zod";
+import { GEMINI_OPTIONS, geminiErrorMessage, geminiModel } from "./gemini.server";
 import {
   BANNER_AXES,
   bannerTotal,
@@ -9,19 +9,6 @@ import {
   type BannerAxisScore,
   type BannerFeedback,
 } from "./banner-review";
-
-const RUN_ID_HEADER = "X-Lovable-AIG-Run-ID";
-
-function createRunIdFetch() {
-  let runId: string | undefined;
-  return async (input: RequestInfo | URL, init?: RequestInit) => {
-    const headers = new Headers(init?.headers);
-    if (runId && !headers.has(RUN_ID_HEADER)) headers.set(RUN_ID_HEADER, runId);
-    const res = await fetch(input, { ...init, headers });
-    runId ??= res.headers.get(RUN_ID_HEADER)?.trim() || undefined;
-    return res;
-  };
-}
 
 const axis = z.object({ score: z.number(), comment: z.string() });
 
@@ -92,10 +79,11 @@ Os alunos lerão tudo, exceto as notas: nunca escreva notas, pontos ou números 
 function friendlyError(failure: unknown): Error {
   console.error("Banner diagnosis error", failure);
   const status = (failure as { statusCode?: number } | undefined)?.statusCode;
-  if (status === 429) return new Error("Muitos pedidos agora. Tente de novo em alguns minutos.");
-  if (status === 402 || status === 403) return new Error("Os créditos de IA acabaram. Avise a professora.");
-  if (status === 400 || status === 413) return new Error("A IA não conseguiu ler este arquivo. Exporte o banner em PDF ou PNG menor e tente de novo.");
-  return new Error("Não foi possível gerar o diagnóstico agora.");
+  if (status === 413) return new Error("A IA não conseguiu ler este arquivo. Exporte o banner em PDF ou PNG menor e tente de novo.");
+  return new Error(
+    geminiErrorMessage(failure, "Não foi possível gerar o diagnóstico agora.") ??
+      "A IA não conseguiu ler este arquivo. Exporte o banner em PDF ou PNG menor e tente de novo.",
+  );
 }
 
 const clean = (xs: string[], max: number) => xs.map((x) => x.trim()).filter(Boolean).slice(0, max);
@@ -109,17 +97,10 @@ export async function generateBannerDiagnosis(args: {
   projectText: string;
   previous: string | null;
 }): Promise<BannerDiagnosis> {
-  const apiKey = process.env["LOVABLE_API_KEY"];
-  if (!apiKey) throw new Error("A IA não está configurada.");
-  const provider = createOpenAI({
-    baseURL: "https://ai.gateway.lovable.dev/v1",
-    apiKey,
-    headers: { "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
-    fetch: createRunIdFetch(),
-  });
+  const model = geminiModel();
   let failure: unknown;
   const result = streamText({
-    model: provider.responses("openai/gpt-6-astra"),
+    model,
     system: INSTRUCTIONS,
     messages: [
       {
@@ -139,18 +120,10 @@ export async function generateBannerDiagnosis(args: {
       },
     ],
     output: Output.object({ schema }),
-    maxRetries: 0,
+    maxRetries: 1,
+    providerOptions: GEMINI_OPTIONS,
     onError: ({ error }) => {
       failure = error;
-    },
-    providerOptions: {
-      openai: {
-        forceReasoning: true,
-        reasoningEffort: "low",
-        reasoningSummary: "auto",
-        store: false,
-        include: ["reasoning.encrypted_content"],
-      },
     },
   });
 
