@@ -329,6 +329,25 @@ export const teacherRosterQuery = queryOptions({
   },
 });
 
+export const teacherExternalFairsQuery = queryOptions({
+  queryKey: ["teacher", "external-fairs"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("classes")
+      .select(
+        `id, name, code_label, ethics_form_template_url,
+        groups!groups_class_id_fkey(
+          id, group_name,
+          group_members(profiles(name)),
+          projects(title, theme, area_code, code_number, current_phase, external_fairs_interest, external_fairs, ethics_human_research, ethics_collection, ethics_form_url)
+        )`,
+      )
+      .order("created_at", { ascending: false });
+    fail(error);
+    return data ?? [];
+  },
+});
+
 /* ---------------- Teacher: bimestre grades across classes ---------------- */
 
 export const teacherBimesterQuery = queryOptions({

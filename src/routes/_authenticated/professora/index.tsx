@@ -56,6 +56,11 @@ function TeacherHome() {
                 <ListChecks /> Progresso dos grupos
               </Link>
             </Button>
+            <Button variant="outline" asChild>
+              <Link to="/professora/feiras">
+                <Trophy /> Feiras externas
+              </Link>
+            </Button>
             {classes.length > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
