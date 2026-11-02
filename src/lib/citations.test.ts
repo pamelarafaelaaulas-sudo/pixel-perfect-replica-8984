@@ -47,7 +47,7 @@ describe("citation rule for Introdução and Resultados e discussão", () => {
   });
 
   it("does not require citations in other parts", () => {
-    expect(phaseProblems(7, { methodology: words(300) }, 0)).toEqual([]);
+    expect(phaseProblems(7, { methodology: words(300), ethics_human_research: false }, 0)).toEqual([]);
   });
 });
 
