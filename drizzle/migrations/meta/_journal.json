@@ -148,6 +148,13 @@
       "when": 1793658779001,
       "tag": "0020_numbering_grouped_by_area",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1793662615908,
+      "tag": "0021_min_five_citations_and_references",
+      "breakpoints": true
     }
   ]
 }
