@@ -64,7 +64,7 @@ export const classDetailQuery = (classId: string) =>
           groups!groups_class_id_fkey(
             id, group_name, created_at,
             group_members(id, student_id, whatsapp, profiles(name)),
-            projects(id, current_phase, updated_at, area_code, code_number, phase_submissions(phase_number, submitted_at), banner_reviews(resubmit_due_at, resubmitted_at)),
+            projects(id, current_phase, updated_at, area_code, code_number, external_fairs_interest, external_fairs, phase_submissions(phase_number, submitted_at), banner_reviews(resubmit_due_at, resubmitted_at)),
             grades(trimester, score)
           )`,
         )

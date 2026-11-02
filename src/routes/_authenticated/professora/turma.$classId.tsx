@@ -27,6 +27,7 @@ import { formatPoints, projectLateness } from "@/lib/penalty";
 import { isCanvaUrl } from "@/lib/phase-rules";
 import { normalizeClassLabel } from "@/lib/project-code";
 import { ProjectCodeTag } from "@/components/project-code";
+import { ExternalFairsTag } from "@/components/external-fairs";
 
 export const Route = createFileRoute("/_authenticated/professora/turma/$classId")({
   head: () => ({
@@ -164,6 +165,7 @@ function ClassPage() {
                           {g.group_name}
                           <ProjectCodeTag area={project?.area_code} classLabel={cls.code_label} seq={project?.code_number} />
                           {project && !project.area_code && <Badge variant="warning">Sem área</Badge>}
+                          {project && <ExternalFairsTag interest={project.external_fairs_interest} fairs={project.external_fairs} />}
                         </div>
                         <p className="truncate text-sm text-muted-foreground">
                           {(g.group_members ?? []).map((m) => m.profiles?.name).join(", ") || "Sem integrantes"}
