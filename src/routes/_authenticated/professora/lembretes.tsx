@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ArrowLeft, CalendarClock, CheckCheck, Loader2, MessageCircle, Send, TriangleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
+import { CustomWhatsappCard } from "@/components/custom-whatsapp";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -114,8 +115,8 @@ function RemindersPage() {
       </Link>
       <PageHeader
         eyebrow="Comunicação com os alunos"
-        title="Lembretes no WhatsApp"
-        description="O PamLab avisa cada aluno quantos dias faltam para o prazo da etapa em que o grupo está. Quem já entregou ou está com o prazo vencido não recebe."
+        title="WhatsApp dos alunos"
+        description="Lembretes automáticos com os dias que faltam para o prazo de cada etapa, e recados escritos por você para os alunos que escolher."
       />
 
       {overview.isPending ? (
@@ -130,6 +131,7 @@ function RemindersPage() {
           <p>O WhatsApp ligado ao PamLab é o número da professora Pâmela. Para enviar lembretes da sua conta, peça para ligar um número seu.</p>
         </div>
       ) : (
+        <>
         <div className="grid gap-5 lg:grid-cols-[1fr_1.2fr]">
           <section className="card-paper space-y-4 p-5">
             <div className="flex items-center gap-3">
@@ -276,6 +278,15 @@ function RemindersPage() {
             )}
           </section>
         </div>
+        {o && (
+          <CustomWhatsappCard
+            recipients={o.recipients}
+            skipped={o.recipientsSkipped}
+            templateStatus={o.customTemplateStatus}
+            rejectedReason={o.customRejectedReason}
+          />
+        )}
+        </>
       )}
 
       <section className="mt-8">
@@ -329,8 +340,8 @@ function RemindersPage() {
                 <tr className="border-b border-border text-left text-xs text-muted-foreground">
                   <th className="px-5 py-2 font-medium">Quando</th>
                   <th className="px-3 py-2 font-medium">Aluno</th>
-                  <th className="px-3 py-2 font-medium">Etapa</th>
-                  <th className="px-3 py-2 font-medium">Como</th>
+                  <th className="px-3 py-2 font-medium">Etapa / recado</th>
+                  <th className="px-3 py-2 font-medium">Tipo</th>
                   <th className="px-5 py-2 text-right font-medium">Situação</th>
                 </tr>
               </thead>
@@ -339,11 +350,21 @@ function RemindersPage() {
                   <tr key={m.id} className="border-b border-border last:border-0">
                     <td className="px-5 py-2 text-muted-foreground">{fmtDateTime(m.created_at)}</td>
                     <td className="px-3 py-2">{m.student_name}</td>
-                    <td className="px-3 py-2">
-                      {phaseMeta(m.phase_number).name}
-                      {m.days_left !== null && <span className="text-muted-foreground"> · {daysText(m.days_left)}</span>}
+                    <td className="max-w-xs px-3 py-2">
+                      {m.kind === "custom" ? (
+                        <span className="line-clamp-2 text-muted-foreground" title={m.body ?? undefined}>
+                          “{m.body}”
+                        </span>
+                      ) : (
+                        <>
+                          {phaseMeta(m.phase_number).name}
+                          {m.days_left !== null && <span className="text-muted-foreground"> · {daysText(m.days_left)}</span>}
+                        </>
+                      )}
                     </td>
-                    <td className="px-3 py-2 text-muted-foreground">{m.trigger === "auto" ? "Automático" : "Manual"}</td>
+                    <td className="px-3 py-2 text-muted-foreground">
+                      {m.kind === "custom" ? "Recado" : m.trigger === "auto" ? "Lembrete automático" : "Lembrete manual"}
+                    </td>
                     <td className="px-5 py-2 text-right">
                       <Badge
                         variant={m.status === "failed" ? "destructive" : m.status === "read" || m.status === "delivered" ? "success" : "muted"}
