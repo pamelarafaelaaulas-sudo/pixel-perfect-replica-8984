@@ -15,6 +15,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TeacherBannerPanel } from "@/components/banner-cycle";
 import { ExternalFairsTag } from "@/components/external-fairs";
+import { TeacherDiaryTab } from "@/components/diary";
+import { diaryReviewWindow, isDiaryReviewOpen } from "@/lib/diary";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   AlertDialog,
@@ -123,6 +125,8 @@ function TeacherGroupPage() {
     perDay,
   });
   const penalties = bimesterPenalties(lateness.phases);
+  const diaryWindow = diaryReviewWindow(cls);
+  const diaryOpen = isDiaryReviewOpen(diaryWindow);
 
   return (
     <>
@@ -258,6 +262,7 @@ function TeacherGroupPage() {
           <TabsTrigger value="contrib">Quem escreveu</TabsTrigger>
           <TabsTrigger value="pares">Avaliação dos colegas</TabsTrigger>
           <TabsTrigger value="banner">Corretor de banner</TabsTrigger>
+          {diaryOpen && <TabsTrigger value="diario">Diário de bordo</TabsTrigger>}
           <TabsTrigger value="notas">Notas</TabsTrigger>
           <TabsTrigger value="ia">Avaliação da IA</TabsTrigger>
         </TabsList>
@@ -305,6 +310,25 @@ function TeacherGroupPage() {
             );
           })}
         </TabsContent>
+
+        {!diaryOpen && (
+          <p className="mb-4 text-xs text-muted-foreground">
+            Diário de bordo: a avaliação aparece aqui só no 3º bimestre
+            {diaryWindow.start && diaryWindow.end
+              ? ` (de ${fmtDateTime(diaryWindow.start)} a ${fmtDateTime(diaryWindow.end)})`
+              : ""}
+            . Ajuste o período em “Vídeos e diário” no painel.
+          </p>
+        )}
+        {diaryOpen && (
+          <TabsContent value="diario" className="card-paper p-6 md:p-8">
+            <p className="mb-6 text-sm text-muted-foreground">
+              Avaliação do 3º bimestre, aberta até {fmtDateTime(diaryWindow.end)}. A nota e as observações aparecem para cada aluno no
+              diário dele.
+            </p>
+            <TeacherDiaryTab groupId={groupId} members={members.map((m) => ({ id: m.student_id, name: m.profiles?.name ?? "Aluno" }))} />
+          </TabsContent>
+        )}
 
         <TabsContent value="banner" className="card-paper p-6 md:p-8">
           {project ? (

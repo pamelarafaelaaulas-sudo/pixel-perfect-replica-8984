@@ -59,6 +59,8 @@ import { BannerStage } from "@/components/banner-stage";
 import { StudentBannerCorrector } from "@/components/banner-cycle";
 import { EthicsScreening } from "@/components/ethics-screening";
 import { ExternalFairsCard } from "@/components/external-fairs";
+import { DiaryVideoStep, ReferencesVideoStep } from "@/components/video-trail";
+import { DiaryCard } from "@/components/diary";
 import { bannerBrief } from "@/lib/banner";
 import { ProjectAreaPicker, ProjectCodeTag } from "@/components/project-code";
 import { SocialApplicationCard } from "@/components/social-application";
@@ -344,6 +346,24 @@ function StudentProjectPage() {
             )}
           </fieldset>
 
+          {selected === 1 && (
+            <div className="mt-5">
+              <DiaryVideoStep
+                url={cls.diary_video_url}
+                projectId={project.id}
+                groupId={groupId}
+                watchedAt={project.diary_video_watched_at}
+                editable={editable}
+              />
+            </div>
+          )}
+
+          {selected === 11 && (
+            <div className="mt-5">
+              <ReferencesVideoStep url={cls.references_video_url} articleUrl={cls.highlighted_article_url} />
+            </div>
+          )}
+
           {selected === 7 && (
             <div className="mt-5">
               <EthicsScreening
@@ -429,6 +449,7 @@ function StudentProjectPage() {
         </section>
 
         <aside className="space-y-4">
+          <DiaryCard groupId={groupId} studentId={me!.id} />
           <ExternalFairsCard
             projectId={project.id}
             groupId={groupId}
