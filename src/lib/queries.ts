@@ -249,7 +249,8 @@ async function fetchStudentReview(studentId: string) {
               group_members(student_id),
               projects(id, current_phase, phase_submissions(phase_number, submitted_at), project_contributions(student_id, char_count_added), banner_reviews(resubmit_due_at, resubmitted_at)),
               grades(trimester, score, feedback, is_reference_ten, created_at),
-              student_grade_adjustments(id, student_id, bimester, points, note)
+              student_grade_adjustments(id, student_id, bimester, points, note),
+              diary_grades(student_id, score, feedback)
             )`,
       )
       .eq("student_id", studentId)
@@ -367,7 +368,8 @@ export const teacherExportQuery = queryOptions({
             group_members(student_id, profiles(name)),
             projects(current_phase, area_code, code_number, phase_submissions(phase_number, submitted_at), banner_reviews(resubmit_due_at, resubmitted_at)),
             grades(trimester, score, feedback, is_reference_ten, created_at),
-            student_grade_adjustments(student_id, bimester, points, note)
+            student_grade_adjustments(student_id, bimester, points, note),
+            diary_grades(student_id, score)
           )`,
         )
         .order("created_at", { ascending: false }),

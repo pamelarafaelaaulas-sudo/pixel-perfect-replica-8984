@@ -185,12 +185,13 @@ export async function buildStudentGradesWorkbook(
       { header: "Grupo", key: "groupName", width: 22 },
       { header: "Código do projeto", key: "projectCode", width: 14 },
       ...bimesterTitles.flatMap((t, i) => [
-        { header: `${t} — nota do grupo`, key: `s${i}`, width: 12, fmt: "0.0" },
+        { header: i === 2 ? `${t} — nota do banner (60%)` : `${t} — nota do grupo`, key: `s${i}`, width: 12, fmt: "0.0" },
         { header: `${t} — desconto de atraso`, key: `p${i}`, width: 12, fmt: "0.0" },
         { header: `${t} — ajuste da professora`, key: `a${i}`, width: 12, fmt: "+0.0;-0.0;0.0" },
         { header: `${t} — nota final`, key: `f${i}`, width: 12, fmt: "0.0" },
       ]),
       { header: "Média final", key: "avg", width: 10, fmt: "0.0" },
+      { header: `${bimesterTitles[2] ?? "3º bimestre"} — diário de bordo (40%)`, key: "diary", width: 14, fmt: "0.0" },
     ]);
     ws.getRow(1).height = 48;
     block.rows.forEach((r, i) => {
@@ -211,6 +212,7 @@ export async function buildStudentGradesWorkbook(
           ]),
         ),
         avg: { formula: `IF(COUNT(${finals})=0,"",ROUND(AVERAGE(${finals}),1))`, result: avg },
+        diary: r.details[2]?.diary ?? null,
       });
     });
   }

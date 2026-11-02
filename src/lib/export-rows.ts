@@ -1,5 +1,5 @@
 import { AI_CRITERIA, latestPerPhase, parseSavedEvaluation } from "./ai-score";
-import { bimesterPenalties, finalGrade, gradeAfterPenalty, projectLateness } from "./penalty";
+import { bimesterBase, bimesterPenalties, finalGrade, gradeAfterPenalty, projectLateness } from "./penalty";
 import { BIMESTER_NUMBERS, bimesterMeta, phaseMeta } from "./phases";
 import { projectCode } from "./project-code";
 
@@ -20,6 +20,8 @@ type InputGroup = {
     | null;
   /** Teacher's per-student adjustment of the bimestre grade. */
   student_grade_adjustments?: { student_id: string; bimester: number; points: number | string; note: string | null }[] | null;
+  /** Diário de Bordo grade per student (40% of the 3º bimestre). */
+  diary_grades?: { student_id: string; score: number | string }[] | null;
 };
 
 export type ExportInput = {
@@ -190,11 +192,13 @@ export function buildExport(input: ExportInput, filters: ExportFilters = {}) {
 export type StudentGradeDetail = {
   /** Group grade launched by the teacher; null = not launched. */
   score: number | null;
+  /** 3º bimestre only: the student's Diário de Bordo grade (40%); null = not graded. */
+  diary: number | null;
   /** Late penalty of that bimestre's stages. */
   penalty: number;
   /** Teacher's per-student adjustment (+/−). */
   adjustment: number;
-  /** score − penalty + adjustment, between 0 and 10; null = not launched. */
+  /** base − penalty + adjustment, between 0 and 10 (base = 60% banner + 40% diary in the 3º); null = pending. */
   final: number | null;
 };
 
@@ -234,7 +238,10 @@ export function buildStudentGrades(classes: ExportInput["classes"], now: Date = 
             const score = grade ? Number(grade.score) : null;
             const penalty = penalties[b] ?? 0;
             const adjustment = adj ? Number(adj.points) : 0;
-            return { score, penalty, adjustment, final: score === null ? null : finalGrade(score, penalty, adjustment) };
+            const dg = b === 3 ? (g.diary_grades ?? []).find((x) => x.student_id === m.student_id) : undefined;
+            const diary = dg ? Number(dg.score) : null;
+            const base = bimesterBase(b, score, diary);
+            return { score, diary, penalty, adjustment, final: base === null ? null : finalGrade(base, penalty, adjustment) };
           });
           rows.push({
             name: m.profiles?.name ?? "",

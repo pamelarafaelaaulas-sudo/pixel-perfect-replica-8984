@@ -136,6 +136,10 @@ function GroupReview({
     adjustments: (group.student_grade_adjustments ?? [])
       .filter((a) => a.student_id === studentId)
       .map((a) => ({ bimester: a.bimester, points: Number(a.points), note: a.note })),
+    diaryScore: (() => {
+      const d = (group.diary_grades ?? []).find((x) => x.student_id === studentId);
+      return d ? Number(d.score) : null;
+    })(),
   });
   const contributions = project?.project_contributions ?? [];
   const groupChars = contributions.reduce((s, c) => s + c.char_count_added, 0);
@@ -237,6 +241,7 @@ function GroupReview({
           <h3 className="text-lg font-semibold">Bimestres</h3>
           <p className="mb-3 text-xs text-muted-foreground">
             Nota final = nota do grupo − desconto de atraso das etapas daquele bimestre ± seu ajuste para este aluno (de 0 a 10).
+            No 3º bimestre, a nota do grupo é 60% banner + 40% diário de bordo deste aluno.
           </p>
           <ul className="space-y-3">
             {summary.bimesters.map((t) => (
@@ -252,9 +257,16 @@ function GroupReview({
                     <Badge variant="success">Lançada</Badge>
                   )}
                 </div>
-                {t.score !== null && (
+                {t.bimester === 3 && t.score !== null && (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Banner {formatPoints(t.score)} × 60% + diário{" "}
+                    {t.diary === null ? "ainda sem nota" : `${formatPoints(t.diary)} × 40%`}
+                    {t.base !== null && ` = ${formatPoints(t.base)}`}
+                  </p>
+                )}
+                {t.base !== null && (
                   <p className="mt-2 font-mono text-sm">
-                    {formatPoints(t.score)}
+                    {formatPoints(t.base)}
                     {t.penalty > 0 && (
                       <span className="text-destructive">
                         {" "}

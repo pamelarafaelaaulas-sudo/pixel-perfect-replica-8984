@@ -62,7 +62,7 @@ describe("student grades spreadsheet", () => {
     const [block] = buildStudentGrades(withAdj, now);
     // 9 − 1.5 (3 days late × 0.5) + 1 = 8.5 for Ana; Davi keeps 7.5
     expect(block!.rows.find((r) => r.name === "Ana")!.totals[0]).toBe(8.5);
-    expect(block!.rows.find((r) => r.name === "Ana")!.details[0]).toEqual({ score: 9, penalty: 1.5, adjustment: 1, final: 8.5 });
+    expect(block!.rows.find((r) => r.name === "Ana")!.details[0]).toEqual({ score: 9, diary: null, penalty: 1.5, adjustment: 1, final: 8.5 });
     expect(block!.rows.find((r) => r.name === "Davi")!.totals[0]).toBe(7.5);
   });
 
@@ -89,5 +89,35 @@ describe("numbering spreadsheet", () => {
       [2, "BIO-9B-02"],
     ]);
     expect(rows[1]!.members).toBe("Bruno, Carla");
+  });
+});
+
+describe("3º bimestre in the grades spreadsheet", () => {
+  it("uses 60% banner + 40% each student's diary grade, pending without the diary", () => {
+    const b3: ExportInput["classes"] = [
+      {
+        id: "c3",
+        name: "9C",
+        code_label: "9C",
+        late_penalty_per_day: 0.5,
+        schedules: [],
+        groups: [
+          {
+            id: "g3",
+            group_name: "Grupo Luz",
+            group_members: [
+              { student_id: "a", profiles: { name: "Ana" } },
+              { student_id: "b", profiles: { name: "Bia" } },
+            ],
+            projects: { current_phase: 13, area_code: "FIS", code_number: 3, phase_submissions: [] },
+            grades: [{ trimester: 3, score: 8, feedback: null, is_reference_ten: false, created_at: "2026-01-01T00:00:00Z" }],
+            diary_grades: [{ student_id: "a", score: 10 }],
+          },
+        ],
+      },
+    ];
+    const [block] = buildStudentGrades(b3, new Date("2026-01-02T00:00:00Z"));
+    expect(block!.rows.find((r) => r.name === "Ana")!.totals[2]).toBe(8.8);
+    expect(block!.rows.find((r) => r.name === "Bia")!.totals[2]).toBeNull();
   });
 });

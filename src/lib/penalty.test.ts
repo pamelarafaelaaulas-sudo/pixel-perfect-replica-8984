@@ -77,3 +77,21 @@ describe("class deadlines overview", () => {
     expect(lateGroups).toBe(1);
   });
 });
+
+import { bimesterBase, finalGrade } from "./penalty";
+
+describe("3º bimestre: diário de bordo vale 40%", () => {
+  it("mixes 60% banner grade and 40% the student's diary grade", () => {
+    expect(bimesterBase(3, 8, 10)).toBe(8.8);
+    expect(bimesterBase(3, 10, 5)).toBe(8);
+  });
+  it("stays pending until the diary is graded", () => {
+    expect(bimesterBase(3, 8, null)).toBeNull();
+  });
+  it("does not change the other bimestres", () => {
+    expect(bimesterBase(1, 7, 10)).toBe(7);
+  });
+  it("applies late discount and adjustment after the mix", () => {
+    expect(finalGrade(bimesterBase(3, 8, 10)!, 1, 0.5)).toBe(8.3);
+  });
+});
