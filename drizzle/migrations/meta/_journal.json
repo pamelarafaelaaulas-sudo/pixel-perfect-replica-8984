@@ -127,6 +127,13 @@
       "when": 1793577986274,
       "tag": "0017_external_fairs_and_ethics_screening",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1793651754870,
+      "tag": "0018_logbook_and_video_trail",
+      "breakpoints": true
     }
   ]
 }

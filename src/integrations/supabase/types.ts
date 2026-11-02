@@ -262,12 +262,17 @@ export type Database = {
           code_label: string | null
           code_order: number | null
           created_at: string
+          diary_review_end: string | null
+          diary_review_start: string | null
+          diary_video_url: string | null
           ethics_form_template_url: string | null
           fair_at: string | null
           fair_name: string
+          highlighted_article_url: string | null
           id: string
           late_penalty_per_day: number
           name: string
+          references_video_url: string | null
           teacher_id: string
         }
         Insert: {
@@ -279,12 +284,17 @@ export type Database = {
           code_label?: string | null
           code_order?: number | null
           created_at?: string
+          diary_review_end?: string | null
+          diary_review_start?: string | null
+          diary_video_url?: string | null
           ethics_form_template_url?: string | null
           fair_at?: string | null
           fair_name?: string
+          highlighted_article_url?: string | null
           id?: string
           late_penalty_per_day?: number
           name: string
+          references_video_url?: string | null
           teacher_id: string
         }
         Update: {
@@ -296,18 +306,110 @@ export type Database = {
           code_label?: string | null
           code_order?: number | null
           created_at?: string
+          diary_review_end?: string | null
+          diary_review_start?: string | null
+          diary_video_url?: string | null
           ethics_form_template_url?: string | null
           fair_at?: string | null
           fair_name?: string
+          highlighted_article_url?: string | null
           id?: string
           late_penalty_per_day?: number
           name?: string
+          references_video_url?: string | null
           teacher_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "classes_teacher_id_fkey"
             columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diary_entries: {
+        Row: {
+          content: string
+          created_at: string
+          entry_date: string
+          group_id: string
+          id: string
+          kind: string
+          student_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          entry_date?: string
+          group_id: string
+          id?: string
+          kind?: string
+          student_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          entry_date?: string
+          group_id?: string
+          id?: string
+          kind?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diary_entries_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diary_entries_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diary_grades: {
+        Row: {
+          feedback: string | null
+          group_id: string
+          id: string
+          score: number
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          feedback?: string | null
+          group_id: string
+          id?: string
+          score: number
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          feedback?: string | null
+          group_id?: string
+          id?: string
+          score?: number
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diary_grades_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diary_grades_student_id_fkey"
+            columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -602,6 +704,8 @@ export type Database = {
           code_number: number | null
           conclusion: string | null
           current_phase: number
+          diary_video_watched_at: string | null
+          diary_video_watched_by: string | null
           ethics_collection: string[]
           ethics_form_url: string | null
           ethics_human_research: boolean | null
@@ -636,6 +740,8 @@ export type Database = {
           code_number?: number | null
           conclusion?: string | null
           current_phase?: number
+          diary_video_watched_at?: string | null
+          diary_video_watched_by?: string | null
           ethics_collection?: string[]
           ethics_form_url?: string | null
           ethics_human_research?: boolean | null
@@ -670,6 +776,8 @@ export type Database = {
           code_number?: number | null
           conclusion?: string | null
           current_phase?: number
+          diary_video_watched_at?: string | null
+          diary_video_watched_by?: string | null
           ethics_collection?: string[]
           ethics_form_url?: string | null
           ethics_human_research?: boolean | null

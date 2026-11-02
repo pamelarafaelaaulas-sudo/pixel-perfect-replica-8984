@@ -15,6 +15,7 @@ import { TeacherInvitesDialog } from "@/components/teacher-invites";
 import { normalizeClassLabel } from "@/lib/project-code";
 import { FairCountdown } from "@/components/fair-countdown";
 import { EthicsFormTemplateDialog } from "@/components/ethics-form-template";
+import { TrailSettingsDialog } from "@/components/trail-settings";
 
 export const Route = createFileRoute("/_authenticated/professora/")({
   head: () => ({
@@ -75,6 +76,7 @@ function TeacherHome() {
               </Link>
             </Button>
             {me && <EthicsFormTemplateDialog teacherId={me.id} classes={classes} />}
+            {me && <TrailSettingsDialog teacherId={me.id} classes={classes} />}
             <TeacherInvitesDialog />
             <NewClassDialog />
           </div>
