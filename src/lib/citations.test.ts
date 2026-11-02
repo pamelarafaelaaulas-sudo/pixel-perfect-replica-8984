@@ -4,6 +4,7 @@ import { phaseProblems } from "./phase-rules";
 
 const words = (n: number) => Array.from({ length: n }, (_, i) => `palavra${i}`).join(" ");
 
+const notMin = (p: string) => !p.includes("o mínimo é 5");
 describe("ABNT citations", () => {
   it.each([
     "A água fica contaminada (Silva, 2020).",
@@ -38,7 +39,7 @@ describe("citation rule for Introdução and Resultados e discussão", () => {
   });
 
   it("lets the introduction through with a correct citation", () => {
-    expect(phaseProblems(8, { introduction: `${words(300)} (Silva, 2020).` }, 0)).toEqual([]);
+    expect(phaseProblems(8, { introduction: `${words(300)} (Silva, 2020) (Souza, 2019) (Lima, 2018) (Costa, 2021) (Rocha, 2022).` }, 0)).toEqual([]);
   });
 
   it("blocks results with a citation written outside the norm", () => {
@@ -63,23 +64,23 @@ describe("Referências must contain every work cited in Introdução and Resulta
   const values = { introduction: intro, results_discussion: results };
 
   it("lets the references through when every cited work is listed", () => {
-    expect(phaseProblems(11, { ...values, references_list: fullRefs }, 0)).toEqual([]);
+    expect(phaseProblems(11, { ...values, references_list: fullRefs }, 0).filter(notMin)).toEqual([]);
   });
 
   it("blocks the references when a cited work is missing, naming it", () => {
     const refs = fullRefs.split("\n").filter((l) => !l.startsWith("PELLIS")).join("\n");
-    const problems = phaseProblems(11, { ...values, references_list: refs }, 0);
+    const problems = phaseProblems(11, { ...values, references_list: refs }, 0).filter(notMin);
     expect(problems).toEqual(["Falta nas Referências: (Pellis et al., 2018), citado em Resultados e discussão."]);
   });
 
   it("treats a listed author with the wrong year as missing", () => {
     const refs = fullRefs.replace("Editora, 2020", "Editora, 2019");
-    expect(phaseProblems(11, { ...values, references_list: refs }, 0)).toHaveLength(1);
+    expect(phaseProblems(11, { ...values, references_list: refs }, 0).filter(notMin)).toHaveLength(1);
   });
 
   it("asks once for a work cited in both parts", () => {
     const refs = fullRefs.split("\n").filter((l) => !l.startsWith("SILVA")).join("\n");
-    expect(phaseProblems(11, { ...values, references_list: refs }, 0)).toEqual([
+    expect(phaseProblems(11, { ...values, references_list: refs }, 0).filter(notMin)).toEqual([
       "Falta nas Referências: Silva (2020), citado em Introdução.",
     ]);
   });

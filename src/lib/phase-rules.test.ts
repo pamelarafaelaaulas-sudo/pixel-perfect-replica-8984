@@ -80,9 +80,9 @@ describe("delivery rules", () => {
   });
 
   it("requires 250–500 words in the introduction", () => {
-    const cite = " (Silva, 2020)."; // 2 words
-    expect(phaseProblems(8, { introduction: words(499) + cite }, 0)).toHaveLength(1);
-    expect(phaseProblems(8, { introduction: words(498) + cite }, 0)).toEqual([]);
+    const cite = " (Silva, 2020) (Souza, 2019) (Lima, 2018) (Costa, 2021) (Rocha, 2022)."; // 10 words
+    expect(phaseProblems(8, { introduction: words(491) + cite }, 0)).toHaveLength(1);
+    expect(phaseProblems(8, { introduction: words(490) + cite }, 0)).toEqual([]);
   });
 
   it("limits the conclusion to 150 words", () => {
@@ -99,5 +99,20 @@ describe("delivery rules", () => {
 
   it("finds keywords repeated in the title ignoring accents and case", () => {
     expect(keywordsInTitle(["Oleo", "solo"], "Descarte de óleo")).toEqual(["Oleo"]);
+  });
+});
+
+describe("minimum citations and references", () => {
+  const words = (n: number) => Array(n).fill("palavra").join(" ");
+  it("introduction needs 5 distinct works; repeats count once", () => {
+    const four = `${words(260)} (Silva, 2020) (Silva, 2020) (Souza, 2019) (Lima, 2018) (Costa, 2021).`;
+    expect(phaseProblems(8, { introduction: four }, 0).some((p) => p.includes("o mínimo é 5"))).toBe(true);
+    const five = `${four} (Rocha, 2022).`;
+    expect(phaseProblems(8, { introduction: five }, 0).some((p) => p.includes("o mínimo é 5"))).toBe(false);
+  });
+  it("references need at least 5 lines", () => {
+    const four = "SILVA, A. X. 2020.\nSOUZA, B. Y. 2019.\nLIMA, C. 2018.\nCOSTA, D. 2021.";
+    expect(phaseProblems(11, { references_list: four }, 0).some((p) => p.includes("mínimo é 5"))).toBe(true);
+    expect(phaseProblems(11, { references_list: four + "\nROCHA, E. 2022." }, 0).some((p) => p.includes("mínimo é 5"))).toBe(false);
   });
 });
