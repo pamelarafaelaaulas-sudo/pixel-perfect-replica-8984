@@ -135,7 +135,7 @@ export const PHASE_FORM: Record<number, FormField[]> = {
     },
     {
       key: "social_application",
-      label: "Aplicação ou intervenção social",
+      label: "Aplicação ou intervenção social (obrigatória)",
       rows: 4,
       placeholder: "Ex.: Criar pontos de coleta de óleo na escola e uma campanha com os moradores do bairro.",
     },
