@@ -37,6 +37,9 @@ async function openDoc(path: string) {
 }
 
 async function downloadTemplate(key: string) {
+  // Prefer the model the teacher uploaded; fall back to the built-in Word text.
+  const { data: own } = await supabase.from("fair_doc_templates").select("file_path").eq("doc_type", key).limit(1).maybeSingle();
+  if (own?.file_path) { await openDoc(own.file_path); return; }
   const doc = FAIR_DOCS.find((d) => d.key === key)!;
   const { buildEthicsDocx } = await import("@/lib/ethics-docx");
   const blob = await buildEthicsDocx(doc.template);
@@ -45,6 +48,78 @@ async function downloadTemplate(key: string) {
   a.download = `${doc.label.replace(/[^\wÀ-ú]+/g, "_")}.docx`;
   a.click();
   URL.revokeObjectURL(a.href);
+}
+
+/** Teacher: upload her own model file for each accreditation document (used by all her groups). */
+export function FairTemplatesManager() {
+  const qc = useQueryClient();
+  const inputs = useRef<Record<string, HTMLInputElement | null>>({});
+  const [busy, setBusy] = useState<string | null>(null);
+  const { data: rows = [] } = useQuery({
+    queryKey: ["fair-templates"],
+    queryFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
+      const { data, error } = await supabase.from("fair_doc_templates").select("*").eq("teacher_id", u.user?.id ?? "");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  async function upload(key: string, file: File) {
+    if (file.size > 15 * 1024 * 1024) { toast.error("Arquivo maior que 15 MB."); return; }
+    setBusy(key);
+    const { data: u } = await supabase.auth.getUser();
+    const uid = u.user?.id;
+    if (!uid) { setBusy(null); return; }
+    const path = `templates/${uid}/${key}-${Date.now()}-${safeFileName(file.name)}`;
+    const up = await supabase.storage.from(BUCKET).upload(path, file, { upsert: true });
+    if (up.error) { setBusy(null); toast.error("Falha no envio do modelo."); return; }
+    const { error } = await supabase.from("fair_doc_templates").upsert({ teacher_id: uid, doc_type: key, file_path: path, file_name: file.name, uploaded_at: new Date().toISOString() });
+    setBusy(null);
+    if (error) { toast.error("Não foi possível salvar o modelo."); return; }
+    toast.success("Modelo salvo. Os grupos aprovados já baixam este arquivo.");
+    qc.invalidateQueries({ queryKey: ["fair-templates"] });
+  }
+  async function remove(key: string) {
+    const row = rows.find((r) => r.doc_type === key);
+    if (!row) return;
+    await supabase.storage.from(BUCKET).remove([row.file_path]);
+    await supabase.from("fair_doc_templates").delete().eq("teacher_id", row.teacher_id).eq("doc_type", key);
+    toast.success("Modelo removido. Volta a valer o modelo padrão do PamLab.");
+    qc.invalidateQueries({ queryKey: ["fair-templates"] });
+  }
+  return (
+    <div className="card-paper space-y-3 p-5">
+      <h3 className="text-lg font-semibold">Modelos dos documentos da feira</h3>
+      <p className="text-sm text-muted-foreground">Envie seus próprios modelos (Word, PDF ou imagem). Os grupos aprovados baixam o seu arquivo; sem modelo enviado, usam o padrão do PamLab.</p>
+      <ul className="space-y-2">
+        {FAIR_DOCS.map((d) => {
+          const row = rows.find((r) => r.doc_type === d.key);
+          return (
+            <li key={d.key} className="flex flex-wrap items-center justify-between gap-2 rounded-md border p-3">
+              <div>
+                <p className="text-sm font-medium">{d.label}</p>
+                <p className="text-xs text-muted-foreground">{row ? `Seu modelo: ${row.file_name}` : "Usando o modelo padrão do PamLab"}</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="ghost" onClick={() => (row ? openDoc(row.file_path) : downloadTemplate(d.key))}><Download /> Ver</Button>
+                <input
+                  ref={(el) => { inputs.current[d.key] = el; }}
+                  type="file"
+                  accept=".doc,.docx,.pdf,.odt,image/png,image/jpeg"
+                  className="hidden"
+                  onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(d.key, f); e.target.value = ""; }}
+                />
+                <Button size="sm" onClick={() => inputs.current[d.key]?.click()} disabled={busy === d.key}>
+                  {busy === d.key ? <Loader2 className="animate-spin" /> : <FileUp />} {row ? "Trocar modelo" : "Enviar meu modelo"}
+                </Button>
+                {row && <Button size="sm" variant="outline" onClick={() => remove(d.key)}><RotateCcw /> Usar padrão</Button>}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
 }
 
 const toLocalInput = (iso: string | null | undefined) => {

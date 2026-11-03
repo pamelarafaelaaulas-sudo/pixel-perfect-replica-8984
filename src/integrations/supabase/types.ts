@@ -454,6 +454,30 @@ export type Database = {
           },
         ]
       }
+      fair_doc_templates: {
+        Row: {
+          doc_type: string
+          file_name: string
+          file_path: string
+          teacher_id: string
+          uploaded_at: string
+        }
+        Insert: {
+          doc_type: string
+          file_name: string
+          file_path: string
+          teacher_id: string
+          uploaded_at?: string
+        }
+        Update: {
+          doc_type?: string
+          file_name?: string
+          file_path?: string
+          teacher_id?: string
+          uploaded_at?: string
+        }
+        Relationships: []
+      }
       fair_documents: {
         Row: {
           doc_type: string
