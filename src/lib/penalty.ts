@@ -61,9 +61,9 @@ export type PhaseInfo = {
   submittedAt: string | null;
   state: PhaseState;
   daysLate: number;
-  /** Includes the late banner resubmission (stage 13 only) so every bimestre total agrees. */
+  /** Includes late new versions sent after the teacher's feedback (banner or written stage) so every bimestre total agrees. */
   penalty: number;
-  /** Banner only: lateness of the new versions sent after the teacher's feedback. */
+  /** Lateness of the new versions sent after the teacher's feedback (banner and written stages). */
   resubmit?: ResubmitLateness;
 };
 
