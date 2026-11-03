@@ -78,6 +78,76 @@ export type Database = {
           },
         ]
       }
+      banner_comparisons: {
+        Row: {
+          addressed: Json
+          change_percent: number
+          changed: Json
+          created_at: string
+          group_id: string
+          id: string
+          pending: Json
+          project_id: string
+          requested_by: string | null
+          response_matches: boolean | null
+          response_note: string
+          review_id: string
+          summary: string
+        }
+        Insert: {
+          addressed?: Json
+          change_percent?: number
+          changed?: Json
+          created_at?: string
+          group_id: string
+          id?: string
+          pending?: Json
+          project_id: string
+          requested_by?: string | null
+          response_matches?: boolean | null
+          response_note?: string
+          review_id: string
+          summary?: string
+        }
+        Update: {
+          addressed?: Json
+          change_percent?: number
+          changed?: Json
+          created_at?: string
+          group_id?: string
+          id?: string
+          pending?: Json
+          project_id?: string
+          requested_by?: string | null
+          response_matches?: boolean | null
+          response_note?: string
+          review_id?: string
+          summary?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "banner_comparisons_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banner_comparisons_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banner_comparisons_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: true
+            referencedRelation: "banner_reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       banner_diagnoses: {
         Row: {
           axes: Json
@@ -194,6 +264,7 @@ export type Database = {
           reviewed_file_name: string | null
           reviewed_file_path: string | null
           round: number
+          student_response: string | null
           teacher_id: string | null
           updated_at: string
         }
@@ -213,6 +284,7 @@ export type Database = {
           reviewed_file_name?: string | null
           reviewed_file_path?: string | null
           round?: number
+          student_response?: string | null
           teacher_id?: string | null
           updated_at?: string
         }
@@ -232,6 +304,7 @@ export type Database = {
           reviewed_file_name?: string | null
           reviewed_file_path?: string | null
           round?: number
+          student_response?: string | null
           teacher_id?: string | null
           updated_at?: string
         }
@@ -1339,15 +1412,26 @@ export type Database = {
             Args: { _area_codes: string[]; _class_ids: string[] }
             Returns: number
           }
-      resubmit_banner: {
-        Args: {
-          _hash: string
-          _name: string
-          _path: string
-          _review_id: string
-        }
-        Returns: string
-      }
+      resubmit_banner:
+        | {
+            Args: {
+              _hash: string
+              _name: string
+              _path: string
+              _review_id: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              _hash: string
+              _name: string
+              _path: string
+              _response: string
+              _review_id: string
+            }
+            Returns: string
+          }
       shares_group_with: { Args: { _other: string }; Returns: boolean }
       submit_phase: { Args: { _project_id: string }; Returns: number }
       teaches_class: { Args: { _class_id: string }; Returns: boolean }
