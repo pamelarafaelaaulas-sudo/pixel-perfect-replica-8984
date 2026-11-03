@@ -176,6 +176,13 @@
       "when": 1793673654645,
       "tag": "0024_banner_v2_response_and_comparison",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1793675090094,
+      "tag": "0025_written_reviews_v2",
+      "breakpoints": true
     }
   ]
 }

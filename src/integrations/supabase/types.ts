@@ -1299,6 +1299,151 @@ export type Database = {
         }
         Relationships: []
       }
+      written_comparisons: {
+        Row: {
+          addressed: Json
+          change_percent: number
+          changed: Json
+          created_at: string
+          group_id: string
+          id: string
+          improvement_score: number
+          pending: Json
+          phase_number: number
+          project_id: string
+          requested_by: string | null
+          response_matches: boolean | null
+          response_note: string
+          review_id: string
+          summary: string
+        }
+        Insert: {
+          addressed?: Json
+          change_percent?: number
+          changed?: Json
+          created_at?: string
+          group_id: string
+          id?: string
+          improvement_score?: number
+          pending?: Json
+          phase_number: number
+          project_id: string
+          requested_by?: string | null
+          response_matches?: boolean | null
+          response_note?: string
+          review_id: string
+          summary?: string
+        }
+        Update: {
+          addressed?: Json
+          change_percent?: number
+          changed?: Json
+          created_at?: string
+          group_id?: string
+          id?: string
+          improvement_score?: number
+          pending?: Json
+          phase_number?: number
+          project_id?: string
+          requested_by?: string | null
+          response_matches?: boolean | null
+          response_note?: string
+          review_id?: string
+          summary?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "written_comparisons_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "written_comparisons_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "written_comparisons_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: true
+            referencedRelation: "written_reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      written_reviews: {
+        Row: {
+          created_at: string
+          group_id: string
+          id: string
+          notes: string
+          phase_number: number
+          project_id: string
+          resubmit_due_at: string
+          resubmitted_at: string | null
+          resubmitted_by: string | null
+          resubmitted_text: string | null
+          reviewed_text: string
+          round: number
+          student_response: string | null
+          teacher_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          id?: string
+          notes?: string
+          phase_number: number
+          project_id: string
+          resubmit_due_at: string
+          resubmitted_at?: string | null
+          resubmitted_by?: string | null
+          resubmitted_text?: string | null
+          reviewed_text?: string
+          round?: number
+          student_response?: string | null
+          teacher_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          id?: string
+          notes?: string
+          phase_number?: number
+          project_id?: string
+          resubmit_due_at?: string
+          resubmitted_at?: string | null
+          resubmitted_by?: string | null
+          resubmitted_text?: string | null
+          reviewed_text?: string
+          round?: number
+          student_response?: string | null
+          teacher_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "written_reviews_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "written_reviews_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1386,6 +1531,7 @@ export type Database = {
           member_count: number
         }[]
       }
+      normalized_text: { Args: { _t: string }; Returns: string }
       phase_rule_problem: {
         Args: {
           _p: Database["public"]["Tables"]["projects"]["Row"]
@@ -1432,12 +1578,23 @@ export type Database = {
             }
             Returns: string
           }
+      resubmit_written: {
+        Args: { _response: string; _review_id: string }
+        Returns: string
+      }
       shares_group_with: { Args: { _other: string }; Returns: boolean }
       submit_phase: { Args: { _project_id: string }; Returns: number }
       teaches_class: { Args: { _class_id: string }; Returns: boolean }
       teaches_group: { Args: { _group_id: string }; Returns: boolean }
       teaches_student: { Args: { _student_id: string }; Returns: boolean }
       word_count: { Args: { _t: string }; Returns: number }
+      written_phase_text: {
+        Args: {
+          _p: Database["public"]["Tables"]["projects"]["Row"]
+          _phase: number
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "teacher" | "student"
