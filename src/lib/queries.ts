@@ -504,3 +504,29 @@ export const bannerRoundsQuery = (projectId: string) =>
     },
     refetchInterval: 20_000,
   });
+
+/** Teacher: AI comparison and improvement grade of each written-stage feedback round. */
+export const writtenComparisonsQuery = (groupId: string) =>
+  queryOptions({
+    queryKey: ["written", "comparisons", groupId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("written_comparisons").select("*").eq("group_id", groupId);
+      fail(error);
+      return data ?? [];
+    },
+  });
+
+/** Student: light poll so written-stage feedback the teacher just sent shows up without reloading. */
+export const writtenRoundsQuery = (projectId: string) =>
+  queryOptions({
+    queryKey: ["written", "rounds", projectId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("written_reviews")
+        .select("id, resubmitted_at, updated_at")
+        .eq("project_id", projectId);
+      fail(error);
+      return (data ?? []).map((r) => `${r.id}:${r.resubmitted_at ?? ""}:${r.updated_at}`).sort().join("|");
+    },
+    refetchInterval: 20_000,
+  });
