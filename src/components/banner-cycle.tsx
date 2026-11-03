@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CalendarClock, CheckCircle2, FileUp, Loader2, PenLine, Send, Trash2 } from "lucide-react";
+import { CalendarClock, CheckCircle2, FileUp, GitCompare, Loader2, PenLine, RefreshCw, Send, Sparkles, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
@@ -383,6 +383,81 @@ function ReviewForm({
   );
 }
 
+type Comparison = Database["public"]["Tables"]["banner_comparisons"]["Row"];
+const asList = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string" && !!x.trim()) : []);
+
+function ComparisonList({ title, items, tone }: { title: string; items: string[]; tone: "neutral" | "success" | "warning" }) {
+  if (items.length === 0) return null;
+  const style = tone === "success" ? "border-success/40 bg-success/10" : tone === "warning" ? "border-warning/50 bg-warning/10" : "border-border bg-muted/40";
+  return (
+    <div className={`rounded-md border p-3 ${style}`}>
+      <p className="text-sm font-semibold text-foreground">{title}</p>
+      <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-foreground">
+        {items.map((x, i) => (
+          <li key={i}>{x}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** Teacher: AI side-by-side of version N and N+1 for one answered feedback round. */
+function BannerComparisonBlock({ groupId, review, comparison }: { groupId: string; review: Review; comparison: Comparison | undefined }) {
+  const qc = useQueryClient();
+  const fn = useServerFn(compareBannerVersions);
+  const run = useMutation({
+    mutationFn: () => fn({ data: { reviewId: review.id } }),
+    onSuccess: () => {
+      toast.success("Comparação pronta");
+      qc.invalidateQueries({ queryKey: ["banner", "comparisons", groupId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const v1 = review.round;
+  const v2 = review.round + 1;
+  return (
+    <div className="space-y-3 border-t border-border pt-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="flex items-center gap-2 font-medium text-foreground">
+          <GitCompare className="size-4 text-primary" /> Comparação da IA: versão {v1} × versão {v2}
+        </p>
+        <Button size="sm" variant="secondary" onClick={() => run.mutate()} disabled={run.isPending}>
+          {run.isPending ? <Loader2 className="animate-spin" /> : comparison ? <RefreshCw /> : <Sparkles />}{" "}
+          {comparison ? "Refazer comparação" : "Comparar as versões"}
+        </Button>
+      </div>
+      {run.isPending && (
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="size-4 animate-spin" /> A IA está lendo as duas versões. Leva cerca de 1 minuto.
+        </p>
+      )}
+      {comparison ? (
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant={comparison.change_percent < 10 ? "destructive" : "secondary"}>
+              Mudou cerca de {comparison.change_percent}%
+            </Badge>
+            {comparison.response_matches === false && <Badge variant="warning">A resposta do grupo não bate com o banner</Badge>}
+            {comparison.response_matches === true && <Badge variant="success">A resposta do grupo bate com o banner</Badge>}
+            <span className="text-xs text-muted-foreground">{fmtDateTime(comparison.created_at)}</span>
+          </div>
+          {comparison.summary && <p className="text-sm text-foreground">{comparison.summary}</p>}
+          <ComparisonList title="O que mudou" items={asList(comparison.changed)} tone="neutral" />
+          <ComparisonList title="O que foi atendido da sua devolutiva" items={asList(comparison.addressed)} tone="success" />
+          <ComparisonList title="O que ainda precisa de atenção" items={asList(comparison.pending)} tone="warning" />
+          {comparison.response_note && <p className="text-sm italic text-muted-foreground">{comparison.response_note}</p>}
+        </div>
+      ) : (
+        !run.isPending && (
+          <p className="text-sm italic text-muted-foreground">
+            Ainda sem comparação. Ela é feita sozinha quando o grupo envia a nova versão; se não aparecer, clique em "Comparar as versões".
+          </p>
+        )
+      )}
+    </div>
+  );
+}
+
 /** Teacher side: AI diagnosis with suggested grade, grade validation and the V1 → V2 feedback rounds. */
 export function TeacherBannerPanel({
   groupId,
@@ -399,6 +474,7 @@ export function TeacherBannerPanel({
 }) {
   const qc = useQueryClient();
   const diagnoses = useQuery(bannerDiagnosesQuery(groupId));
+  const comparisons = useQuery(bannerComparisonsQuery(groupId));
   const reviews = [...(project.banner_reviews ?? [])].sort(byRoundDesc);
   const open = reviews.find((r) => !r.resubmitted_at) ?? null;
   const [editing, setEditing] = useState(false);
@@ -560,6 +636,13 @@ export function TeacherBannerPanel({
                 )}
                 {!r.resubmitted_at && editing && (
                   <ReviewForm groupId={groupId} project={project} existing={r} onDone={() => setEditing(false)} />
+                )}
+                {r.resubmitted_at && (
+                  <BannerComparisonBlock
+                    groupId={groupId}
+                    review={r}
+                    comparison={comparisons.data?.find((c) => c.review_id === r.id)}
+                  />
                 )}
               </ReviewCard>
             ))}
