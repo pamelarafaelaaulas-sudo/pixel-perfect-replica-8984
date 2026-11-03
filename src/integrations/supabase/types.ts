@@ -419,6 +419,85 @@ export type Database = {
           },
         ]
       }
+      fair_approvals: {
+        Row: {
+          decided_at: string
+          docs_due_at: string | null
+          group_id: string
+          note: string | null
+          status: string
+          teacher_id: string | null
+        }
+        Insert: {
+          decided_at?: string
+          docs_due_at?: string | null
+          group_id: string
+          note?: string | null
+          status?: string
+          teacher_id?: string | null
+        }
+        Update: {
+          decided_at?: string
+          docs_due_at?: string | null
+          group_id?: string
+          note?: string | null
+          status?: string
+          teacher_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fair_approvals_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: true
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fair_documents: {
+        Row: {
+          doc_type: string
+          file_name: string
+          file_path: string
+          group_id: string
+          id: string
+          status: string
+          teacher_note: string | null
+          uploaded_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          doc_type: string
+          file_name: string
+          file_path: string
+          group_id: string
+          id?: string
+          status?: string
+          teacher_note?: string | null
+          uploaded_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          doc_type?: string
+          file_name?: string
+          file_path?: string
+          group_id?: string
+          id?: string
+          status?: string
+          teacher_note?: string | null
+          uploaded_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fair_documents_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       grades: {
         Row: {
           created_at: string
@@ -1149,6 +1228,7 @@ export type Database = {
         }
         Returns: string
       }
+      fair_approved: { Args: { _group_id: string }; Returns: boolean }
       find_class: {
         Args: { _code: string }
         Returns: {
