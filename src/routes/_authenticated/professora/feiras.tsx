@@ -10,6 +10,7 @@ import { teacherExternalFairsQuery } from "@/lib/queries";
 import { EXTERNAL_FAIRS } from "@/lib/ethics";
 import { ETHICS_STATUS_LABEL, externalFairRows, type EthicsStatus } from "@/lib/external-fairs-list";
 import { downloadBlob } from "@/lib/export-xlsx";
+import { FairTemplatesManager } from "@/components/fair-accreditation";
 
 export const Route = createFileRoute("/_authenticated/professora/feiras")({
   head: () => ({
@@ -86,6 +87,8 @@ function FairsPage() {
         title="Feiras externas"
         description="Todos os grupos das suas turmas que querem participar da FETEC/MS ou da FECINTEC."
       />
+      <FairTemplatesManager />
+
       <div className="flex flex-wrap items-center gap-2">
         {["all", ...EXTERNAL_FAIRS].map((f) => (
           <Button key={f} size="sm" variant={fair === f ? "default" : "outline"} onClick={() => setFair(f)}>
