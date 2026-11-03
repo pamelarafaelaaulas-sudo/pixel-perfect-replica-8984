@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { PhaseTimeline } from "@/components/phase-timeline";
 import { AiFeedback } from "@/components/ai-feedback";
+import { useServerFn } from "@tanstack/react-start";
+import { getPhaseEvaluation } from "@/lib/ai-feedback.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -158,11 +160,20 @@ function StudentProjectPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["group", groupId] }),
   });
 
+  const evaluate = useServerFn(getPhaseEvaluation);
   const submitMutation = useMutation({
     mutationFn: async () => {
       if (changedFields.length) await saveMutation.mutateAsync();
       const { error } = await supabase.rpc("submit_phase", { _project_id: project!.id });
       if (error) throw error;
+      // Every delivered written stage gets an AI evaluation for the teacher, even if the group never asked.
+      const phase = selected;
+      const text = draft ? phaseText(draft, phase).trim() : "";
+      if (phase !== BANNER_PHASE && text.length >= 20) {
+        evaluate({ data: { projectId: project!.id, phaseNumber: phase, text: text.slice(0, 30000) } })
+          .then(() => qc.invalidateQueries({ queryKey: ["ai", "group", groupId] }))
+          .catch((e) => console.warn("Automatic AI evaluation failed", e));
+      }
     },
     onSuccess: () => {
       toast.success("Etapa entregue para a professora!");
