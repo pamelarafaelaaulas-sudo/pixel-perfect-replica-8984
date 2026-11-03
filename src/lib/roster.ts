@@ -25,7 +25,7 @@ type RosterClass = {
         id: string;
         group_name: string;
         group_members: { student_id: string; profiles: { name: string; email: string } | null }[] | null;
-        projects: { current_phase: number; phase_submissions: { phase_number: number; submitted_at: string }[] | null; banner_reviews?: { resubmit_due_at: string; resubmitted_at: string | null }[] | null } | null;
+        projects: { current_phase: number; phase_submissions: { phase_number: number; submitted_at: string }[] | null; banner_reviews?: { resubmit_due_at: string; resubmitted_at: string | null }[] | null; written_reviews?: { phase_number: number; resubmit_due_at: string; resubmitted_at: string | null }[] | null } | null;
       }[]
     | null;
 };

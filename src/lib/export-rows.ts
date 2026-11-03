@@ -12,7 +12,8 @@ type InputGroup = {
     area_code?: string | null;
     code_number?: number | null;
     phase_submissions: { phase_number: number; submitted_at: string }[] | null;
-    banner_reviews?: { resubmit_due_at: string; resubmitted_at: string | null }[] | null; written_reviews?: { phase_number: number; resubmit_due_at: string; resubmitted_at: string | null }[] | null;
+    banner_reviews?: { resubmit_due_at: string; resubmitted_at: string | null }[] | null;
+    written_reviews?: { phase_number: number; resubmit_due_at: string; resubmitted_at: string | null }[] | null;
   } | null;
   /** `trimester` holds the bimestre number (database column name). */
   grades:
