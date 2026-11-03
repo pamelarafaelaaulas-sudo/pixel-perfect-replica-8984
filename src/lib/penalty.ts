@@ -106,6 +106,8 @@ export function projectLateness(args: {
   perDay: number;
   /** Teacher feedback rounds on the banner (V1 → V2); their late resubmission counts on the banner stage. */
   bannerReviews?: ReviewRound[] | null;
+  /** Teacher feedback rounds on written stages; a late new version counts on its own stage (and bimestre). */
+  writtenReviews?: (ReviewRound & { phase_number: number })[] | null;
   now?: Date;
 }): { phases: PhaseInfo[]; totalPenalty: number } {
   const now = args.now ?? new Date();
@@ -119,8 +121,10 @@ export function projectLateness(args: {
     else state = "skipped";
     const days = !due || state === "skipped" ? 0 : daysLate(due, sub, now);
     const info: PhaseInfo = { phase, dueDate: due, submittedAt: sub, state, daysLate: days, penalty: phasePenalty(days, args.perDay) };
-    if (phase === BANNER_PHASE && args.bannerReviews?.length) {
-      info.resubmit = resubmitLateness(args.bannerReviews, args.perDay, now);
+    const rounds =
+      phase === BANNER_PHASE ? args.bannerReviews : args.writtenReviews?.filter((r) => r.phase_number === phase);
+    if (rounds?.length) {
+      info.resubmit = resubmitLateness(rounds, args.perDay, now);
       info.penalty = Math.round((info.penalty + info.resubmit.penalty) * 100) / 100;
     }
     return info;
