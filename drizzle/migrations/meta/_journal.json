@@ -169,6 +169,13 @@
       "when": 1793672545449,
       "tag": "0023_fair_doc_templates",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1793673654645,
+      "tag": "0024_banner_v2_response_and_comparison",
+      "breakpoints": true
     }
   ]
 }

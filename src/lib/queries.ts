@@ -475,3 +475,32 @@ export const whatsappRemindersQuery = queryOptions({
     };
   },
 });
+
+/** Teacher: AI comparison of each feedback round (V1 × V2). */
+export const bannerComparisonsQuery = (groupId: string) =>
+  queryOptions({
+    queryKey: ["banner", "comparisons", groupId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("banner_comparisons")
+        .select("*")
+        .eq("group_id", groupId);
+      fail(error);
+      return data ?? [];
+    },
+  });
+
+/** Student: light poll so a feedback round the teacher just sent shows up without reloading. */
+export const bannerRoundsQuery = (projectId: string) =>
+  queryOptions({
+    queryKey: ["banner", "rounds", projectId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("banner_reviews")
+        .select("id, resubmitted_at, updated_at")
+        .eq("project_id", projectId);
+      fail(error);
+      return (data ?? []).map((r) => `${r.id}:${r.resubmitted_at ?? ""}:${r.updated_at}`).sort().join("|");
+    },
+    refetchInterval: 20_000,
+  });

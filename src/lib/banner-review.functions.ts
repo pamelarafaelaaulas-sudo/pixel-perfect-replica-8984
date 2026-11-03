@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { generateBannerDiagnosis } from "./banner-review.server";
+import { generateBannerComparison, generateBannerDiagnosis } from "./banner-review.server";
 import { SEVERITY_LABEL, parseBannerFeedback } from "./banner-review";
 import { projectCode } from "./project-code";
 
@@ -124,4 +124,66 @@ export const diagnoseBanner = createServerFn({ method: "POST" })
       throw new Error("O diagnóstico foi gerado, mas não foi salvo. Tente de novo.");
     }
     return { version };
+  });
+
+/**
+ * AI comparison of the reviewed version and the group's new version for one feedback round.
+ * The group triggers it right after resubmitting and the teacher can redo it; only the teacher reads the result.
+ */
+export const compareBannerVersions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ reviewId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase;
+    const { data: review, error } = await sb.from("banner_reviews").select("*").eq("id", data.reviewId).maybeSingle();
+    if (error || !review) throw new Error("Devolutiva não encontrada.");
+    const [{ data: isMember }, { data: isTeacher }] = await Promise.all([
+      sb.rpc("is_group_member", { _group_id: review.group_id }),
+      sb.rpc("teaches_group", { _group_id: review.group_id }),
+    ]);
+    if (!isMember && !isTeacher) throw new Error("Só o grupo e a professora podem pedir a comparação.");
+    if (!review.resubmitted_file_path) throw new Error("O grupo ainda não enviou a nova versão.");
+    if (!review.reviewed_file_path) throw new Error("Não há a versão anterior para comparar.");
+
+    const load = async (path: string, name: string | null) => {
+      const f = await sb.storage.from("banners").download(path);
+      if (f.error || !f.data) throw new Error("Não foi possível abrir um dos arquivos do banner.");
+      const fileName = name ?? "banner";
+      const mediaType = mediaTypeOf(fileName, f.data.type);
+      if (!mediaType) throw new Error("A IA compara banners em PDF, PNG ou JPG.");
+      return { data: new Uint8Array(await f.data.arrayBuffer()), mediaType, fileName };
+    };
+    const [before, after] = await Promise.all([
+      load(review.reviewed_file_path, review.reviewed_file_name),
+      load(review.resubmitted_file_path, review.resubmitted_file_name),
+    ]);
+    if (before.data.byteLength + after.data.byteLength > MAX_AI_BYTES)
+      throw new Error("Os dois arquivos juntos passam de 20 MB, grande demais para a IA. Exporte em PDF padrão ou PNG menor.");
+
+    const cmp = await generateBannerComparison({
+      before,
+      after,
+      teacherNotes: review.notes ?? "",
+      studentResponse: review.student_response ?? "",
+      round: review.round,
+    });
+
+    // Caller verified as member/teacher above; students have no write (or read) access to comparisons.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error: saveError } = await supabaseAdmin.from("banner_comparisons").upsert(
+      {
+        review_id: review.id,
+        group_id: review.group_id,
+        project_id: review.project_id,
+        requested_by: context.userId,
+        created_at: new Date().toISOString(),
+        ...cmp,
+      },
+      { onConflict: "review_id" },
+    );
+    if (saveError) {
+      console.error("Failed to save banner comparison", saveError);
+      throw new Error("A comparação foi feita, mas não foi salva. Tente de novo.");
+    }
+    return { ok: true };
   });

@@ -1,7 +1,7 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CalendarClock, CheckCircle2, FileUp, Loader2, PenLine, Send, Trash2 } from "lucide-react";
+import { CalendarClock, CheckCircle2, FileUp, GitCompare, Loader2, PenLine, RefreshCw, Send, Sparkles, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
@@ -22,11 +22,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { BUCKET, BannerFileLink, bannerFileProblem, safeFileName } from "@/components/banner-stage";
-import { BannerChecklist, type ChecklistState } from "@/components/banner-checklist";
 import { DiagnoseButton, DiagnosisRunning, DiagnosisView, useDiagnoseBanner } from "@/components/banner-diagnosis";
 import { syncBannerToDrive } from "@/lib/banner-drive.functions";
-import { checklistComplete, fileFingerprint, parseBannerFeedback, type BannerAxisScore } from "@/lib/banner-review";
-import { bannerDiagnosesQuery, bannerGuidanceQuery } from "@/lib/queries";
+import { fileFingerprint, parseBannerFeedback, responseProblem, type BannerAxisScore } from "@/lib/banner-review";
+import { compareBannerVersions } from "@/lib/banner-review.functions";
+import { bannerComparisonsQuery, bannerDiagnosesQuery, bannerGuidanceQuery, bannerRoundsQuery } from "@/lib/queries";
 import { daysLate, formatPoints, phasePenalty } from "@/lib/penalty";
 import { fmtDateTime } from "@/lib/format";
 import { format } from "date-fns";
@@ -89,6 +89,12 @@ function ReviewCard({ review, perDay, children }: { review: Review; perDay: numb
           <BannerFileLink path={review.resubmitted_file_path} name={`Versão ${review.round + 1}: ${review.resubmitted_file_name ?? "arquivo"}`} />
         )}
       </div>
+      {review.student_response && (
+        <div className="rounded-md border border-secondary/40 bg-secondary/10 p-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-foreground">Resposta do grupo</p>
+          <p className="mt-1 whitespace-pre-wrap text-sm text-foreground">{review.student_response}</p>
+        </div>
+      )}
       <RoundStatus review={review} perDay={perDay} />
       {children}
     </li>
@@ -103,22 +109,25 @@ function ResubmitForm({ groupId, project, review }: { groupId: string; project: 
   const qc = useQueryClient();
   const diagnose = useDiagnoseBanner(groupId);
   const copyToDrive = useServerFn(syncBannerToDrive);
-  const [checklist, setChecklist] = useState<ChecklistState>({});
+  const compare = useServerFn(compareBannerVersions);
+  const [response, setResponse] = useState("");
   const [busy, setBusy] = useState(false);
   const input = useRef<HTMLInputElement>(null);
-  const done = checklistComplete(checklist);
+  const problem = responseProblem(response);
+  const next = review.round + 1;
 
   async function send(file: File) {
-    const problem = bannerFileProblem(file);
     if (problem) return void toast.error(problem);
+    const fileProblem = bannerFileProblem(file);
+    if (fileProblem) return void toast.error(fileProblem);
     setBusy(true);
     try {
       const hash = await fileFingerprint(file);
       if (project.banner_file_hash && hash === project.banner_file_hash) {
-        toast.error("Este arquivo é idêntico à versão anterior. Faça as correções pedidas antes de reenviar.");
+        toast.error("O arquivo enviado é idêntico ao anterior. Faça as alterações antes de reenviar.");
         return;
       }
-      const path = `${groupId}/v${review.round + 1}-${Date.now()}-${safeFileName(file.name)}`;
+      const path = `${groupId}/v${next}-${Date.now()}-${safeFileName(file.name)}`;
       const up = await supabase.storage.from(BUCKET).upload(path, file, { contentType: file.type });
       if (up.error) throw up.error;
       const { data: at, error } = await supabase.rpc("resubmit_banner", {
@@ -126,6 +135,7 @@ function ResubmitForm({ groupId, project, review }: { groupId: string; project: 
         _path: path,
         _name: file.name,
         _hash: hash,
+        _response: response.trim(),
       });
       if (error) {
         await supabase.storage.from(BUCKET).remove([path]);
@@ -139,10 +149,11 @@ function ResubmitForm({ groupId, project, review }: { groupId: string; project: 
       });
       const days = daysLate(review.resubmit_due_at, at ?? new Date().toISOString());
       const perDayMsg = days > 0 ? `Atraso de ${days} dia(s).` : "Dentro do prazo.";
-      toast.success(`Versão ${review.round + 1} enviada em ${fmtDateTime(at)}. ${perDayMsg}`);
-      setChecklist({});
+      toast.success(`Versão ${next} enviada em ${fmtDateTime(at)}. ${perDayMsg}`);
+      setResponse("");
       qc.invalidateQueries({ queryKey: ["group", groupId] });
       diagnose.mutate();
+      compare({ data: { reviewId: review.id } }).catch((e) => console.warn("Banner comparison failed", e));
       copyToDrive({ data: { groupId } }).catch((e) => console.warn("Banner Drive copy failed", e));
     } catch (e) {
       toast.error((e as Error).message);
@@ -152,9 +163,19 @@ function ResubmitForm({ groupId, project, review }: { groupId: string; project: 
   }
 
   return (
-    <div className="space-y-3 border-t border-border pt-3">
-      <p className="text-sm font-medium text-foreground">Enviar a versão {review.round + 1} corrigida</p>
-      <BannerChecklist idPrefix={`v${review.round + 1}-${review.id}`} value={checklist} onChange={setChecklist} />
+    <div className="space-y-3 rounded-lg border border-primary/40 bg-primary/5 p-4">
+      <p className="font-medium text-foreground">Responder à devolutiva e enviar a versão {next}</p>
+      <div className="space-y-2">
+        <Label htmlFor={`response-${review.id}`}>O que vocês mudaram nesta versão? (obrigatório)</Label>
+        <Textarea
+          id={`response-${review.id}`}
+          rows={4}
+          value={response}
+          onChange={(e) => setResponse(e.target.value)}
+          placeholder="Ex.: Incluímos a 3ª referência (SILVA, 2023), aumentamos a fonte dos Resultados para 28 pt e refizemos o gráfico com legenda."
+        />
+        {problem && response.length > 0 && <p className="text-xs text-destructive">{problem}</p>}
+      </div>
       <input
         ref={input}
         type="file"
@@ -167,11 +188,12 @@ function ResubmitForm({ groupId, project, review }: { groupId: string; project: 
           if (f) void send(f);
         }}
       />
-      <Button type="button" onClick={() => input.current?.click()} disabled={!done || busy}>
-        {busy ? <Loader2 className="animate-spin" /> : <Send />} Enviar versão {review.round + 1}
+      <Button type="button" onClick={() => input.current?.click()} disabled={!!problem || busy}>
+        {busy ? <Loader2 className="animate-spin" /> : <Send />} Escolher arquivo e enviar versão {next}
       </Button>
       <p className="text-xs text-muted-foreground">
-        O PamLab registra a data e a hora do envio. Arquivos idênticos à versão anterior são recusados.
+        O PamLab registra a data e a hora do envio. Se o arquivo for idêntico ao anterior, o envio é recusado. A professora recebe a
+        sua resposta e uma comparação entre as duas versões.
       </p>
     </div>
   );
@@ -187,8 +209,18 @@ export function StudentBannerCorrector({
   project: ProjectBanner;
   perDay: number;
 }) {
+  const qc = useQueryClient();
   const guidance = useQuery(bannerGuidanceQuery(groupId));
   const reviews = [...(project.banner_reviews ?? [])].sort(byRoundDesc);
+  // A feedback round sent while this page is open shows up within ~20 s, no reload needed.
+  const rounds = useQuery(bannerRoundsQuery(project.id));
+  const known = (project.banner_reviews ?? [])
+    .map((r) => `${r.id}:${r.resubmitted_at ?? ""}:${r.updated_at}`)
+    .sort()
+    .join("|");
+  useEffect(() => {
+    if (rounds.data !== undefined && rounds.data !== known) qc.invalidateQueries({ queryKey: ["group", groupId] });
+  }, [rounds.data, known, qc, groupId]);
   const latest = guidance.data?.[0];
   const stale = !!latest && latest.file_path !== project.banner_file_path;
 
@@ -351,6 +383,81 @@ function ReviewForm({
   );
 }
 
+type Comparison = Database["public"]["Tables"]["banner_comparisons"]["Row"];
+const asList = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string" && !!x.trim()) : []);
+
+function ComparisonList({ title, items, tone }: { title: string; items: string[]; tone: "neutral" | "success" | "warning" }) {
+  if (items.length === 0) return null;
+  const style = tone === "success" ? "border-success/40 bg-success/10" : tone === "warning" ? "border-warning/50 bg-warning/10" : "border-border bg-muted/40";
+  return (
+    <div className={`rounded-md border p-3 ${style}`}>
+      <p className="text-sm font-semibold text-foreground">{title}</p>
+      <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-foreground">
+        {items.map((x, i) => (
+          <li key={i}>{x}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** Teacher: AI side-by-side of version N and N+1 for one answered feedback round. */
+function BannerComparisonBlock({ groupId, review, comparison }: { groupId: string; review: Review; comparison: Comparison | undefined }) {
+  const qc = useQueryClient();
+  const fn = useServerFn(compareBannerVersions);
+  const run = useMutation({
+    mutationFn: () => fn({ data: { reviewId: review.id } }),
+    onSuccess: () => {
+      toast.success("Comparação pronta");
+      qc.invalidateQueries({ queryKey: ["banner", "comparisons", groupId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const v1 = review.round;
+  const v2 = review.round + 1;
+  return (
+    <div className="space-y-3 border-t border-border pt-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="flex items-center gap-2 font-medium text-foreground">
+          <GitCompare className="size-4 text-primary" /> Comparação da IA: versão {v1} × versão {v2}
+        </p>
+        <Button size="sm" variant="secondary" onClick={() => run.mutate()} disabled={run.isPending}>
+          {run.isPending ? <Loader2 className="animate-spin" /> : comparison ? <RefreshCw /> : <Sparkles />}{" "}
+          {comparison ? "Refazer comparação" : "Comparar as versões"}
+        </Button>
+      </div>
+      {run.isPending && (
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="size-4 animate-spin" /> A IA está lendo as duas versões. Leva cerca de 1 minuto.
+        </p>
+      )}
+      {comparison ? (
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant={comparison.change_percent < 10 ? "destructive" : "secondary"}>
+              Mudou cerca de {comparison.change_percent}%
+            </Badge>
+            {comparison.response_matches === false && <Badge variant="warning">A resposta do grupo não bate com o banner</Badge>}
+            {comparison.response_matches === true && <Badge variant="success">A resposta do grupo bate com o banner</Badge>}
+            <span className="text-xs text-muted-foreground">{fmtDateTime(comparison.created_at)}</span>
+          </div>
+          {comparison.summary && <p className="text-sm text-foreground">{comparison.summary}</p>}
+          <ComparisonList title="O que mudou" items={asList(comparison.changed)} tone="neutral" />
+          <ComparisonList title="O que foi atendido da sua devolutiva" items={asList(comparison.addressed)} tone="success" />
+          <ComparisonList title="O que ainda precisa de atenção" items={asList(comparison.pending)} tone="warning" />
+          {comparison.response_note && <p className="text-sm italic text-muted-foreground">{comparison.response_note}</p>}
+        </div>
+      ) : (
+        !run.isPending && (
+          <p className="text-sm italic text-muted-foreground">
+            Ainda sem comparação. Ela é feita sozinha quando o grupo envia a nova versão; se não aparecer, clique em "Comparar as versões".
+          </p>
+        )
+      )}
+    </div>
+  );
+}
+
 /** Teacher side: AI diagnosis with suggested grade, grade validation and the V1 → V2 feedback rounds. */
 export function TeacherBannerPanel({
   groupId,
@@ -367,6 +474,7 @@ export function TeacherBannerPanel({
 }) {
   const qc = useQueryClient();
   const diagnoses = useQuery(bannerDiagnosesQuery(groupId));
+  const comparisons = useQuery(bannerComparisonsQuery(groupId));
   const reviews = [...(project.banner_reviews ?? [])].sort(byRoundDesc);
   const open = reviews.find((r) => !r.resubmitted_at) ?? null;
   const [editing, setEditing] = useState(false);
@@ -528,6 +636,13 @@ export function TeacherBannerPanel({
                 )}
                 {!r.resubmitted_at && editing && (
                   <ReviewForm groupId={groupId} project={project} existing={r} onDone={() => setEditing(false)} />
+                )}
+                {r.resubmitted_at && (
+                  <BannerComparisonBlock
+                    groupId={groupId}
+                    review={r}
+                    comparison={comparisons.data?.find((c) => c.review_id === r.id)}
+                  />
                 )}
               </ReviewCard>
             ))}
