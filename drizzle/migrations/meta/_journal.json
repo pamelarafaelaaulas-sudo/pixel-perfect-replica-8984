@@ -162,6 +162,13 @@
       "when": 1793671637836,
       "tag": "0022_fair_accreditation",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1793672545449,
+      "tag": "0023_fair_doc_templates",
+      "breakpoints": true
     }
   ]
 }
