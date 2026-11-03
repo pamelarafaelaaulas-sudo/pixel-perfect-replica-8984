@@ -125,7 +125,7 @@ export function buildExport(input: ExportInput, filters: ExportFilters = {}) {
         schedules: c.schedules ?? [],
         submissions: g.projects?.phase_submissions ?? [],
         bannerReviews: g.projects?.banner_reviews ?? [],
-          writtenReviews: g.projects?.written_reviews ?? [],
+        writtenReviews: g.projects?.written_reviews ?? [],
         perDay,
         now,
       });
