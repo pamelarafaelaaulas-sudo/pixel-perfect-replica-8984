@@ -64,7 +64,7 @@ export const classDetailQuery = (classId: string) =>
           groups!groups_class_id_fkey(
             id, group_name, created_at,
             group_members(id, student_id, whatsapp, profiles(name)),
-            projects(id, current_phase, updated_at, area_code, code_number, external_fairs_interest, external_fairs, phase_submissions(phase_number, submitted_at), banner_reviews(resubmit_due_at, resubmitted_at)),
+            projects(id, current_phase, updated_at, area_code, code_number, external_fairs_interest, external_fairs, phase_submissions(phase_number, submitted_at), banner_reviews(resubmit_due_at, resubmitted_at), written_reviews(phase_number, resubmit_due_at, resubmitted_at)),
             grades(trimester, score)
           )`,
         )
@@ -85,7 +85,7 @@ export const groupDetailQuery = (groupId: string) =>
           `*,
           classes!groups_class_id_fkey(id, name, class_code, code_label, late_penalty_per_day, banner_template_url, banner_size, banner_sections, banner_instructions, ethics_form_template_url, diary_video_url, references_video_url, highlighted_article_url, diary_review_start, diary_review_end, schedules(*)),
           group_members(id, student_id, whatsapp, profiles(name, email)),
-          projects(*, phase_submissions(*), project_contributions(*), banner_reviews(*)),
+          projects(*, phase_submissions(*), project_contributions(*), banner_reviews(*), written_reviews(*)),
           grades(*)`,
         )
         .eq("id", groupId)
@@ -247,7 +247,7 @@ async function fetchStudentReview(studentId: string) {
             groups(id, group_name,
               classes!groups_class_id_fkey(id, name, late_penalty_per_day, schedules(phase_number, due_date)),
               group_members(student_id),
-              projects(id, current_phase, phase_submissions(phase_number, submitted_at), project_contributions(student_id, char_count_added), banner_reviews(resubmit_due_at, resubmitted_at)),
+              projects(id, current_phase, phase_submissions(phase_number, submitted_at), project_contributions(student_id, char_count_added), banner_reviews(resubmit_due_at, resubmitted_at), written_reviews(phase_number, resubmit_due_at, resubmitted_at)),
               grades(trimester, score, feedback, is_reference_ten, created_at),
               student_grade_adjustments(id, student_id, bimester, points, note),
               diary_grades(student_id, score, feedback)
@@ -320,7 +320,7 @@ export const teacherRosterQuery = queryOptions({
         groups!groups_class_id_fkey(
           id, group_name,
           group_members(student_id, profiles(name, email)),
-          projects(current_phase, phase_submissions(phase_number, submitted_at), banner_reviews(resubmit_due_at, resubmitted_at))
+          projects(current_phase, phase_submissions(phase_number, submitted_at), banner_reviews(resubmit_due_at, resubmitted_at), written_reviews(phase_number, resubmit_due_at, resubmitted_at))
         )`,
       )
       .order("created_at", { ascending: false });
@@ -361,7 +361,7 @@ export const teacherBimesterQuery = queryOptions({
         groups!groups_class_id_fkey(
           id, group_name,
           group_members(profiles(name)),
-          projects(current_phase, phase_submissions(phase_number, submitted_at), banner_reviews(resubmit_due_at, resubmitted_at)),
+          projects(current_phase, phase_submissions(phase_number, submitted_at), banner_reviews(resubmit_due_at, resubmitted_at), written_reviews(phase_number, resubmit_due_at, resubmitted_at)),
           grades(trimester, score, feedback, is_reference_ten)
         )`,
       )
@@ -385,7 +385,7 @@ export const teacherExportQuery = queryOptions({
           groups!groups_class_id_fkey(
             id, group_name,
             group_members(student_id, profiles(name)),
-            projects(current_phase, area_code, code_number, phase_submissions(phase_number, submitted_at), banner_reviews(resubmit_due_at, resubmitted_at)),
+            projects(current_phase, area_code, code_number, phase_submissions(phase_number, submitted_at), banner_reviews(resubmit_due_at, resubmitted_at), written_reviews(phase_number, resubmit_due_at, resubmitted_at)),
             grades(trimester, score, feedback, is_reference_ten, created_at),
             student_grade_adjustments(student_id, bimester, points, note),
             diary_grades(student_id, score)
@@ -497,6 +497,32 @@ export const bannerRoundsQuery = (projectId: string) =>
     queryFn: async () => {
       const { data, error } = await supabase
         .from("banner_reviews")
+        .select("id, resubmitted_at, updated_at")
+        .eq("project_id", projectId);
+      fail(error);
+      return (data ?? []).map((r) => `${r.id}:${r.resubmitted_at ?? ""}:${r.updated_at}`).sort().join("|");
+    },
+    refetchInterval: 20_000,
+  });
+
+/** Teacher: AI comparison and improvement grade of each written-stage feedback round. */
+export const writtenComparisonsQuery = (groupId: string) =>
+  queryOptions({
+    queryKey: ["written", "comparisons", groupId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("written_comparisons").select("*").eq("group_id", groupId);
+      fail(error);
+      return data ?? [];
+    },
+  });
+
+/** Student: light poll so written-stage feedback the teacher just sent shows up without reloading. */
+export const writtenRoundsQuery = (projectId: string) =>
+  queryOptions({
+    queryKey: ["written", "rounds", projectId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("written_reviews")
         .select("id, resubmitted_at, updated_at")
         .eq("project_id", projectId);
       fail(error);

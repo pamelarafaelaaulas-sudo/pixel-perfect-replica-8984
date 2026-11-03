@@ -150,6 +150,7 @@ function ClassPage() {
                   schedules,
                   submissions: project?.phase_submissions ?? [],
                   bannerReviews: project?.banner_reviews ?? [],
+                  writtenReviews: project?.written_reviews ?? [],
                   perDay: Number(cls.late_penalty_per_day),
                 });
                 const grades = g.grades ?? [];

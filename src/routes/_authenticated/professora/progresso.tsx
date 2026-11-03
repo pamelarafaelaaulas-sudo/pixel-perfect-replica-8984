@@ -62,6 +62,7 @@ function ProgressPage() {
               currentPhase: g.projects?.current_phase ?? 1,
               submissions: g.projects?.phase_submissions ?? [],
               bannerReviews: g.projects?.banner_reviews ?? [],
+              writtenReviews: g.projects?.written_reviews ?? [],
             })),
           })
         : [],

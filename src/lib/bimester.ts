@@ -31,7 +31,7 @@ type InputClass = {
         id: string;
         group_name: string;
         group_members: { profiles: { name: string } | null }[] | null;
-        projects: { current_phase: number; phase_submissions: { phase_number: number; submitted_at: string }[] | null; banner_reviews?: { resubmit_due_at: string; resubmitted_at: string | null }[] | null } | null;
+        projects: { current_phase: number; phase_submissions: { phase_number: number; submitted_at: string }[] | null; banner_reviews?: { resubmit_due_at: string; resubmitted_at: string | null }[] | null; written_reviews?: { phase_number: number; resubmit_due_at: string; resubmitted_at: string | null }[] | null } | null;
         /** `trimester` holds the bimestre number (column name kept in the database). */
         grades: { trimester: number; score: number | string; feedback: string | null; is_reference_ten: boolean }[] | null;
       }[]
@@ -52,6 +52,7 @@ export function bimesterReport(classes: InputClass[], bimester: number, now: Dat
           schedules: c.schedules ?? [],
           submissions: g.projects?.phase_submissions ?? [],
           bannerReviews: g.projects?.banner_reviews ?? [],
+          writtenReviews: g.projects?.written_reviews ?? [],
           perDay,
           now,
         });

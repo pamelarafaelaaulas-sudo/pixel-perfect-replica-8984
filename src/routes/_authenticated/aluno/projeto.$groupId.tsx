@@ -194,6 +194,7 @@ function StudentProjectPage() {
     schedules: cls.schedules ?? [],
     submissions,
     bannerReviews: project.banner_reviews ?? [],
+    writtenReviews: project.written_reviews ?? [],
     perDay: Number(cls.late_penalty_per_day),
   });
   const penalties = bimesterPenalties(lateness.phases);
