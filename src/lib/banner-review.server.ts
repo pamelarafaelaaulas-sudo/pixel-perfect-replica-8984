@@ -176,3 +176,93 @@ export async function generateBannerDiagnosis(args: {
   };
   return { total: bannerTotal(axes), axes, feedback, critical: criticalReasons(feedback).length > 0 };
 }
+
+/* ---------------- V(n) × V(n+1) comparison for the teacher ---------------- */
+
+const comparisonSchema = z.object({
+  change_percent: z.number(),
+  summary: z.string(),
+  changed: z.array(z.string()),
+  addressed: z.array(z.string()),
+  pending: z.array(z.string()),
+  response_matches: z.boolean(),
+  response_note: z.string(),
+});
+
+const COMPARE_INSTRUCTIONS = `Você é a assistente de uma professora de educação científica que corrige banners para as feiras FETEC/MS e FECITMS. Escreva em português do Brasil, frases curtas e objetivas.
+
+Você recebe: (1) a VERSÃO ANTERIOR do banner, (2) a DEVOLUTIVA da professora sobre essa versão, (3) a RESPOSTA escrita pelo grupo dizendo o que mudou e (4) a NOVA VERSÃO do banner.
+Compare as duas versões lado a lado e responda para a professora:
+- change_percent: estimativa de 0 a 100 de quanto o banner mudou visualmente e no texto (0 = praticamente igual).
+- summary: 1 a 2 frases com a visão geral da mudança.
+- changed: lista do que mudou de fato entre as versões (seção + o que mudou). Lista vazia se nada mudou.
+- addressed: pontos da devolutiva da professora que foram atendidos na nova versão.
+- pending: pontos da devolutiva que NÃO foram atendidos ou ficaram incompletos.
+- response_matches: true se o que o grupo escreveu na resposta realmente aparece na nova versão; false se o grupo disse que mudou algo que não mudou.
+- response_note: 1 frase explicando o response_matches (ex.: "O grupo disse que incluiu a 3ª referência, mas ela não aparece").
+Não dê notas. Seja concreta e cite a seção do banner.`;
+
+export type BannerComparison = {
+  change_percent: number;
+  summary: string;
+  changed: string[];
+  addressed: string[];
+  pending: string[];
+  response_matches: boolean;
+  response_note: string;
+};
+
+type BannerFile = { data: Uint8Array; mediaType: string; fileName: string };
+
+export async function generateBannerComparison(args: {
+  before: BannerFile;
+  after: BannerFile;
+  teacherNotes: string;
+  studentResponse: string;
+  round: number;
+}): Promise<BannerComparison> {
+  let failure: unknown;
+  const result = streamText({
+    model: geminiModel(),
+    system: COMPARE_INSTRUCTIONS,
+    messages: [
+      {
+        role: "user",
+        content: [
+          { type: "text", text: `(1) VERSÃO ${args.round} (anterior):` },
+          { type: "file", data: args.before.data, mediaType: args.before.mediaType, filename: args.before.fileName },
+          {
+            type: "text",
+            text:
+              `(2) DEVOLUTIVA DA PROFESSORA:\n${args.teacherNotes.trim() || "(sem texto; ela pode ter enviado só o banner anotado)"}\n\n` +
+              `(3) RESPOSTA DO GRUPO:\n${args.studentResponse.trim() || "(o grupo não escreveu resposta)"}\n\n` +
+              `(4) VERSÃO ${args.round + 1} (nova):`,
+          },
+          { type: "file", data: args.after.data, mediaType: args.after.mediaType, filename: args.after.fileName },
+        ],
+      },
+    ],
+    output: Output.object({ schema: comparisonSchema }),
+    maxRetries: 1,
+    providerOptions: GEMINI_OPTIONS,
+    onError: ({ error }) => {
+      failure = error;
+    },
+  });
+  let out: z.infer<typeof comparisonSchema>;
+  try {
+    out = await result.output;
+  } catch (e) {
+    throw friendlyError(failure ?? e);
+  }
+  if (failure) throw friendlyError(failure);
+  return {
+    change_percent: Math.min(100, Math.max(0, Math.round(out.change_percent))),
+    summary: out.summary.trim(),
+    changed: clean(out.changed, 10),
+    addressed: clean(out.addressed, 10),
+    pending: clean(out.pending, 10),
+    response_matches: out.response_matches,
+    response_note: out.response_note.trim(),
+  };
+}
