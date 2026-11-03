@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TeacherBannerPanel } from "@/components/banner-cycle";
 import { ExternalFairsTag } from "@/components/external-fairs";
 import { TeacherDiaryTab } from "@/components/diary";
+import { TeacherFairPanel } from "@/components/fair-accreditation";
 import { diaryReviewWindow, isDiaryReviewOpen } from "@/lib/diary";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -262,6 +263,7 @@ function TeacherGroupPage() {
           <TabsTrigger value="contrib">Quem escreveu</TabsTrigger>
           <TabsTrigger value="pares">Avaliação dos colegas</TabsTrigger>
           <TabsTrigger value="banner">Corretor de banner</TabsTrigger>
+          <TabsTrigger value="feira">Feira</TabsTrigger>
           {diaryOpen && <TabsTrigger value="diario">Diário de bordo</TabsTrigger>}
           <TabsTrigger value="notas">Notas</TabsTrigger>
           <TabsTrigger value="ia">Avaliação da IA</TabsTrigger>
@@ -329,6 +331,10 @@ function TeacherGroupPage() {
             <TeacherDiaryTab groupId={groupId} members={members.map((m) => ({ id: m.student_id, name: m.profiles?.name ?? "Aluno" }))} />
           </TabsContent>
         )}
+
+        <TabsContent value="feira" className="card-paper p-6 md:p-8">
+          <TeacherFairPanel groupId={groupId} />
+        </TabsContent>
 
         <TabsContent value="banner" className="card-paper p-6 md:p-8">
           {project ? (

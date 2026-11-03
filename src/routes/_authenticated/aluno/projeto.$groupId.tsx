@@ -63,6 +63,7 @@ import { EthicsScreening } from "@/components/ethics-screening";
 import { ExternalFairsCard } from "@/components/external-fairs";
 import { DiaryVideoStep, ReferencesVideoStep } from "@/components/video-trail";
 import { DiaryCard } from "@/components/diary";
+import { StudentFairCard } from "@/components/fair-accreditation";
 import { bannerBrief } from "@/lib/banner";
 import { ProjectAreaPicker, ProjectCodeTag } from "@/components/project-code";
 import { ProjectDocxButton } from "@/components/project-docx";
@@ -461,6 +462,7 @@ function StudentProjectPage() {
         </section>
 
         <aside className="space-y-4">
+          <StudentFairCard groupId={groupId} />
           <DiaryCard groupId={groupId} studentId={me!.id} />
           <ExternalFairsCard
             projectId={project.id}
