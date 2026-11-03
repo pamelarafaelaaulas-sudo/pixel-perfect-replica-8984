@@ -120,6 +120,7 @@ function GroupReview({
     schedules: cls?.schedules ?? [],
     submissions: project?.phase_submissions ?? [],
     bannerReviews: project?.banner_reviews ?? [],
+    writtenReviews: project?.written_reviews ?? [],
     perDay,
   });
   const aiLatest = latestPerPhase(data.aiEvaluations.filter((e) => e.groupId === group.id));

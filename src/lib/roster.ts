@@ -45,7 +45,8 @@ export function buildRoster(classes: RosterClass[], now: Date = new Date()): Ros
       const currentPhase = g.projects?.current_phase ?? 1;
       const submissions = g.projects?.phase_submissions ?? [];
       const bannerReviews = g.projects?.banner_reviews ?? [];
-      const { phases, totalPenalty } = projectLateness({ currentPhase, schedules, submissions, perDay, bannerReviews, now });
+      const writtenReviews = g.projects?.written_reviews ?? [];
+      const { phases, totalPenalty } = projectLateness({ currentPhase, schedules, submissions, perDay, bannerReviews, writtenReviews, now });
       const delivered = phases.filter((p) => p.state === "delivered").length;
       const daysLate = phases.reduce((s, p) => s + p.daysLate, 0);
       for (const m of g.group_members ?? []) {

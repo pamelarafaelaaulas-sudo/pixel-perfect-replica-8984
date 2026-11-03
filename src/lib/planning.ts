@@ -114,6 +114,7 @@ export function groupProgress(args: {
     currentPhase: number;
     submissions: { phase_number: number; submitted_at: string }[];
     bannerReviews?: { resubmit_due_at: string; resubmitted_at: string | null }[] | null;
+    writtenReviews?: { phase_number: number; resubmit_due_at: string; resubmitted_at: string | null }[] | null;
   }[];
   now?: Date;
 }): GroupProgress[] {
@@ -126,6 +127,7 @@ export function groupProgress(args: {
         submissions: g.submissions,
         perDay: args.perDay,
         bannerReviews: g.bannerReviews ?? null,
+        writtenReviews: g.writtenReviews ?? null,
         now,
       });
       const penalties = bimesterPenalties(phases);

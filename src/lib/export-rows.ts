@@ -12,7 +12,7 @@ type InputGroup = {
     area_code?: string | null;
     code_number?: number | null;
     phase_submissions: { phase_number: number; submitted_at: string }[] | null;
-    banner_reviews?: { resubmit_due_at: string; resubmitted_at: string | null }[] | null;
+    banner_reviews?: { resubmit_due_at: string; resubmitted_at: string | null }[] | null; written_reviews?: { phase_number: number; resubmit_due_at: string; resubmitted_at: string | null }[] | null;
   } | null;
   /** `trimester` holds the bimestre number (database column name). */
   grades:
@@ -124,6 +124,7 @@ export function buildExport(input: ExportInput, filters: ExportFilters = {}) {
         schedules: c.schedules ?? [],
         submissions: g.projects?.phase_submissions ?? [],
         bannerReviews: g.projects?.banner_reviews ?? [],
+          writtenReviews: g.projects?.written_reviews ?? [],
         perDay,
         now,
       });
@@ -226,6 +227,7 @@ export function buildStudentGrades(classes: ExportInput["classes"], now: Date = 
           schedules: c.schedules ?? [],
           submissions: g.projects?.phase_submissions ?? [],
           bannerReviews: g.projects?.banner_reviews ?? [],
+          writtenReviews: g.projects?.written_reviews ?? [],
           perDay: Number(c.late_penalty_per_day),
           now,
         });
