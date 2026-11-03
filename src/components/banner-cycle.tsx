@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { CalendarClock, CheckCircle2, FileUp, Loader2, PenLine, Send, Trash2 } from "lucide-react";
@@ -22,11 +22,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { BUCKET, BannerFileLink, bannerFileProblem, safeFileName } from "@/components/banner-stage";
-import { BannerChecklist, type ChecklistState } from "@/components/banner-checklist";
 import { DiagnoseButton, DiagnosisRunning, DiagnosisView, useDiagnoseBanner } from "@/components/banner-diagnosis";
 import { syncBannerToDrive } from "@/lib/banner-drive.functions";
-import { checklistComplete, fileFingerprint, parseBannerFeedback, type BannerAxisScore } from "@/lib/banner-review";
-import { bannerDiagnosesQuery, bannerGuidanceQuery } from "@/lib/queries";
+import { fileFingerprint, parseBannerFeedback, responseProblem, type BannerAxisScore } from "@/lib/banner-review";
+import { compareBannerVersions } from "@/lib/banner-review.functions";
+import { bannerComparisonsQuery, bannerDiagnosesQuery, bannerGuidanceQuery, bannerRoundsQuery } from "@/lib/queries";
 import { daysLate, formatPoints, phasePenalty } from "@/lib/penalty";
 import { fmtDateTime } from "@/lib/format";
 import { format } from "date-fns";
@@ -89,6 +89,12 @@ function ReviewCard({ review, perDay, children }: { review: Review; perDay: numb
           <BannerFileLink path={review.resubmitted_file_path} name={`Versão ${review.round + 1}: ${review.resubmitted_file_name ?? "arquivo"}`} />
         )}
       </div>
+      {review.student_response && (
+        <div className="rounded-md border border-secondary/40 bg-secondary/10 p-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-secondary">Resposta do grupo</p>
+          <p className="mt-1 whitespace-pre-wrap text-sm text-foreground">{review.student_response}</p>
+        </div>
+      )}
       <RoundStatus review={review} perDay={perDay} />
       {children}
     </li>
@@ -203,8 +209,18 @@ export function StudentBannerCorrector({
   project: ProjectBanner;
   perDay: number;
 }) {
+  const qc = useQueryClient();
   const guidance = useQuery(bannerGuidanceQuery(groupId));
   const reviews = [...(project.banner_reviews ?? [])].sort(byRoundDesc);
+  // A feedback round sent while this page is open shows up within ~20 s, no reload needed.
+  const rounds = useQuery(bannerRoundsQuery(project.id));
+  const known = (project.banner_reviews ?? [])
+    .map((r) => `${r.id}:${r.resubmitted_at ?? ""}:${r.updated_at}`)
+    .sort()
+    .join("|");
+  useEffect(() => {
+    if (rounds.data !== undefined && rounds.data !== known) qc.invalidateQueries({ queryKey: ["group", groupId] });
+  }, [rounds.data, known, qc, groupId]);
   const latest = guidance.data?.[0];
   const stale = !!latest && latest.file_path !== project.banner_file_path;
 
