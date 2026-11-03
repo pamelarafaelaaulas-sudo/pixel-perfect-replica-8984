@@ -91,7 +91,7 @@ function ReviewCard({ review, perDay, children }: { review: Review; perDay: numb
       </div>
       {review.student_response && (
         <div className="rounded-md border border-secondary/40 bg-secondary/10 p-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-secondary">Resposta do grupo</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-foreground">Resposta do grupo</p>
           <p className="mt-1 whitespace-pre-wrap text-sm text-foreground">{review.student_response}</p>
         </div>
       )}
