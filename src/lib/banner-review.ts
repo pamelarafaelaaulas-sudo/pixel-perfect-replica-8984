@@ -204,3 +204,13 @@ export async function fileFingerprint(file: Blob): Promise<string> {
   const buf = await crypto.subtle.digest("SHA-256", await file.arrayBuffer());
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
+
+/** The group's written answer to the teacher's feedback is mandatory with every new version (mirrored in SQL `resubmit_banner`). */
+export const MIN_RESPONSE_CHARS = 20;
+
+export function responseProblem(text: string): string | null {
+  const n = text.trim().length;
+  if (n === 0) return "Escreva o que vocês mudaram nesta versão.";
+  if (n < MIN_RESPONSE_CHARS) return `Explique melhor o que mudou (pelo menos ${MIN_RESPONSE_CHARS} caracteres, faltam ${MIN_RESPONSE_CHARS - n}).`;
+  return null;
+}

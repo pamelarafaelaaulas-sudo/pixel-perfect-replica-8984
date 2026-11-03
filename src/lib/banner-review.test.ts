@@ -8,6 +8,8 @@ import {
   criticalReasons,
   mermaidFromSteps,
   parseBannerFeedback,
+  MIN_RESPONSE_CHARS,
+  responseProblem,
 } from "./banner-review";
 import { bimesterPenalties, projectLateness, resubmitLateness } from "./penalty";
 
@@ -92,5 +94,17 @@ describe("late banner resubmission", () => {
 describe("methodology flowchart", () => {
   it("builds Mermaid graph TD code from the steps", () => {
     expect(mermaidFromSteps(["Coletar água", "Medir pH"])).toBe('graph TD\n  P1["Coletar água"]\n  P2["Medir pH"]\n  P1 --> P2');
+  });
+});
+
+describe("V2 written answer", () => {
+  it("blocks sending a new version without the group's answer", () => {
+    expect(responseProblem("")).not.toBeNull();
+    expect(responseProblem("   ")).not.toBeNull();
+  });
+  it("requires at least 20 characters", () => {
+    expect(MIN_RESPONSE_CHARS).toBe(20);
+    expect(responseProblem("Mudamos o título")).not.toBeNull();
+    expect(responseProblem("Incluímos a 3ª referência e aumentamos a fonte.")).toBeNull();
   });
 });
