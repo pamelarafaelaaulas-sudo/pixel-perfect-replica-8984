@@ -6,6 +6,6 @@ describe("accreditationComplete", () => {
     const all = FAIR_DOCS.map((d) => ({ doc_type: d.key, status: "conferido" }));
     expect(accreditationComplete(all)).toBe(true);
     expect(accreditationComplete(all.slice(1))).toBe(false);
-    expect(accreditationComplete([{ ...all[0], status: "enviado" }, ...all.slice(1)])).toBe(false);
+    expect(accreditationComplete([{ doc_type: all[0]!.doc_type, status: "enviado" }, ...all.slice(1)])).toBe(false);
   });
 });

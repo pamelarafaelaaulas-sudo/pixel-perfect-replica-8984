@@ -32,7 +32,7 @@ function useFairData(groupId: string) {
 
 async function openDoc(path: string) {
   const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, 600);
-  if (error || !data) return toast.error("Não foi possível abrir o arquivo.");
+  if (error || !data) { toast.error("Não foi possível abrir o arquivo."); return; }
   window.open(data.signedUrl, "_blank", "noopener");
 }
 
@@ -74,18 +74,18 @@ export function TeacherFairPanel({ groupId }: { groupId: string }) {
       status: s,
       note: (note ?? approval?.note ?? "").trim() || null,
       docs_due_at: dueVal ? new Date(dueVal).toISOString() : null,
-      teacher_id: u.user?.id,
+      teacher_id: u.user?.id ?? null,
       decided_at: new Date().toISOString(),
     });
     setBusy(false);
-    if (error) return toast.error("Não foi possível salvar a decisão.");
+    if (error) { toast.error("Não foi possível salvar a decisão."); return; }
     toast.success("Decisão salva. O grupo já vê na área dele.");
     qc.invalidateQueries({ queryKey: ["fair-accreditation", groupId] });
   }
 
   async function review(id: string, st: "conferido" | "refazer", teacher_note?: string) {
     const { error } = await supabase.from("fair_documents").update({ status: st, teacher_note: teacher_note ?? null }).eq("id", id);
-    if (error) return toast.error("Não foi possível atualizar o documento.");
+    if (error) { toast.error("Não foi possível atualizar o documento."); return; }
     qc.invalidateQueries({ queryKey: ["fair-accreditation", groupId] });
   }
 
@@ -166,21 +166,22 @@ export function StudentFairCard({ groupId }: { groupId: string }) {
   const { approval, docs } = data;
 
   async function upload(key: string, file: File) {
-    if (file.size > 15 * 1024 * 1024) return toast.error("O arquivo passa de 15 MB.");
+    if (file.size > 15 * 1024 * 1024) { toast.error("O arquivo passa de 15 MB."); return; }
     setBusyKey(key);
     const { data: u } = await supabase.auth.getUser();
     const path = `${groupId}/${key}-${Date.now()}-${safeFileName(file.name)}`;
     const up = await supabase.storage.from(BUCKET).upload(path, file);
     if (up.error) {
       setBusyKey(null);
-      return toast.error("Não foi possível enviar o arquivo.");
+      toast.error("Não foi possível enviar o arquivo.");
+      return;
     }
     const { error } = await supabase.from("fair_documents").upsert(
-      { group_id: groupId, doc_type: key, file_path: path, file_name: file.name, uploaded_by: u.user?.id, status: "enviado", teacher_note: null, uploaded_at: new Date().toISOString() },
+      { group_id: groupId, doc_type: key, file_path: path, file_name: file.name, uploaded_by: u.user?.id ?? null, status: "enviado", teacher_note: null, uploaded_at: new Date().toISOString() },
       { onConflict: "group_id,doc_type" },
     );
     setBusyKey(null);
-    if (error) return toast.error("Não foi possível registrar o documento.");
+    if (error) { toast.error("Não foi possível registrar o documento."); return; }
     toast.success("Documento enviado para a professora conferir.");
     qc.invalidateQueries({ queryKey: ["fair-accreditation", groupId] });
   }

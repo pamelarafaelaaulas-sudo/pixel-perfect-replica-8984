@@ -6,6 +6,7 @@ export const FAIR_DOCS: { key: string; label: string; template: EthicsDoc }[] = 
     key: "ficha",
     label: "Ficha de inscrição / credenciamento",
     template: {
+      fileName: "ficha-credenciamento.docx",
       title: "FICHA DE INSCRIÇÃO E CREDENCIAMENTO",
       subtitle: "Feira de Ciências",
       paragraphs: [
@@ -24,6 +25,7 @@ export const FAIR_DOCS: { key: string; label: string; template: EthicsDoc }[] = 
     key: "autoria",
     label: "Declaração de autoria",
     template: {
+      fileName: "declaracao-autoria.docx",
       title: "DECLARAÇÃO DE AUTORIA",
       subtitle: "Feira de Ciências",
       paragraphs: [
@@ -38,6 +40,7 @@ export const FAIR_DOCS: { key: string; label: string; template: EthicsDoc }[] = 
     key: "responsaveis",
     label: "Autorização dos responsáveis",
     template: {
+      fileName: "autorizacao-responsaveis.docx",
       title: "AUTORIZAÇÃO DOS RESPONSÁVEIS",
       subtitle: "Participação de estudante menor de idade em feira de ciências",
       paragraphs: [
