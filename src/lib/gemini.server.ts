@@ -1,7 +1,7 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
 /** Gemini Flash: reads text, images and PDFs (banner files). "gemini-flash-latest" was overloaded and far slower. */
-export const GEMINI_MODEL = "gemini-3.5-flash";
+export const GEMINI_MODEL = "gemini-3.5-flash-lite";
 
 /** Light thinking keeps answers within a few seconds instead of over a minute. */
 export const GEMINI_OPTIONS = { google: { thinkingConfig: { thinkingLevel: "low" as const } } };
