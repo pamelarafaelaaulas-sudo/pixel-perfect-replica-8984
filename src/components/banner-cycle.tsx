@@ -103,22 +103,25 @@ function ResubmitForm({ groupId, project, review }: { groupId: string; project: 
   const qc = useQueryClient();
   const diagnose = useDiagnoseBanner(groupId);
   const copyToDrive = useServerFn(syncBannerToDrive);
-  const [checklist, setChecklist] = useState<ChecklistState>({});
+  const compare = useServerFn(compareBannerVersions);
+  const [response, setResponse] = useState("");
   const [busy, setBusy] = useState(false);
   const input = useRef<HTMLInputElement>(null);
-  const done = checklistComplete(checklist);
+  const problem = responseProblem(response);
+  const next = review.round + 1;
 
   async function send(file: File) {
-    const problem = bannerFileProblem(file);
     if (problem) return void toast.error(problem);
+    const fileProblem = bannerFileProblem(file);
+    if (fileProblem) return void toast.error(fileProblem);
     setBusy(true);
     try {
       const hash = await fileFingerprint(file);
       if (project.banner_file_hash && hash === project.banner_file_hash) {
-        toast.error("Este arquivo é idêntico à versão anterior. Faça as correções pedidas antes de reenviar.");
+        toast.error("O arquivo enviado é idêntico ao anterior. Faça as alterações antes de reenviar.");
         return;
       }
-      const path = `${groupId}/v${review.round + 1}-${Date.now()}-${safeFileName(file.name)}`;
+      const path = `${groupId}/v${next}-${Date.now()}-${safeFileName(file.name)}`;
       const up = await supabase.storage.from(BUCKET).upload(path, file, { contentType: file.type });
       if (up.error) throw up.error;
       const { data: at, error } = await supabase.rpc("resubmit_banner", {
@@ -126,6 +129,7 @@ function ResubmitForm({ groupId, project, review }: { groupId: string; project: 
         _path: path,
         _name: file.name,
         _hash: hash,
+        _response: response.trim(),
       });
       if (error) {
         await supabase.storage.from(BUCKET).remove([path]);
@@ -139,10 +143,11 @@ function ResubmitForm({ groupId, project, review }: { groupId: string; project: 
       });
       const days = daysLate(review.resubmit_due_at, at ?? new Date().toISOString());
       const perDayMsg = days > 0 ? `Atraso de ${days} dia(s).` : "Dentro do prazo.";
-      toast.success(`Versão ${review.round + 1} enviada em ${fmtDateTime(at)}. ${perDayMsg}`);
-      setChecklist({});
+      toast.success(`Versão ${next} enviada em ${fmtDateTime(at)}. ${perDayMsg}`);
+      setResponse("");
       qc.invalidateQueries({ queryKey: ["group", groupId] });
       diagnose.mutate();
+      compare({ data: { reviewId: review.id } }).catch((e) => console.warn("Banner comparison failed", e));
       copyToDrive({ data: { groupId } }).catch((e) => console.warn("Banner Drive copy failed", e));
     } catch (e) {
       toast.error((e as Error).message);
@@ -152,9 +157,19 @@ function ResubmitForm({ groupId, project, review }: { groupId: string; project: 
   }
 
   return (
-    <div className="space-y-3 border-t border-border pt-3">
-      <p className="text-sm font-medium text-foreground">Enviar a versão {review.round + 1} corrigida</p>
-      <BannerChecklist idPrefix={`v${review.round + 1}-${review.id}`} value={checklist} onChange={setChecklist} />
+    <div className="space-y-3 rounded-lg border border-primary/40 bg-primary/5 p-4">
+      <p className="font-medium text-foreground">Responder à devolutiva e enviar a versão {next}</p>
+      <div className="space-y-2">
+        <Label htmlFor={`response-${review.id}`}>O que vocês mudaram nesta versão? (obrigatório)</Label>
+        <Textarea
+          id={`response-${review.id}`}
+          rows={4}
+          value={response}
+          onChange={(e) => setResponse(e.target.value)}
+          placeholder="Ex.: Incluímos a 3ª referência (SILVA, 2023), aumentamos a fonte dos Resultados para 28 pt e refizemos o gráfico com legenda."
+        />
+        {problem && response.length > 0 && <p className="text-xs text-destructive">{problem}</p>}
+      </div>
       <input
         ref={input}
         type="file"
@@ -167,11 +182,12 @@ function ResubmitForm({ groupId, project, review }: { groupId: string; project: 
           if (f) void send(f);
         }}
       />
-      <Button type="button" onClick={() => input.current?.click()} disabled={!done || busy}>
-        {busy ? <Loader2 className="animate-spin" /> : <Send />} Enviar versão {review.round + 1}
+      <Button type="button" onClick={() => input.current?.click()} disabled={!!problem || busy}>
+        {busy ? <Loader2 className="animate-spin" /> : <Send />} Escolher arquivo e enviar versão {next}
       </Button>
       <p className="text-xs text-muted-foreground">
-        O PamLab registra a data e a hora do envio. Arquivos idênticos à versão anterior são recusados.
+        O PamLab registra a data e a hora do envio. Se o arquivo for idêntico ao anterior, o envio é recusado. A professora recebe a
+        sua resposta e uma comparação entre as duas versões.
       </p>
     </div>
   );
