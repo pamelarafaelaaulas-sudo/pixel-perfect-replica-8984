@@ -67,6 +67,8 @@ import { StudentFairCard } from "@/components/fair-accreditation";
 import { bannerBrief } from "@/lib/banner";
 import { ProjectAreaPicker, ProjectCodeTag } from "@/components/project-code";
 import { ProjectDocxButton } from "@/components/project-docx";
+import { StudentWrittenFeedback, StudentWrittenResubmit, stageReviews, useWrittenRoundsSync } from "@/components/written-review";
+import { writtenPhaseText } from "@/lib/written-review";
 
 export const Route = createFileRoute("/_authenticated/aluno/projeto/$groupId")({
   head: () => ({
@@ -185,6 +187,8 @@ function StudentProjectPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  useWrittenRoundsSync(project?.id ?? "", groupId, project?.written_reviews);
+
   if (!group || !group.classes || !project || !draft) return null;
   const cls = group.classes;
   const members = group.group_members ?? [];
@@ -201,7 +205,10 @@ function StudentProjectPage() {
   const isBanner = selected === BANNER_PHASE;
   const info = lateness.phases[selected - 1] ?? lateness.phases[0]!;
   const isSubmitted = info.state === "delivered";
-  const editable = !isSubmitted && selected <= project.current_phase && info.state !== "skipped";
+  // A delivered written stage reopens while the teacher's feedback round awaits the new version.
+  const writtenRounds = isWrittenPart(selected) ? stageReviews(project.written_reviews, selected) : [];
+  const openReview = isSubmitted ? (writtenRounds.find((r) => !r.resubmitted_at) ?? null) : null;
+  const editable = (!isSubmitted && selected <= project.current_phase && info.state !== "skipped") || !!openReview;
   const phaseDirty = changedFields.some((f) => phaseFields(selected).includes(f));
   const problems = phaseProblems(
     selected,
@@ -302,7 +309,9 @@ function StudentProjectPage() {
               <h2 className="text-2xl font-semibold">{phaseMeta(selected).name}</h2>
               <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{phaseMeta(selected).hint}</p>
             </div>
-            {isSubmitted ? (
+            {openReview ? (
+              <Badge variant="warning">Nova versão até {fmtDateTime(openReview.resubmit_due_at)}</Badge>
+            ) : isSubmitted ? (
               <Badge variant={info.daysLate > 0 ? "warning" : "success"}>Entregue em {fmtDateTime(info.submittedAt)}</Badge>
             ) : !editable ? (
               <Badge variant="muted">
@@ -326,6 +335,7 @@ function StudentProjectPage() {
               editable={editable}
             />
           )}
+          <StudentWrittenFeedback reviews={writtenRounds} perDay={Number(cls.late_penalty_per_day)} />
           <fieldset disabled={!editable} className="space-y-5">
             {isBanner ? null : selected === 2 ? (
               <ArticlesEditor value={draft.scientific_articles} onChange={(v) => set("scientific_articles", v)} editable={editable} />
@@ -391,7 +401,7 @@ function StudentProjectPage() {
             </div>
           )}
 
-          {editable && selected === project.current_phase && problems.length > 0 && (
+          {editable && selected === project.current_phase && !openReview && problems.length > 0 && (
             <div className="mt-6 rounded-lg border border-warning/40 bg-warning/10 p-4 text-sm">
               <p className="font-medium text-foreground">Para entregar esta etapa, falta:</p>
               <ul className="mt-1 ml-5 list-disc text-muted-foreground">
@@ -440,6 +450,27 @@ function StudentProjectPage() {
                 )}
               </div>
             </div>
+          )}
+
+          {openReview && (
+            <StudentWrittenResubmit
+              key={openReview.id}
+              review={openReview}
+              groupId={groupId}
+              currentText={writtenPhaseText(draft, selected)}
+              problems={problems}
+              onSave={async () => {
+                if (changedFields.length) await saveMutation.mutateAsync();
+              }}
+              onSent={() => {
+                // The teacher also gets a fresh AI grade of the corrected text.
+                const text = phaseText(draft, selected).trim();
+                if (text.length >= 20)
+                  evaluate({ data: { projectId: project.id, phaseNumber: selected, text: text.slice(0, 30000) } })
+                    .then(() => qc.invalidateQueries({ queryKey: ["ai", "group", groupId] }))
+                    .catch((e) => console.warn("AI evaluation of new version failed", e));
+              }}
+            />
           )}
 
           {isBanner && (

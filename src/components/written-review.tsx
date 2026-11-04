@@ -94,7 +94,7 @@ function ReviewCard({ review, perDay, children }: { review: WrittenReview; perDa
 /** Refreshes the group page when the teacher sends or edits written-stage feedback (no reload needed). */
 export function useWrittenRoundsSync(projectId: string, groupId: string, reviews: WrittenReview[] | null | undefined) {
   const qc = useQueryClient();
-  const rounds = useQuery(writtenRoundsQuery(projectId));
+  const rounds = useQuery({ ...writtenRoundsQuery(projectId), enabled: !!projectId });
   const known = (reviews ?? [])
     .map((r) => `${r.id}:${r.resubmitted_at ?? ""}:${r.updated_at}`)
     .sort()

@@ -17,6 +17,7 @@ import { TeacherBannerPanel } from "@/components/banner-cycle";
 import { ExternalFairsTag } from "@/components/external-fairs";
 import { TeacherDiaryTab } from "@/components/diary";
 import { TeacherFairPanel } from "@/components/fair-accreditation";
+import { TeacherWrittenReviews } from "@/components/written-review";
 import { diaryReviewWindow, isDiaryReviewOpen } from "@/lib/diary";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -261,6 +262,12 @@ function TeacherGroupPage() {
       <Tabs defaultValue="projeto">
         <TabsList className="mb-4 flex-wrap">
           <TabsTrigger value="projeto">Projeto</TabsTrigger>
+          <TabsTrigger value="devolutivas">
+            Devolutivas do texto
+            {(project?.written_reviews ?? []).some((r) => !r.resubmitted_at) && (
+              <span className="ml-1.5 inline-block size-2 rounded-full bg-highlight" aria-label="devolutiva aberta" />
+            )}
+          </TabsTrigger>
           <TabsTrigger value="contrib">Quem escreveu</TabsTrigger>
           <TabsTrigger value="pares">Avaliação dos colegas</TabsTrigger>
           <TabsTrigger value="banner">Corretor de banner</TabsTrigger>
@@ -272,6 +279,10 @@ function TeacherGroupPage() {
 
         <TabsContent value="projeto" className="card-paper p-6 md:p-8">
           {project ? <ProjectView project={project} /> : <p>Sem projeto.</p>}
+        </TabsContent>
+
+        <TabsContent value="devolutivas" className="card-paper p-6 md:p-8">
+          {project ? <TeacherWrittenReviews groupId={groupId} project={project} perDay={perDay} /> : <p>Sem projeto.</p>}
         </TabsContent>
 
         <TabsContent value="contrib" className="card-paper p-6">
