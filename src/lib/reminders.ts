@@ -242,3 +242,20 @@ export function customParams(studentName: string, raw: string): string[] {
   const first = studentName.trim().split(/\s+/)[0] || "aluno(a)";
   return [first, cleanCustomText(raw)];
 }
+
+/** Free "click to chat" link: opens the teacher's own WhatsApp with the text ready (no Meta billing). */
+export function waLink(phone: string, text: string): string {
+  return `https://wa.me/${phone.replace(/\D/g, "")}?text=${encodeURIComponent(text)}`;
+}
+
+/** Reminder text for the free link, same content as the approved template. */
+export function reminderText(r: Pick<Reminder, "studentName" | "daysLeft" | "phaseName" | "dueDate">): string {
+  const [name, days, phase, due] = reminderParams(r);
+  return `Olá, ${name}! Faltam ${days} para o fim do prazo da etapa "${phase}" do seu projeto no PamLab (prazo: ${due}). Esta é uma mensagem automática da professora Pâmela, não precisa responder.`;
+}
+
+/** Custom note text for the free link; line breaks are kept (allowed outside templates). */
+export function customText(studentName: string, raw: string): string {
+  const first = studentName.trim().split(/\s+/)[0] || "aluno(a)";
+  return `Olá, ${first}! A professora Pâmela deixou um recado sobre o seu projeto científico no PamLab:\n\n${raw.trim()}`;
+}
