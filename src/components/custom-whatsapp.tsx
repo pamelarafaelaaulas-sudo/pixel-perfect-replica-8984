@@ -24,6 +24,8 @@ import {
   cleanCustomText,
   customMessageProblems,
   customParams,
+  customText,
+  waLink,
   type MessageRecipient,
   type SkippedReminder,
 } from "@/lib/reminders";
@@ -107,6 +109,10 @@ export function CustomWhatsappCard({
       </h2>
       <p className="mt-1 text-sm text-muted-foreground">
         Escreva um recado e escolha quem recebe: alguns alunos, uma turma inteira ou todos de uma vez.
+      </p>
+      <p className="mt-2 rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm">
+        <b>Grátis:</b> escreva o recado e clique em “Abrir no WhatsApp” ao lado de cada aluno. Seu WhatsApp abre com a
+        mensagem pronta — é só apertar enviar. Não usa o envio pago da Meta.
       </p>
       {!approved && (
         <p className="mt-3 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
@@ -206,6 +212,17 @@ export function CustomWhatsappCard({
                           {r.className} · {r.groupName}
                         </span>
                       </span>
+                      {text.trim() && (
+                        <a
+                          href={waLink(r.phone, customText(r.studentName, text))}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="ml-auto inline-flex shrink-0 items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-medium text-primary hover:bg-muted"
+                        >
+                          <MessageSquareText className="size-3.5" /> Abrir no WhatsApp
+                        </a>
+                      )}
                     </label>
                   </li>
                 ))}
