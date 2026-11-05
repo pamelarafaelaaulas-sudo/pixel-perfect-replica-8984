@@ -293,6 +293,23 @@ export const studentReviewQuery = (studentId: string) =>
     queryFn: () => fetchStudentReview(studentId),
   });
 
+/* ---------------- Medals (deadline podium per class) ---------------- */
+
+/** Deadlines and every group's delivery times for one class (teacher or students of the class). */
+export const classMedalsQuery = (classId: string) =>
+  queryOptions({
+    queryKey: ["medals", classId],
+    queryFn: async () => {
+      const [schedules, deliveries] = await Promise.all([
+        supabase.from("schedules").select("phase_number, due_date").eq("class_id", classId),
+        supabase.rpc("class_medal_deliveries", { _class_id: classId }),
+      ]);
+      fail(schedules.error);
+      fail(deliveries.error);
+      return { schedules: schedules.data ?? [], deliveries: deliveries.data ?? [] };
+    },
+  });
+
 /* ---------------- Teacher: invites for other teachers ---------------- */
 
 export const teacherInvitesQuery = queryOptions({
