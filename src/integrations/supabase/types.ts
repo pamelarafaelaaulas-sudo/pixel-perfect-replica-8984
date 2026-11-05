@@ -1457,6 +1457,14 @@ export type Database = {
       can_edit_banner: { Args: { _group_id: string }; Returns: boolean }
       canva_design_id: { Args: { _url: string }; Returns: string }
       cited_work_count: { Args: { _t: string }; Returns: number }
+      class_medal_deliveries: {
+        Args: { _class_id: string }
+        Returns: {
+          group_id: string
+          phase_number: number
+          submitted_at: string
+        }[]
+      }
       consume_teacher_invite: {
         Args: { _code: string; _user_id: string }
         Returns: boolean
