@@ -14,6 +14,7 @@ import { PHASES, phaseMeta } from "@/lib/phases";
 import { fmtAgo } from "@/lib/format";
 import { AreaSelect, ProjectCodeTag } from "@/components/project-code";
 import { FairCountdown } from "@/components/fair-countdown";
+import { StudentMedals } from "@/components/medals";
 
 export const Route = createFileRoute("/_authenticated/aluno/")({
   head: () => ({
@@ -107,6 +108,11 @@ function StudentHome() {
         </section>
 
         <div className="space-y-6">
+          {memberships.map((m) =>
+            m.groups?.classes ? (
+              <StudentMedals key={m.id} classId={m.groups.classes.id} groupId={m.groups.id} groupName={m.groups.group_name} />
+            ) : null,
+          )}
           <JoinClass defaultWhatsapp={me?.whatsapp ?? ""} />
           {memberships.length === 0 && <RedeemTeacherInvite />}
         </div>

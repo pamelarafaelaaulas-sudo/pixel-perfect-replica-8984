@@ -1,8 +1,42 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { generateWrittenComparison } from "./written-review.server";
+import { generateWrittenComparison, generateWrittenFeedbackDraft } from "./written-review.server";
 import { phaseMeta } from "./phases";
+import { reviewableStage, writtenPhaseText } from "./written-review";
+
+/**
+ * Teacher only: Gemini drafts her feedback on a delivered written stage, writing as the teacher-researcher.
+ * Nothing is saved; she edits the draft and sends it herself.
+ */
+export const draftWrittenFeedback = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z.object({ projectId: z.string().uuid(), phase: z.number().int(), draft: z.string().max(5000).default("") }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase;
+    if (!reviewableStage(data.phase)) throw new Error("A devolutiva com a IA vale só para as partes escritas.");
+    const { data: project, error } = await sb.from("projects").select("*").eq("id", data.projectId).maybeSingle();
+    if (error || !project) throw new Error("Projeto não encontrado.");
+    const { data: isTeacher } = await sb.rpc("teaches_group", { _group_id: project.group_id });
+    if (!isTeacher) throw new Error("Só a professora da turma pode pedir o rascunho da devolutiva.");
+    const [{ data: me }, { data: previous }] = await Promise.all([
+      sb.from("profiles").select("name").eq("id", context.userId).maybeSingle(),
+      sb.from("written_reviews").select("notes, round").eq("project_id", project.id).eq("phase_number", data.phase).order("round"),
+    ]);
+    const firstName = (me?.name ?? "").trim().split(/\s+/)[0];
+    const meta = phaseMeta(data.phase);
+    const notes = await generateWrittenFeedbackDraft({
+      teacherName: firstName ? `a Prof.ª ${firstName}` : "a professora",
+      stageName: meta.name,
+      stageGuide: meta.hint,
+      text: writtenPhaseText(project, data.phase),
+      teacherDraft: data.draft,
+      previousNotes: (previous ?? []).map((r) => r.notes ?? "").filter((n) => n.trim()),
+    });
+    return { notes };
+  });
 
 /**
  * AI comparison of the reviewed text and the group's new version for one written-stage feedback round,

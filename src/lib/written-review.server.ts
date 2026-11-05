@@ -47,6 +47,60 @@ function friendlyError(failure: unknown): Error {
   return new Error(geminiErrorMessage(failure, fallback) ?? fallback);
 }
 
+const DRAFT_INSTRUCTIONS = (teacher: string) => `Você é ${teacher}, professora pesquisadora de educação científica que orienta projetos científicos de alunos do ensino médio no Brasil (feiras FECITI/MS, FETEC/MS, FECINTEC).
+Escreva, em primeira pessoa e falando diretamente com o grupo ("vocês"), a DEVOLUTIVA de uma parte do projeto escrito. Tom: acolhedor, firme e de orientadora de pesquisa — valorize o que está bom e mostre com clareza o que precisa mudar, como uma pesquisadora que quer ver o grupo crescer.
+Regras:
+- Português do Brasil, frases curtas, sem jargão desnecessário.
+- Estrutura: 1 frase reconhecendo o que está bom; depois "O que precisa melhorar:" com 2 a 5 itens numerados, cada um concreto (cite o trecho ou a ideia e diga o que fazer); termine com 1 frase de incentivo e o próximo passo.
+- Considere o que a professora pede nesta parte (limites de palavras, estrutura) e as normas da ABNT (citações autor-data NBR 10520:2023, referências NBR 6023) quando fizer sentido.
+- Nunca dê nota, pontuação ou conceito. Não invente dados nem autores. Não reescreva o texto pelos alunos: oriente.
+- No máximo 220 palavras. Texto simples, sem markdown (sem asteriscos ou #).
+- Se a professora já começou um rascunho, mantenha as ideias dela e melhore a redação.`;
+
+/** Draft of the teacher's feedback on a written stage, in her voice as a teacher-researcher. She edits it before sending. */
+export async function generateWrittenFeedbackDraft(args: {
+  teacherName: string;
+  stageName: string;
+  stageGuide: string;
+  text: string;
+  teacherDraft: string;
+  previousNotes: string[];
+}): Promise<string> {
+  let failure: unknown;
+  const result = streamText({
+    model: geminiModel(),
+    system: DRAFT_INSTRUCTIONS(args.teacherName),
+    messages: [
+      {
+        role: "user",
+        content:
+          `Parte do projeto: ${args.stageName}\nO que a professora pede nesta parte: ${args.stageGuide}\n\n` +
+          (args.previousNotes.length ? `Devolutivas anteriores desta parte (não repita o que já foi atendido):\n${args.previousNotes.join("\n---\n")}\n\n` : "") +
+          (args.teacherDraft.trim() ? `Rascunho que a professora já começou:\n${args.teacherDraft.trim()}\n\n` : "") +
+          `Texto entregue pelo grupo:\n${args.text.slice(0, 15000) || "(vazio)"}`,
+      },
+    ],
+    maxRetries: 1,
+    providerOptions: GEMINI_OPTIONS,
+    onError: ({ error }) => {
+      failure = error;
+    },
+  });
+  let text: string;
+  try {
+    text = await result.text;
+  } catch (e) {
+    failure ??= e;
+    text = "";
+  }
+  if (failure || !text.trim()) {
+    console.error("Written feedback draft error", failure);
+    const fallback = "Não foi possível escrever o rascunho agora. Tente de novo.";
+    throw new Error(geminiErrorMessage(failure, fallback) ?? fallback);
+  }
+  return text.replace(/\*\*/g, "").replace(/^#+\s*/gm, "").trim();
+}
+
 export async function generateWrittenComparison(args: {
   stageName: string;
   stageGuide: string;

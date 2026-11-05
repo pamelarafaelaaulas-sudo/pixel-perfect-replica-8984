@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { compareWrittenVersions } from "@/lib/written-review.functions";
+import { compareWrittenVersions, draftWrittenFeedback } from "@/lib/written-review.functions";
 import { writtenComparisonsQuery, writtenRoundsQuery } from "@/lib/queries";
 import {
   WRITTEN_REVIEW_DAYS,
@@ -251,11 +251,31 @@ function ReviewForm({
     },
     onError: (e: Error) => toast.error(e.message),
   });
+  const draftFn = useServerFn(draftWrittenFeedback);
+  const draft = useMutation({
+    mutationFn: () => draftFn({ data: { projectId, phase, draft: notes } }),
+    onSuccess: (r) => {
+      setNotes(r.notes);
+      toast.success("Rascunho pronto. Revise e ajuste antes de enviar.");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
   const id = existing?.id ?? `new-${phase}`;
   return (
     <div className="space-y-4 rounded-lg border border-border bg-muted/40 p-4">
       <div className="space-y-2">
-        <Label htmlFor={`wnotes-${id}`}>Observações para o grupo</Label>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Label htmlFor={`wnotes-${id}`}>Observações para o grupo</Label>
+          <Button type="button" size="sm" variant="secondary" onClick={() => draft.mutate()} disabled={draft.isPending}>
+            {draft.isPending ? <Loader2 className="animate-spin" /> : <Sparkles />}{" "}
+            {notes.trim() ? "Melhorar com a IA" : "Escrever com a IA"}
+          </Button>
+        </div>
+        {draft.isPending && (
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="size-4 animate-spin" /> A IA está lendo o texto do grupo e escrevendo como professora pesquisadora…
+          </p>
+        )}
         <Textarea
           id={`wnotes-${id}`}
           rows={5}
@@ -269,6 +289,10 @@ function ReviewForm({
         <Input id={`wdue-${id}`} type="datetime-local" value={due} onChange={(e) => setDue(e.target.value)} />
         {!existing && <p className="text-xs text-muted-foreground">Já vem com {WRITTEN_REVIEW_DAYS} dias a partir de hoje.</p>}
       </div>
+      <p className="text-xs text-muted-foreground">
+        A IA (Gemini, na sua própria chave) só sugere o texto: nada é enviado ao grupo até você clicar no botão abaixo. Se você já escreveu algo, ela
+        mantém as suas ideias e melhora a redação.
+      </p>
       <Button onClick={() => save.mutate()} disabled={save.isPending}>
         {save.isPending ? <Loader2 className="animate-spin" /> : <Send />} {existing ? "Salvar devolutiva" : "Enviar devolutiva ao grupo"}
       </Button>
