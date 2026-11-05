@@ -25,7 +25,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { whatsappRemindersQuery } from "@/lib/queries";
 import { getReminderOverview, sendRemindersNow } from "@/lib/whatsapp.functions";
 import { PHASES, phaseMeta } from "@/lib/phases";
-import { daysText, dueText, reminderParams } from "@/lib/reminders";
+import { daysText, dueText, reminderParams, reminderText, waLink } from "@/lib/reminders";
 import { fmtDateTime, plural } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -258,7 +258,17 @@ function RemindersPage() {
                       </td>
                       <td className="px-3 py-2">{r.phaseName}</td>
                       <td className="px-3 py-2 text-muted-foreground">{dueText(r.dueDate)}</td>
-                      <td className="px-5 py-2 text-right font-mono">{daysText(r.daysLeft)}</td>
+                      <td className="px-5 py-2 text-right font-mono">
+                        {daysText(r.daysLeft)}
+                        <a
+                          href={waLink(r.phone, reminderText(r))}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="ml-3 inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 font-sans text-xs font-medium text-primary hover:bg-muted"
+                        >
+                          <MessageCircle className="size-3.5" /> Abrir no WhatsApp
+                        </a>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
