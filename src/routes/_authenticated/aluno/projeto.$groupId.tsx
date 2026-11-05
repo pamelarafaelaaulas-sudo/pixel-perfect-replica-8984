@@ -180,6 +180,15 @@ function StudentProjectPage() {
     },
     onSuccess: () => {
       toast.success("Etapa entregue para a professora!");
+      const deliveredPhase = selected;
+      const classId = group?.classes?.id;
+      if (classId)
+        qc.fetchQuery({ ...classMedalsQuery(classId), staleTime: 0 })
+          .then((d) => {
+            const m = stageMedals(d.schedules, d.deliveries).find((x) => x.groupId === groupId && x.phase === deliveredPhase);
+            if (m) toast.success(`${MEDAL_EMOJI[m.kind]} Medalha conquistada: ${MEDAL_LABEL[m.kind]}!`, { duration: 8000 });
+          })
+          .catch(() => {});
       qc.invalidateQueries({ queryKey: ["group", groupId] });
       qc.invalidateQueries({ queryKey: ["student"] });
       setSelected((s) => Math.min(PHASE_COUNT, s + 1));
