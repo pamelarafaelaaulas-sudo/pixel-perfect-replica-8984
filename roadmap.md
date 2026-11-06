@@ -3,6 +3,6 @@
 - [x] Verify copying and queue progression in the teacher screen (desktop/mobile; no messages sent).
 - [x] Let group members choose a group leader for reminders and a diary-writing responsible student.
 - [x] Show responsibilities read-only to the teacher and test leader-only reminder targeting.
-- [ ] Verify saved choices end-to-end as a student — blocked on selecting/authorizing a student account; requester account has no group membership.
-- [ ] Add ongoing Diário de bordo submission with selected group responsibilities and pending teacher approval.
-- [ ] Add teacher approve/return actions and validate permission/state rules.
+- [x] Verify saved choices end-to-end as a student in teste 3.
+- [x] Add ongoing Diário de bordo submission with selected group responsibilities and pending teacher approval.
+- [x] Add owning-teacher approve/return actions; test submission prerequisites and verify pending → approved end-to-end.
