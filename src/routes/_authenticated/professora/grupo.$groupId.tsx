@@ -41,6 +41,7 @@ import { AiEvaluationView, scoreTone } from "@/components/ai-feedback";
 import { ProjectAreaPicker, ProjectCodeTag } from "@/components/project-code";
 import { ProjectDocxButton } from "@/components/project-docx";
 import { SocialApplicationCard } from "@/components/social-application";
+import { RenameGroupButton } from "@/components/rename-group";
 
 export const Route = createFileRoute("/_authenticated/professora/grupo/$groupId")({
   head: () => ({
@@ -142,7 +143,12 @@ function TeacherGroupPage() {
       </Link>
       <PageHeader
         eyebrow={`Grupo · ${cls.name}`}
-        title={group.group_name}
+        title={
+          <span className="inline-flex items-center gap-2">
+            {group.group_name}
+            <RenameGroupButton groupId={group.id} current={group.group_name} />
+          </span>
+        }
         actions={
           project && (
             <div className="flex flex-wrap gap-2">
