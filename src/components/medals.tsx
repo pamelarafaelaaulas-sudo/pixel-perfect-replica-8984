@@ -40,7 +40,7 @@ export function MedalCounts({ tally }: { tally: MedalTally }) {
 export function MedalRules() {
   return (
     <p className="text-sm text-muted-foreground">
-      Em cada etapa, os 3 primeiros grupos da turma que entregam dentro do prazo ganham {MEDAL_EMOJI.ouro} ouro, {MEDAL_EMOJI.prata} prata e{" "}
+      Em cada etapa, os 3 primeiros grupos (da turma ou das turmas que disputam juntas) que entregam dentro do prazo ganham {MEDAL_EMOJI.ouro} ouro, {MEDAL_EMOJI.prata} prata e{" "}
       {MEDAL_EMOJI.bronze} bronze. Quem entrega no prazo depois deles ganha {MEDAL_EMOJI.honra} Honra ao Mérito. Pontos: ouro{" "}
       {MEDAL_POINTS.ouro}, prata {MEDAL_POINTS.prata}, bronze {MEDAL_POINTS.bronze}, Honra ao Mérito {formatPoints(MEDAL_POINTS.honra)}. Quem
       somar mais pontos no fim do ano ganha um presente da professora!

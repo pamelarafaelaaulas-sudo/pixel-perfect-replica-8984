@@ -166,7 +166,7 @@ function MedalPools({ classes }: { classes: { id: string; name: string; medal_po
   });
   const groups = new Map<string, string[]>();
   for (const c of classes) {
-    const k = medalPoolKey({ id: c.id, medal_pool: pools[c.id] });
+    const k = medalPoolKey({ id: c.id, medal_pool: pools[c.id] ?? null });
     groups.set(k, [...(groups.get(k) ?? []), c.name]);
   }
   const shared = [...groups.values()].filter((g) => g.length > 1);
