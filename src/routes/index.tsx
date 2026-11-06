@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowRight, BookOpenText, FlaskConical, HelpCircle, Lightbulb, PenLine, Presentation, Users } from "lucide-react";
-import caricature from "@/assets/pamela-caricatura.png";
+import logo from "@/assets/feciti-flow-logo.png.asset.json";
 import { Brand } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -73,11 +73,11 @@ function Index() {
             <div aria-hidden className="absolute bottom-48 left-[12%] size-20 rounded-full bg-highlight md:left-[16%]" />
             <div aria-hidden className="absolute right-[14%] top-10 size-10 rounded-full border-4 border-info" />
             <img
-              src={caricature}
-              alt="Caricatura da professora Pâmela segurando um troféu e usando medalhas"
-              width={270}
-              height={900}
-              className="relative z-10 h-[440px] w-auto drop-shadow-xl md:h-[520px]"
+              src={logo.url}
+              alt="Logo FECITI Flow — Iniciação & Feiras"
+              width={435}
+              height={330}
+              className="relative z-10 mt-16 w-full max-w-md rounded-3xl bg-card p-4 shadow-lift"
             />
             <figcaption className="absolute -bottom-5 right-0 z-20 rotate-2 rounded-xl bg-highlight px-4 py-2 font-display text-lg font-semibold text-highlight-foreground shadow-lift">
               Bem-vindos ao FECITI Flow!
