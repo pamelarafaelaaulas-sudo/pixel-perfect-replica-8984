@@ -6,3 +6,5 @@
 - [x] Verify saved choices end-to-end as a student in teste 3.
 - [x] Add ongoing Diário de bordo submission with selected group responsibilities and pending teacher approval.
 - [x] Add owning-teacher approve/return actions; test submission prerequisites and verify pending → approved end-to-end.
+- [ ] Automatically approve dated diary submissions and provide Gemini tips without blocking on teacher review.
+- [ ] Test date validation, safe AI fallback and the saved student-facing approval flow.
