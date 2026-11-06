@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { medalPoolKey } from "@/lib/medals";
-import { ArrowLeft, Award, Gift } from "lucide-react";
+import { Award, Gift } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { teacherRosterQuery } from "@/lib/queries";

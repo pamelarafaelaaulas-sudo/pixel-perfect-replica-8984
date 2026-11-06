@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { ArrowLeft, CalendarClock, Copy, Trash2, Users, ArrowRight, Timer, Palette, ExternalLink, Hash } from "lucide-react";
+import { CalendarClock, Copy, Trash2, Users, ArrowRight, Timer, Palette, ExternalLink, Hash } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";

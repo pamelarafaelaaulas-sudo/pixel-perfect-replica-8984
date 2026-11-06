@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { ArrowLeft, CalendarClock, CheckCheck, Loader2, MessageCircle, Send, TriangleAlert } from "lucide-react";
+import { CalendarClock, CheckCheck, Loader2, MessageCircle, Send, TriangleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { CustomWhatsappCard } from "@/components/custom-whatsapp";

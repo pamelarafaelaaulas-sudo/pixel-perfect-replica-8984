@@ -109,13 +109,6 @@ function DeadlinesPage() {
 
   return (
     <>
-      <Link
-        to="/professora/turma/$classId"
-        params={{ classId }}
-        className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" /> {cls.name}
-      </Link>
       <PageHeader
         eyebrow="Prazos e atrasos"
         title={cls.name}

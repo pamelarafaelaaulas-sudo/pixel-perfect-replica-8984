@@ -2,7 +2,6 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   AlertTriangle,
-  ArrowLeft,
   Award,
   Check,
   Clock,
