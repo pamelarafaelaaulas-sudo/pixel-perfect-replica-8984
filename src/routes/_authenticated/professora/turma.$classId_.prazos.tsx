@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { format } from "date-fns";
-import { AlertTriangle, ArrowLeft, CalendarClock, Calculator, Check, Clock, Lock, SkipForward, Users } from "lucide-react";
+import { AlertTriangle, CalendarClock, Calculator, Check, Clock, Lock, SkipForward, Users } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";

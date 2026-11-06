@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { ArrowLeft, MessageCircle, RotateCcw, Star, UserMinus, Award, Sparkles } from "lucide-react";
+import { MessageCircle, RotateCcw, Star, UserMinus, Award, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { GroupResponsibilities } from "@/components/group-responsibilities";
