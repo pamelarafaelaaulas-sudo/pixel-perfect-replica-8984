@@ -362,6 +362,42 @@ export const teacherExternalFairsQuery = queryOptions({
   },
 });
 
+export const teacherIndicatorsQuery = queryOptions({
+  queryKey: ["teacher", "indicators"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("classes")
+      .select(
+        `id, name, ethics_form_template_url, fair_name,
+        groups!groups_class_id_fkey(
+          id, group_name,
+          group_members(id),
+          peer_evaluations(score),
+          projects(area_code, current_phase, external_fairs_interest, external_fairs, ethics_human_research, ethics_collection, ethics_form_url)
+        )`,
+      )
+      .order("created_at", { ascending: false });
+    fail(error);
+    return data ?? [];
+  },
+});
+
+/** Last diary entry date of a group (null when empty). */
+export const lastDiaryDateQuery = (groupId: string) =>
+  queryOptions({
+    queryKey: ["diary", "last", groupId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("diary_entries")
+        .select("entry_date")
+        .eq("group_id", groupId)
+        .order("entry_date", { ascending: false })
+        .limit(1);
+      fail(error);
+      return data?.[0]?.entry_date ?? null;
+    },
+  });
+
 /* ---------------- Teacher: bimestre grades across classes ---------------- */
 
 export const teacherBimesterQuery = queryOptions({
