@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { groupMedalRanking, stageMedals, studentMedalRanking, tallyMedals } from "./medals";
+import { groupMedalRanking, poolMedals, stageMedals, studentMedalRanking, tallyMedals } from "./medals";
 
 const due = "2026-03-10T23:59:00-04:00";
 const schedules = [{ phase_number: 1, due_date: due }];
@@ -33,6 +33,27 @@ describe("stage medals", () => {
 
   it("gives no medal on a stage without a deadline", () => {
     expect(stageMedals([], [{ group_id: "a", phase_number: 1, submitted_at: at(1) }])).toEqual([]);
+  });
+});
+
+describe("competing classes", () => {
+  const cls = (id: string, pool: string | null, day: number) => ({
+    id,
+    name: id,
+    medal_pool: pool,
+    schedules,
+    groups: [{ id: `g-${id}`, name: id, members: [], submissions: [{ phase_number: 1, submitted_at: at(day) }] }],
+  });
+  it("classes with the same pool share one podium", () => {
+    const m = poolMedals([cls("A", "Manhã", 2), cls("B", "manhã", 1)]);
+    expect(m.map((x) => [x.groupId, x.kind])).toEqual([
+      ["g-B", "ouro"],
+      ["g-A", "prata"],
+    ]);
+  });
+  it("a class without a pool competes alone", () => {
+    const m = poolMedals([cls("A", null, 2), cls("B", null, 1)]);
+    expect(m.map((x) => x.kind)).toEqual(["ouro", "ouro"]);
   });
 });
 

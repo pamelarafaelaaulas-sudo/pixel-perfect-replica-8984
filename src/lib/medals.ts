@@ -24,18 +24,24 @@ export const MEDAL_LABEL: Record<MedalKind, string> = {
 
 export const MEDAL_EMOJI: Record<MedalKind, string> = { ouro: "🥇", prata: "🥈", bronze: "🥉", honra: "🎖️" };
 
-export type Delivery = { group_id: string; phase_number: number; submitted_at: string };
+/** `due_date` = the deadline of the group's own class (competing classes may have different dates). */
+export type Delivery = { group_id: string; phase_number: number; submitted_at: string; due_date?: string | null };
 export type Schedule = { phase_number: number; due_date: string };
 export type StageMedal = { groupId: string; phase: number; kind: MedalKind; at: string };
 
-/** Medals of every stage of one class. Stages without a deadline give no medals. */
+/**
+ * Medals of every stage among competing groups. Each delivery is judged by its own class deadline
+ * (or `schedules` when it has none). Stages without a deadline give no medals.
+ */
 export function stageMedals(schedules: Schedule[], deliveries: Delivery[]): StageMedal[] {
   const out: StageMedal[] = [];
   for (const { number: phase } of PHASES) {
-    const due = schedules.find((s) => s.phase_number === phase)?.due_date;
-    if (!due) continue;
+    const fallback = schedules.find((s) => s.phase_number === phase)?.due_date;
     const onTime = deliveries
-      .filter((d) => d.phase_number === phase && daysLate(due, d.submitted_at) === 0)
+      .filter((d) => {
+        const due = d.due_date ?? fallback;
+        return d.phase_number === phase && !!due && daysLate(due, d.submitted_at) === 0;
+      })
       .sort((a, b) => new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime() || a.group_id.localeCompare(b.group_id));
     onTime.forEach((d, i) => out.push({ groupId: d.group_id, phase, kind: PODIUM[i] ?? "honra", at: d.submitted_at }));
   }
@@ -78,20 +84,44 @@ export function groupMedalRanking(groups: { id: string; name: string }[], medals
   );
 }
 
+/** Key of the competition a class is in: classes with the same pool label compete together; no label = alone. */
+export const medalPoolKey = (c: { id: string; medal_pool?: string | null }) => {
+  const p = c.medal_pool?.trim().toLowerCase();
+  return p ? `pool:${p}` : `class:${c.id}`;
+};
+
+type RankClass = {
+  id: string;
+  name: string;
+  medal_pool?: string | null;
+  schedules: Schedule[];
+  groups: { id: string; name: string; members: { id: string; name: string }[]; submissions: Omit<Delivery, "group_id" | "due_date">[] }[];
+};
+
+/** Medals for every group, with the podium computed inside each competition (pool of classes). */
+export function poolMedals(classes: RankClass[]): StageMedal[] {
+  const pools = new Map<string, RankClass[]>();
+  for (const c of classes) pools.set(medalPoolKey(c), [...(pools.get(medalPoolKey(c)) ?? []), c]);
+  return [...pools.values()].flatMap((cs) =>
+    stageMedals(
+      [],
+      cs.flatMap((c) =>
+        c.groups.flatMap((g) =>
+          g.submissions.map((s) => ({
+            ...s,
+            group_id: g.id,
+            due_date: c.schedules.find((x) => x.phase_number === s.phase_number)?.due_date ?? null,
+          })),
+        ),
+      ),
+    ),
+  );
+}
+
 /** Ranking of students: each one gets all medals of their group. */
-export function studentMedalRanking(
-  classes: {
-    id: string;
-    name: string;
-    schedules: Schedule[];
-    groups: { id: string; name: string; members: { id: string; name: string }[]; submissions: Omit<Delivery, "group_id">[] }[];
-  }[],
-) {
+export function studentMedalRanking(classes: RankClass[]) {
+  const medals = poolMedals(classes);
   const rows = classes.flatMap((c) => {
-    const medals = stageMedals(
-      c.schedules,
-      c.groups.flatMap((g) => g.submissions.map((s) => ({ ...s, group_id: g.id }))),
-    );
     return c.groups.flatMap((g) => {
       const mine = medals.filter((m) => m.groupId === g.id);
       return g.members.map((s) => ({
