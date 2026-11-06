@@ -1,11 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, BookOpenText, FlaskConical, HelpCircle, Lightbulb, PenLine, Presentation, Users } from "lucide-react";
+import { ArrowRight, BookOpenText, FlaskConical, Lightbulb, Medal, PenLine, Presentation, Sparkles, Trophy, Users } from "lucide-react";
 import logo from "@/assets/feciti-flow-logo.png.asset.json";
 import { Brand } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { PHASES, WRITTEN_END, WRITTEN_START } from "@/lib/phases";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -28,8 +27,6 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const ICONS = [Lightbulb, BookOpenText, HelpCircle, PenLine, Presentation];
-
 function Index() {
   const [signedIn, setSignedIn] = useState(false);
   useEffect(() => {
@@ -48,19 +45,19 @@ function Index() {
       </header>
 
       <main className="mx-auto max-w-6xl px-6 pb-24">
-        <section className="grid gap-10 pt-10 md:grid-cols-[1.25fr_1fr] md:items-center md:pt-16">
+        <section className="grid gap-12 pt-8 md:grid-cols-[1.2fr_1fr] md:items-center md:pt-14">
           <div>
-            <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 font-mono text-xs uppercase tracking-[0.2em] text-secondary-foreground">
-              <FlaskConical className="size-3.5" /> Projeto científico escolar
+            <p className="mb-5 inline-flex items-center gap-2 rounded-full bg-highlight px-3 py-1 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-highlight-foreground">
+              <FlaskConical className="size-3.5" /> Iniciação científica & feiras
             </p>
             <h1 className="text-5xl font-semibold leading-[1.05] text-foreground md:text-6xl">
-              Transformando a curiosidade em ciência, juntos.
+              Transformando a <span className="text-brand-gradient">curiosidade</span> em ciência, juntos.
             </h1>
             <p className="mt-6 max-w-xl text-lg text-muted-foreground">
               Monte a sua equipe de até 3 integrantes e desenvolva seu projeto passo a passo — da escrita do texto à apresentação do banner na feira. Acompanhe os prazos, colabore com seu grupo e construa sua nota bimestre a bimestre.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg">
+              <Button asChild size="lg" className="shadow-lift">
                 <Link to={signedIn ? "/painel" : "/auth"}>
                   <span key={signedIn ? "in" : "out"}>{signedIn ? "Abrir o FECITI Flow" : "Começar agora"}</span> <ArrowRight />
                 </Link>
@@ -68,81 +65,63 @@ function Index() {
             </div>
           </div>
 
-          <figure className="relative mx-auto flex w-full max-w-sm justify-center md:max-w-none">
-            <div aria-hidden className="absolute bottom-6 left-1/2 size-72 -translate-x-1/2 rounded-full bg-brand-gradient opacity-90 md:size-80" />
-            <div aria-hidden className="absolute bottom-48 left-[12%] size-20 rounded-full bg-highlight md:left-[16%]" />
-            <div aria-hidden className="absolute right-[14%] top-10 size-10 rounded-full border-4 border-info" />
+          <figure className="relative mx-auto w-full max-w-md">
+            <div aria-hidden className="absolute -inset-4 rotate-3 rounded-[2rem] bg-brand-gradient opacity-90" />
             <img
               src={logo.url}
               alt="Logo FECITI Flow — Iniciação & Feiras"
               width={435}
               height={330}
-              className="relative z-10 mt-16 w-full max-w-md rounded-3xl bg-card p-4 shadow-lift"
+              className="relative z-10 w-full -rotate-1 rounded-3xl bg-card p-5 shadow-lift"
             />
-            <figcaption className="absolute -bottom-5 right-0 z-20 rotate-2 rounded-xl bg-highlight px-4 py-2 font-display text-lg font-semibold text-highlight-foreground shadow-lift">
-              Bem-vindos ao FECITI Flow!
-            </figcaption>
+            {[
+              { icon: FlaskConical, text: "Iniciação científica", cls: "-left-6 top-4 bg-info text-info-foreground", delay: "0s" },
+              { icon: Presentation, text: "Banner no Canva", cls: "-right-4 top-1/2 bg-highlight text-highlight-foreground", delay: "1.2s" },
+              { icon: Trophy, text: "Pódio & medalhas", cls: "-bottom-6 left-6 bg-primary text-primary-foreground", delay: "2.4s" },
+            ].map(({ icon: I, text, cls, delay }) => (
+              <span
+                key={text}
+                style={{ animationDelay: delay }}
+                className={`animate-float absolute z-20 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold shadow-lift ${cls}`}
+              >
+                <I className="size-4" /> {text}
+              </span>
+            ))}
           </figure>
         </section>
 
-        <section className="mt-20">
-          <h2 className="mb-4 text-3xl font-semibold">O caminho do projeto</h2>
-          <ol className="card-paper relative grid gap-1 p-6 md:grid-cols-2">
+        <section className="mt-28">
+          <h2 className="mb-2 text-3xl font-semibold">A jornada do ano</h2>
+          <p className="mb-6 text-muted-foreground">Quatro bimestres, um projeto completo.</p>
+          <ol className="grid gap-4 md:grid-cols-4">
             {[
-              ...PHASES.filter((p) => p.number < WRITTEN_START),
-              {
-                number: WRITTEN_START,
-                name: "Projeto escrito",
-                hint: `${WRITTEN_END - WRITTEN_START + 1} partes com prazo próprio: título, objetivos, metodologia, introdução, resultados, conclusão, referências e, por último, o resumo.`,
-              },
-              { number: WRITTEN_START + 1, name: "Banner e feira", hint: "No 3º bimestre, o banner montado no Canva; no 4º, a apresentação na feira." },
-            ].map((p, i) => {
-              const Icon = ICONS[i] ?? Lightbulb;
-              return (
-                <li key={p.number} className="flex gap-4 rounded-lg p-3 transition-colors hover:bg-muted">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-full border-2 border-primary/30 font-display text-lg font-semibold text-primary">
-                    {p.number}
-                  </span>
-                  <div>
-                    <p className="flex items-center gap-2 font-medium text-foreground">
-                      <Icon className="size-4 text-primary" /> {p.name}
-                    </p>
-                    <p className="text-sm text-muted-foreground">{p.hint}</p>
-                  </div>
-                </li>
-              );
-            })}
+              { icon: Lightbulb, b: "1º bimestre", t: "Tema, artigos e pergunta", d: "Da curiosidade à pergunta norteadora, com fichamento dos artigos.", cls: "bg-primary text-primary-foreground" },
+              { icon: PenLine, b: "2º bimestre", t: "Escrita científica", d: "Introdução, resultados, referências e resumo com citações ABNT.", cls: "bg-info text-info-foreground" },
+              { icon: Presentation, b: "3º bimestre", t: "Banner e diário", d: "Banner no Canva com devolutiva da professora e diário de bordo.", cls: "bg-highlight text-highlight-foreground" },
+              { icon: Trophy, b: "4º bimestre", t: "Feira FECITI", d: "Apresentação, avaliação e premiação dos projetos.", cls: "bg-brand-gradient text-primary-foreground" },
+            ].map(({ icon: I, b, t, d, cls }) => (
+              <li key={b} className={`rounded-2xl p-5 shadow-lift transition-transform hover:-translate-y-1 ${cls}`}>
+                <I className="size-7" />
+                <p className="mt-4 font-mono text-xs uppercase tracking-[0.2em] opacity-80">{b}</p>
+                <h3 className="mt-1 text-xl font-semibold">{t}</h3>
+                <p className="mt-2 text-sm opacity-90">{d}</p>
+              </li>
+            ))}
           </ol>
         </section>
 
-        <section className="mt-24 grid gap-6 md:grid-cols-3">
+        <section className="mt-20 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            {
-              icon: Users,
-              title: "Grupos de até 3",
-              text: "Cada aluno entra na turma pelo código e forma ou entra num grupo.",
-            },
-            {
-              icon: PenLine,
-              title: "Quem escreveu o quê",
-              text: "Cada edição fica registrada por aluno e por seção do projeto.",
-            },
-            {
-              icon: BookOpenText,
-              title: "Avaliação entre colegas",
-              text: "Confidencial: só quem avaliou e a professora conseguem ver.",
-            },
-          ].map(({ icon: Icon, title, text }, i) => (
-            <div key={title} className="card-paper p-6">
-              <span
-                className={[
-                  "grid size-10 place-items-center rounded-full",
-                  ["bg-primary text-primary-foreground", "bg-info text-info-foreground", "bg-highlight text-highlight-foreground"][i % 3],
-                ].join(" ")}
-              >
+            { icon: Users, title: "Equipes de até 3", text: "Entre na turma pelo código e forme seu grupo.", cls: "bg-primary/15 text-primary" },
+            { icon: Sparkles, title: "Dicas da IA", text: "Sugestões para melhorar a escrita e as citações.", cls: "bg-info/15 text-info" },
+            { icon: Medal, title: "Medalhas digitais", text: "Ganhe ouro, prata e bronze entregando no prazo.", cls: "bg-highlight/40 text-highlight-foreground" },
+            { icon: BookOpenText, title: "Prazos sempre à vista", text: "Avisos coloridos e contagem regressiva da feira.", cls: "bg-primary/15 text-primary" },
+          ].map(({ icon: Icon, title, text, cls }) => (
+            <div key={title} className="card-paper p-6 transition-transform hover:-translate-y-1">
+              <span className={`grid size-11 place-items-center rounded-xl ${cls}`}>
                 <Icon className="size-5" />
               </span>
-              <h3 className="mt-3 text-xl font-semibold">{title}</h3>
+              <h3 className="mt-4 text-lg font-semibold">{title}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{text}</p>
             </div>
           ))}
