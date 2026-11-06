@@ -15,6 +15,7 @@ import { fmtAgo } from "@/lib/format";
 import { AreaSelect, ProjectCodeTag } from "@/components/project-code";
 import { FairCountdown } from "@/components/fair-countdown";
 import { StudentMedals } from "@/components/medals";
+import { StudentAlerts } from "@/components/student-alerts";
 
 export const Route = createFileRoute("/_authenticated/aluno/")({
   head: () => ({
@@ -47,6 +48,8 @@ function StudentHome() {
       <FairCountdown
         classes={memberships.flatMap((m) => (m.groups?.classes ? [m.groups.classes] : []))}
       />
+
+      {memberships.map((m) => m.groups && <StudentAlerts key={m.id} groupId={m.groups.id} />)}
 
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <section className="space-y-4">
