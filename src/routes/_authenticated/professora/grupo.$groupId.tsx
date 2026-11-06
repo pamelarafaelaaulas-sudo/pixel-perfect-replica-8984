@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ArrowLeft, MessageCircle, RotateCcw, Star, UserMinus, Award, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
+import { GroupResponsibilities } from "@/components/group-responsibilities";
 import { PhaseTimeline } from "@/components/phase-timeline";
 import { ProjectView } from "@/components/project-view";
 import { Button } from "@/components/ui/button";
