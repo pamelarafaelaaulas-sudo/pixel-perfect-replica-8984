@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
 import caricature from "@/assets/pamela-caricatura.png";
+import logo from "@/assets/feciti-flow-logo.png.asset.json";
+import { meQuery } from "@/lib/queries";
+import { isOwnerEmail } from "@/lib/owner";
 
 export function PageHeader({
   eyebrow,
@@ -14,10 +18,15 @@ export function PageHeader({
   actions?: ReactNode;
   mascot?: boolean;
 }) {
+  const { data: me } = useQuery({ ...meQuery, enabled: !!mascot });
+  const isOwner = isOwnerEmail(me?.email);
   return (
     <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
       <div className="flex min-w-0 items-center gap-4">
-        {mascot && (
+        {mascot && !isOwner && (
+          <img src={logo.url} alt="FECITI Flow" className="h-20 w-auto shrink-0 rounded-xl bg-card shadow-paper md:h-24" />
+        )}
+        {mascot && isOwner && (
           <span className="relative size-20 shrink-0 overflow-hidden rounded-full bg-brand-gradient shadow-paper ring-4 ring-highlight md:size-24">
             <img
               src={caricature}
