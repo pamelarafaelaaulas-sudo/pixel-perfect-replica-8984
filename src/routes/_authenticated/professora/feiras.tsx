@@ -127,9 +127,6 @@ function FairsPage() {
 
   return (
     <div className="space-y-6">
-      <Button variant="ghost" size="sm" asChild>
-        <Link to="/professora"><ArrowLeft /> Painel</Link>
-      </Button>
       <PageHeader
         title="Feiras externas"
         description="Todos os grupos das suas turmas que querem participar da FETEC/MS ou da FECINTEC."

@@ -72,9 +72,6 @@ function ProgressPage() {
 
   return (
     <>
-      <Link to="/professora" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="size-4" /> Minhas turmas
-      </Link>
       <PageHeader
         eyebrow="Painel da professora"
         title="Progresso dos grupos"

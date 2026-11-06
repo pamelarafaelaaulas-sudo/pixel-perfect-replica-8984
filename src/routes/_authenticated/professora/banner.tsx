@@ -47,9 +47,6 @@ function BannerTemplatePage() {
 
   return (
     <>
-      <Link to="/professora" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="size-4" /> Painel
-      </Link>
       <PageHeader
         eyebrow="3º bimestre · Banner"
         title="Modelo do banner"

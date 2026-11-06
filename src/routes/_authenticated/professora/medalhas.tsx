@@ -65,13 +65,6 @@ function MedalsPage() {
         eyebrow="Painel da professora"
         title="Medalhas e ranking"
         description="Cada aluno ganha as medalhas do seu grupo. No fim do ano, quem tiver mais pontos ganha o seu presente."
-        actions={
-          <Button variant="outline" asChild>
-            <Link to="/professora">
-              <ArrowLeft /> Voltar
-            </Link>
-          </Button>
-        }
       />
       <div className="card-paper mb-6 space-y-3 p-5">
         <MedalRules />
