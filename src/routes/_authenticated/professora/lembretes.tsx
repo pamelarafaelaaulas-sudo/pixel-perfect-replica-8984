@@ -6,6 +6,7 @@ import { ArrowLeft, CalendarClock, CheckCheck, Loader2, MessageCircle, Send, Tri
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { CustomWhatsappCard } from "@/components/custom-whatsapp";
+import { WhatsappSendQueue } from "@/components/whatsapp-send-queue";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -250,6 +251,13 @@ function RemindersPage() {
 
           <section className="card-paper overflow-x-auto p-0">
             <h2 className="px-5 pt-5 text-lg font-semibold">Quem recebe agora</h2>
+            <div className="px-5 pt-3">
+              <WhatsappSendQueue messages={(o?.reminders ?? []).map((r) => ({
+                id: `${r.studentId}-${r.phase}`, name: r.studentName,
+                detail: `${r.className} · ${r.groupName} · ${r.phaseName}`,
+                phone: r.phone, text: reminderText(r, teacherFirst),
+              }))} />
+            </div>
             {o && o.reminders.length === 0 ? (
               <p className="px-5 py-4 text-sm text-muted-foreground">Nenhum aluno com prazo de etapa pela frente.</p>
             ) : (

@@ -262,3 +262,8 @@ export function customText(studentName: string, raw: string, teacherName = "Pâm
   const first = studentName.trim().split(/\s+/)[0] || "aluno(a)";
   return `Olá, ${first}! A professora ${teacherName} deixou um recado sobre o seu projeto científico no FECITI Flow:\n\n${raw.trim()}`;
 }
+
+/** Broadcast note has no individual name; copied locally without calling Meta. */
+export function generalMessageText(raw: string, teacherName: string): string {
+  return `Olá, turma! A professora ${teacherName} deixou um recado sobre o projeto científico no FECITI Flow:\n\n${raw.trim()}`;
+}
