@@ -1,3 +1,5 @@
 - [x] Add a general note copy button for WhatsApp broadcast lists.
 - [x] Add individual free send queues for selected students and deadline reminders.
 - [x] Verify copying and queue progression in the teacher screen (desktop/mobile; no messages sent).
+- [ ] Let group members choose a group leader for reminders and a diary-writing responsible student.
+- [ ] Show these responsibilities to the teacher and verify saved choices and reminder targeting.
