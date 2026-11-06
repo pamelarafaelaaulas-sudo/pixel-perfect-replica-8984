@@ -4,3 +4,5 @@
 - [x] Let group members choose a group leader for reminders and a diary-writing responsible student.
 - [x] Show responsibilities read-only to the teacher and test leader-only reminder targeting.
 - [ ] Verify saved choices end-to-end as a student — blocked on selecting/authorizing a student account; requester account has no group membership.
+- [ ] Add ongoing Diário de bordo submission with selected group responsibilities and pending teacher approval.
+- [ ] Add teacher approve/return actions and validate permission/state rules.
