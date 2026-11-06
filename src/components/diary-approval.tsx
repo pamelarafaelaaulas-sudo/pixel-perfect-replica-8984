@@ -65,7 +65,7 @@ export function DiaryApproval({ groupId, teacher = false, nameOf }: { groupId: s
       {latest.ai_status === "unavailable" && <p className="text-muted-foreground">Dicas da IA indisponíveis neste envio. A aprovação por datas foi mantida.</p>}
     </div>}
     {!teacher && <>
-      <Button disabled={action.isPending || (!pending && problems.length > 0)} onClick={() => action.mutate(pending ? "auto" : "submit")}>
+      <Button className="h-auto min-h-9 max-w-full whitespace-normal py-2 text-left [&_svg]:shrink-0" disabled={action.isPending || (!pending && problems.length > 0)} onClick={() => action.mutate(pending ? "auto" : "submit")}>
         {action.isPending ? <Loader2 className="animate-spin" /> : <Send />} {action.isPending ? "Conferindo diário e preparando dicas…" : pending ? "Aprovar automaticamente este envio" : latest ? "Enviar atualização com aprovação automática" : "Enviar diário com aprovação automática"}
       </Button>
       {!pending && problems.length > 0 && <ul className="list-inside list-disc text-sm text-muted-foreground">{problems.map((p) => <li key={p}>{p}</li>)}</ul>}
