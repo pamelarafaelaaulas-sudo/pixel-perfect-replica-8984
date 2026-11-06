@@ -23,7 +23,7 @@ export const FAIR_DOCS: { key: string; label: string; template: EthicsDoc }[] = 
   },
   {
     key: "autoria",
-    label: "Declaração de autoria",
+    label: "Comitê de ética ",
     template: {
       fileName: "declaracao-autoria.docx",
       title: "DECLARAÇÃO DE AUTORIA",
