@@ -15,7 +15,7 @@ import { DOC_STATUS_LABEL, FAIR_DOCS, FAIR_STATUS_LABEL, accreditationComplete }
 
 const BUCKET = "fair-docs";
 
-function useFairData(groupId: string) {
+export function useFairData(groupId: string) {
   return useQuery({
     queryKey: ["fair-accreditation", groupId],
     queryFn: async () => {
@@ -62,7 +62,7 @@ export async function downloadBannerModel(fair: string) {
 
 /** Teacher: upload the official banner model of each external fair. */
 export function FairBannerModelsManager({ fairs }: { fairs: readonly string[] }) {
-  return <TemplateList title="Modelos oficiais de banner" text="Envie o modelo de banner de cada feira quando quiser (PDF, PPTX, Word ou imagem). Os grupos que marcarem a feira baixam este arquivo." items={fairs.map((f) => ({ key: bannerModelKey(f), label: `Banner ${f}` }))} />;
+  return <TemplateList title="Modelos oficiais de banner" text="Envie o modelo de banner de cada feira quando quiser (PDF, PPTX, Word ou imagem). Somente os grupos aprovados pela professora baixam o modelo das feiras selecionadas." items={fairs.map((f) => ({ key: bannerModelKey(f), label: `Banner ${f}` }))} />;
 }
 
 /** Teacher: upload her own model file for each accreditation document (used by all her groups). */

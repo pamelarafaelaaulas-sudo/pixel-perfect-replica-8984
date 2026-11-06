@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Download, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { downloadBannerModel } from "@/components/fair-accreditation";
+import { downloadBannerModel, useFairData } from "@/components/fair-accreditation";
 import { toast } from "sonner";
 import { FairAttendees } from "@/components/fair-attendees";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { EXTERNAL_FAIRS, fairsLabel, normalizeFairs } from "@/lib/ethics";
+import { canDownloadFairBanner } from "@/lib/fair-docs";
 
 /** Student: "Deseja participar de feiras externas?" — yes opens FETEC/MS and FECINTEC (one or both). */
 export function ExternalFairsCard({
@@ -23,6 +24,7 @@ export function ExternalFairsCard({
   fairs: string[];
 }) {
   const qc = useQueryClient();
+  const { data: fairData } = useFairData(groupId);
   const save = useMutation({
     mutationFn: async (next: { interest: boolean; fairs: string[] }) => {
       const { error } = await supabase
@@ -64,7 +66,7 @@ export function ExternalFairsCard({
               {f}
             </label>
           ))}
-          {fairs.map((f) => (
+          {canDownloadFairBanner(fairData?.approval?.status) && fairs.map((f) => (
             <Button key={`m-${f}`} size="sm" variant="outline" onClick={() => downloadBannerModel(f)}>
               <Download /> Baixar modelo de banner {f}
             </Button>
