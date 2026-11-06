@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { diaryEntriesQuery, diaryGradesQuery } from "@/lib/queries";
+import { diaryEntriesQuery, diaryGradesQuery, diarySubmissionsQuery } from "@/lib/queries";
 import {
   DIARY_KINDS,
   DIARY_MAX_BACKDATE_DAYS,
@@ -180,6 +180,8 @@ export function DiaryEntryForm({ groupId, studentId }: { groupId: string; studen
 /** Sidebar card on the student's project page. */
 export function DiaryCard({ groupId, studentId }: { groupId: string; studentId: string }) {
   const entries = useQuery(diaryEntriesQuery(groupId));
+  const submissions = useQuery(diarySubmissionsQuery(groupId));
+  const status = submissions.data?.[0]?.status;
   const mine = (entries.data ?? []).filter((e) => e.student_id === studentId);
   const s = diaryStats(mine, diaryToday());
   return (
@@ -197,6 +199,9 @@ export function DiaryCard({ groupId, studentId }: { groupId: string; studentId: 
           <NotebookPen /> Abrir diário
         </Link>
       </Button>
+      <Badge variant={status === "pending" ? "warning" : status === "approved" ? "success" : status === "changes_requested" ? "destructive" : "muted"}>
+        {status === "pending" ? "Aguardando aprovação" : status === "approved" ? "Diário aprovado" : status === "changes_requested" ? "Correções solicitadas" : "Em elaboração"}
+      </Badge>
     </div>
   );
 }

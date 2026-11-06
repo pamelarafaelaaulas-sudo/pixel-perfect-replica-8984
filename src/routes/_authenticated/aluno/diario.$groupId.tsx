@@ -4,8 +4,10 @@ import { useState } from "react";
 import { ArrowLeft, MessageSquareText } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { DiaryEntryForm, DiaryTimeline, StatsLine } from "@/components/diary";
+import { GroupResponsibilities } from "@/components/group-responsibilities";
+import { DiaryApproval } from "@/components/diary-approval";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { diaryEntriesQuery, diaryGradesQuery, groupDetailQuery, meQuery } from "@/lib/queries";
+import { diaryEntriesQuery, diaryGradesQuery, diarySubmissionsQuery, groupResponsibilitiesQuery, groupDetailQuery, meQuery } from "@/lib/queries";
 import { diaryStats, diaryToday } from "@/lib/diary";
 import { formatPoints } from "@/lib/penalty";
 import { fmtDateTime } from "@/lib/format";
@@ -26,6 +28,8 @@ export const Route = createFileRoute("/_authenticated/aluno/diario/$groupId")({
       context.queryClient.ensureQueryData(groupDetailQuery(params.groupId)),
       context.queryClient.ensureQueryData(diaryEntriesQuery(params.groupId)),
       context.queryClient.ensureQueryData(diaryGradesQuery(params.groupId)),
+      context.queryClient.ensureQueryData(diarySubmissionsQuery(params.groupId)),
+      context.queryClient.ensureQueryData(groupResponsibilitiesQuery(params.groupId)),
     ]);
     if (!g) throw notFound();
   },
@@ -56,9 +60,12 @@ function DiaryPage() {
       </Link>
       <PageHeader
         eyebrow="Diário de bordo"
-        title="Registros da pesquisa"
+        title="Diário de bordo"
         description="Anote com frequência, com data e com honestidade: o que deu certo, o que deu errado e o que mudou. A professora avalia o diário no 3º bimestre."
       />
+
+      <GroupResponsibilities groupId={groupId} members={members} editable />
+      <DiaryApproval groupId={groupId} nameOf={nameOf} />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <section className="card-paper space-y-5 p-6">

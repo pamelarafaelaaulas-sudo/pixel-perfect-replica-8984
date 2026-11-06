@@ -5,6 +5,7 @@ import { ArrowLeft, MessageCircle, RotateCcw, Star, UserMinus, Award, Sparkles }
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { GroupResponsibilities } from "@/components/group-responsibilities";
+import { DiaryApproval } from "@/components/diary-approval";
 import { PhaseTimeline } from "@/components/phase-timeline";
 import { ProjectView } from "@/components/project-view";
 import { Button } from "@/components/ui/button";
@@ -280,7 +281,7 @@ function TeacherGroupPage() {
           <TabsTrigger value="pares">Avaliação dos colegas</TabsTrigger>
           <TabsTrigger value="banner">Corretor de banner</TabsTrigger>
           <TabsTrigger value="feira">Feira</TabsTrigger>
-          {diaryOpen && <TabsTrigger value="diario">Diário de bordo</TabsTrigger>}
+          <TabsTrigger value="diario">Diário de bordo</TabsTrigger>
           <TabsTrigger value="notas">Notas</TabsTrigger>
           <TabsTrigger value="ia">Avaliação da IA</TabsTrigger>
         </TabsList>
@@ -342,15 +343,16 @@ function TeacherGroupPage() {
             . Ajuste o período em “Vídeos e diário” no painel.
           </p>
         )}
-        {diaryOpen && (
-          <TabsContent value="diario" className="card-paper p-6 md:p-8">
+          <TabsContent value="diario" className="p-0">
+            <DiaryApproval groupId={groupId} teacher nameOf={nameOf} />
+            {diaryOpen && <>
             <p className="mb-6 text-sm text-muted-foreground">
               Avaliação do 3º bimestre, aberta até {fmtDateTime(diaryWindow.end)}. A nota e as observações aparecem para cada aluno no
               diário dele.
             </p>
             <TeacherDiaryTab groupId={groupId} members={members.map((m) => ({ id: m.student_id, name: m.profiles?.name ?? "Aluno" }))} />
+            </>}
           </TabsContent>
-        )}
 
         <TabsContent value="feira" className="card-paper p-6 md:p-8">
           <TeacherFairPanel groupId={groupId} />
