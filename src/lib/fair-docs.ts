@@ -4,7 +4,7 @@ import type { EthicsDoc } from "./ethics";
 export const FAIR_DOCS: { key: string; label: string; template: EthicsDoc }[] = [
   {
     key: "ficha",
-    label: "Ficha de inscrição / credenciamento",
+    label: "Autorização do Uso de Imagem",
     template: {
       fileName: "ficha-credenciamento.docx",
       title: "FICHA DE INSCRIÇÃO E CREDENCIAMENTO",
