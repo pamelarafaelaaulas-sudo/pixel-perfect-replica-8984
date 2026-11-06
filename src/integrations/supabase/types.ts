@@ -495,6 +495,84 @@ export type Database = {
           },
         ]
       }
+      diary_submissions: {
+        Row: {
+          diary_student_id: string
+          entries_snapshot: Json
+          group_id: string
+          id: string
+          leader_student_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string
+          submitted_by: string
+          teacher_note: string | null
+        }
+        Insert: {
+          diary_student_id: string
+          entries_snapshot: Json
+          group_id: string
+          id?: string
+          leader_student_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          submitted_by: string
+          teacher_note?: string | null
+        }
+        Update: {
+          diary_student_id?: string
+          entries_snapshot?: Json
+          group_id?: string
+          id?: string
+          leader_student_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          submitted_by?: string
+          teacher_note?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diary_submissions_diary_student_id_fkey"
+            columns: ["diary_student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diary_submissions_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diary_submissions_leader_student_id_fkey"
+            columns: ["leader_student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diary_submissions_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diary_submissions_submitted_by_fkey"
+            columns: ["submitted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fair_approvals: {
         Row: {
           decided_at: string
@@ -1734,7 +1812,12 @@ export type Database = {
         Args: { _response: string; _review_id: string }
         Returns: string
       }
+      review_group_diary: {
+        Args: { _approve: boolean; _note?: string; _submission_id: string }
+        Returns: undefined
+      }
       shares_group_with: { Args: { _other: string }; Returns: boolean }
+      submit_group_diary: { Args: { _group_id: string }; Returns: string }
       submit_phase: { Args: { _project_id: string }; Returns: number }
       teaches_class: { Args: { _class_id: string }; Returns: boolean }
       teaches_group: { Args: { _group_id: string }; Returns: boolean }
