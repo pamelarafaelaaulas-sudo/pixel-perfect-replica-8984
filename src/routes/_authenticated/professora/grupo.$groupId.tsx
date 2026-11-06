@@ -284,7 +284,7 @@ function TeacherGroupPage() {
         </TabsList>
 
         <TabsContent value="projeto" className="card-paper p-6 md:p-8">
-          {project ? <ProjectView project={project} /> : <p>Sem projeto.</p>}
+          {project ? <ProjectView project={project} groupId={groupId} /> : <p>Sem projeto.</p>}
         </TabsContent>
 
         <TabsContent value="devolutivas" className="card-paper p-6 md:p-8">

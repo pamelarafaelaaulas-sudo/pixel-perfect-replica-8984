@@ -15,7 +15,7 @@ function Text({ value }: { value: string | null }) {
   return <p className="whitespace-pre-wrap leading-relaxed text-foreground">{value}</p>;
 }
 
-export function ProjectView({ project }: { project: Project }) {
+export function ProjectView({ project, groupId }: { project: Project; groupId?: string }) {
   const articles = parseArticles(project.scientific_articles);
   return (
     <div className="space-y-8">
@@ -76,7 +76,7 @@ export function ProjectView({ project }: { project: Project }) {
           <Part title="Objetivos específicos" value={project.specific_objectives} />
           <Part title="Metodologia" value={project.methodology}>
             <div className="mt-3 rounded-lg bg-muted p-3">
-              <EthicsSummary project={project} />
+              <EthicsSummary project={project} groupId={groupId} />
             </div>
           </Part>
           <Part title="Resultados e discussão" value={project.results_discussion} />
