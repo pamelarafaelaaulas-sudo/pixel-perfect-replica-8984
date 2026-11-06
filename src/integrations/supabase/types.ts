@@ -345,6 +345,7 @@ export type Database = {
           highlighted_article_url: string | null
           id: string
           late_penalty_per_day: number
+          medal_pool: string | null
           name: string
           references_video_url: string | null
           teacher_id: string
@@ -368,6 +369,7 @@ export type Database = {
           highlighted_article_url?: string | null
           id?: string
           late_penalty_per_day?: number
+          medal_pool?: string | null
           name: string
           references_video_url?: string | null
           teacher_id: string
@@ -391,6 +393,7 @@ export type Database = {
           highlighted_article_url?: string | null
           id?: string
           late_penalty_per_day?: number
+          medal_pool?: string | null
           name?: string
           references_video_url?: string | null
           teacher_id?: string
@@ -1537,6 +1540,16 @@ export type Database = {
           group_id: string
           group_name: string
           member_count: number
+        }[]
+      }
+      medal_pool_deliveries: {
+        Args: { _class_id: string }
+        Returns: {
+          class_id: string
+          due_date: string
+          group_id: string
+          phase_number: number
+          submitted_at: string
         }[]
       }
       normalized_text: { Args: { _t: string }; Returns: string }
