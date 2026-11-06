@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { ArrowLeft, Download, Trophy } from "lucide-react";
+import { Download, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -127,9 +127,6 @@ function FairsPage() {
 
   return (
     <div className="space-y-6">
-      <Button variant="ghost" size="sm" asChild>
-        <Link to="/professora"><ArrowLeft /> Painel</Link>
-      </Button>
       <PageHeader
         title="Feiras externas"
         description="Todos os grupos das suas turmas que querem participar da FETEC/MS ou da FECINTEC."

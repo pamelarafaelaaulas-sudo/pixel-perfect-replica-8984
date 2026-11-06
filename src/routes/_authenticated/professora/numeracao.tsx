@@ -1,7 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { ArrowDown, ArrowLeft, ArrowUp, Hash, School } from "lucide-react";
+import { ArrowDown, ArrowUp, Hash, School } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -111,9 +111,6 @@ function NumberingPage() {
 
   return (
     <>
-      <Link to="/professora" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="size-4" /> Minhas turmas
-      </Link>
       <PageHeader
         eyebrow="Painel da professora"
         title="Numeração dos trabalhos"

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowLeft, School } from "lucide-react";
+import { School } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -38,9 +38,6 @@ function BimesterPage() {
 
   return (
     <>
-      <Link to="/professora" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="size-4" /> Minhas turmas
-      </Link>
       <PageHeader
         eyebrow="Painel da professora"
         title={`Notas do ${b}º bimestre · ${bimesterMeta(b).title}`}

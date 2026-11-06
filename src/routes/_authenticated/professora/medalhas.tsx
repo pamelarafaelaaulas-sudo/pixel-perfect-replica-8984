@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { medalPoolKey } from "@/lib/medals";
-import { ArrowLeft, Award, Gift } from "lucide-react";
+import { Award, Gift } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { teacherRosterQuery } from "@/lib/queries";
@@ -65,13 +65,6 @@ function MedalsPage() {
         eyebrow="Painel da professora"
         title="Medalhas e ranking"
         description="Cada aluno ganha as medalhas do seu grupo. No fim do ano, quem tiver mais pontos ganha o seu presente."
-        actions={
-          <Button variant="outline" asChild>
-            <Link to="/professora">
-              <ArrowLeft /> Voltar
-            </Link>
-          </Button>
-        }
       />
       <div className="card-paper mb-6 space-y-3 p-5">
         <MedalRules />

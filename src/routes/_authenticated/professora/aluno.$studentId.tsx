@@ -2,7 +2,6 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   AlertTriangle,
-  ArrowLeft,
   Award,
   Check,
   Clock,
@@ -55,12 +54,7 @@ function StudentReviewPage() {
 
   return (
     <>
-      <Link
-        to="/professora"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" /> Minhas turmas
-      </Link>
+
       <PageHeader
         eyebrow="Revisão antes de lançar o bimestre"
         title={profile.name}

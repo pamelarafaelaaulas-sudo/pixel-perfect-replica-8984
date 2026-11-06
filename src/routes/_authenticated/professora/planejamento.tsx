@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { ArrowLeft, CalendarRange } from "lucide-react";
+import { CalendarRange } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
@@ -60,9 +60,6 @@ function PlanningPage() {
 
   return (
     <>
-      <Link to="/professora" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="size-4" /> Minhas turmas
-      </Link>
       <PageHeader
         eyebrow="Painel da professora"
         title="Planejamento"
