@@ -22,7 +22,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { whatsappRemindersQuery } from "@/lib/queries";
+import { meQuery, whatsappRemindersQuery } from "@/lib/queries";
 import { getReminderOverview, sendRemindersNow } from "@/lib/whatsapp.functions";
 import { PHASES, phaseMeta } from "@/lib/phases";
 import { daysText, dueText, reminderParams, reminderText, waLink } from "@/lib/reminders";
@@ -101,6 +101,8 @@ function RemindersPage() {
   });
 
   const o = overview.data;
+  const { data: me } = useQuery(meQuery);
+  const teacherFirst = me?.name?.trim().split(/\s+/)[0] || "Pâmela";
   const tpl = TEMPLATE_LABEL[o?.templateStatus ?? "UNKNOWN"] ?? TEMPLATE_LABEL["UNKNOWN"]!;
   const approved = o?.templateStatus === "APPROVED";
   const sample = o?.reminders[0];
@@ -125,14 +127,26 @@ function RemindersPage() {
         </div>
       ) : overview.isError ? (
         <div className="card-paper p-5 text-sm text-destructive">{(overview.error as Error).message}</div>
-      ) : o && !o.allowed ? (
-        <div className="card-paper flex items-start gap-3 p-5 text-sm">
-          <TriangleAlert className="mt-0.5 size-5 text-accent-foreground" />
-          <p>O WhatsApp ligado ao FECITI Flow é o número da professora Pâmela. Para enviar lembretes da sua conta, peça para ligar um número seu.</p>
-        </div>
       ) : (
         <>
         <div className="grid gap-5 lg:grid-cols-[1fr_1.2fr]">
+          {o && !o.allowed ? (
+            <section className="card-paper space-y-3 p-5 text-sm">
+              <div className="flex items-center gap-3">
+                <span className="grid size-10 place-items-center rounded-full bg-success/15 text-success">
+                  <MessageCircle className="size-5" />
+                </span>
+                <p className="font-semibold">Envio pelo seu WhatsApp</p>
+              </div>
+              <p>
+                Clique em <b>“Abrir no WhatsApp”</b> ao lado de cada aluno. O seu próprio WhatsApp abre com a mensagem pronta,
+                assinada com o seu nome — é só apertar enviar. É grátis.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                O envio automático usa um número ligado à conta de outra professora, por isso fica desativado na sua conta.
+              </p>
+            </section>
+          ) : (
           <section className="card-paper space-y-4 p-5">
             <div className="flex items-center gap-3">
               <span className="grid size-10 place-items-center rounded-full bg-success/15 text-success">
@@ -232,6 +246,7 @@ function RemindersPage() {
               </AlertDialogContent>
             </AlertDialog>
           </section>
+          )}
 
           <section className="card-paper overflow-x-auto p-0">
             <h2 className="px-5 pt-5 text-lg font-semibold">Quem recebe agora</h2>
@@ -261,7 +276,7 @@ function RemindersPage() {
                       <td className="px-5 py-2 text-right font-mono">
                         {daysText(r.daysLeft)}
                         <a
-                          href={waLink(r.phone, reminderText(r))}
+                          href={waLink(r.phone, reminderText(r, teacherFirst))}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="ml-3 inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 font-sans text-xs font-medium text-primary hover:bg-muted"
@@ -294,6 +309,8 @@ function RemindersPage() {
             skipped={o.recipientsSkipped}
             templateStatus={o.customTemplateStatus}
             rejectedReason={o.customRejectedReason}
+            allowed={o.allowed}
+            teacherName={teacherFirst}
           />
         )}
         </>
