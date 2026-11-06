@@ -1,3 +1,5 @@
+import { classMedalsQuery } from "@/lib/queries";
+import { MEDAL_EMOJI, MEDAL_LABEL, stageMedals } from "@/lib/medals";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
