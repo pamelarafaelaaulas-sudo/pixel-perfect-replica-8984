@@ -50,8 +50,27 @@ async function downloadTemplate(key: string) {
   URL.revokeObjectURL(a.href);
 }
 
+/** Key used in fair_doc_templates for an external fair's official banner model. */
+export const bannerModelKey = (fair: string) => `banner:${fair}`;
+
+/** Student: download the official banner model the teacher uploaded for a fair. */
+export async function downloadBannerModel(fair: string) {
+  const { data } = await supabase.from("fair_doc_templates").select("file_path").eq("doc_type", bannerModelKey(fair)).limit(1).maybeSingle();
+  if (!data?.file_path) { toast.error("A professora ainda não enviou o modelo desta feira."); return; }
+  await openDoc(data.file_path);
+}
+
+/** Teacher: upload the official banner model of each external fair. */
+export function FairBannerModelsManager({ fairs }: { fairs: readonly string[] }) {
+  return <TemplateList title="Modelos oficiais de banner" text="Envie o modelo de banner de cada feira quando quiser (PDF, PPTX, Word ou imagem). Os grupos que marcarem a feira baixam este arquivo." items={fairs.map((f) => ({ key: bannerModelKey(f), label: `Banner ${f}` }))} />;
+}
+
 /** Teacher: upload her own model file for each accreditation document (used by all her groups). */
 export function FairTemplatesManager() {
+  return <TemplateList title="Modelos dos documentos da feira" text="Envie seus próprios modelos (Word, PDF ou imagem). Os grupos aprovados baixam o seu arquivo; sem modelo enviado, usam o padrão do FECITI Flow." items={FAIR_DOCS.map((d) => ({ key: d.key, label: d.label, builtIn: true }))} />;
+}
+
+function TemplateList({ title, text, items }: { title: string; text: string; items: { key: string; label: string; builtIn?: boolean }[] }) {
   const qc = useQueryClient();
   const inputs = useRef<Record<string, HTMLInputElement | null>>({});
   const [busy, setBusy] = useState<string | null>(null);
