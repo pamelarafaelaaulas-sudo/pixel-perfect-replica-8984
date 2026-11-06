@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { FAIR_DOCS, accreditationComplete } from "./fair-docs";
+import { FAIR_DOCS, accreditationComplete, canDownloadFairBanner } from "./fair-docs";
+
+describe("external fair banner models", () => {
+  it("only releases the model after teacher approval", () => {
+    expect(canDownloadFairBanner("aprovado")).toBe(true);
+    expect(canDownloadFairBanner(undefined)).toBe(false);
+    expect(canDownloadFairBanner(null)).toBe(false);
+    expect(canDownloadFairBanner("ajustes")).toBe(false);
+    expect(canDownloadFairBanner("recusado")).toBe(false);
+  });
+});
 
 describe("accreditationComplete", () => {
   it("needs every document checked", () => {

@@ -65,6 +65,11 @@ export const DOC_STATUS_LABEL: Record<string, string> = {
   refazer: "Refazer",
 };
 
+/** Interest alone never releases an external fair's banner model. */
+export function canDownloadFairBanner(status: string | null | undefined): boolean {
+  return status === "aprovado";
+}
+
 /** Accreditation is complete when every required document is checked by the teacher. */
 export function accreditationComplete(docs: { doc_type: string; status: string }[]): boolean {
   return FAIR_DOCS.every((d) => docs.some((x) => x.doc_type === d.key && x.status === "conferido"));
