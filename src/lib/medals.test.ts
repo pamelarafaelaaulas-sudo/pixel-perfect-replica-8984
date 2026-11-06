@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { groupMedalRanking, stageMedals, studentMedalRanking, tallyMedals } from "./medals";
+import { groupMedalRanking, poolMedals, stageMedals, studentMedalRanking, tallyMedals } from "./medals";
 
 const due = "2026-03-10T23:59:00-04:00";
 const schedules = [{ phase_number: 1, due_date: due }];
