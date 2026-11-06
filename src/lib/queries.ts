@@ -300,13 +300,10 @@ export const classMedalsQuery = (classId: string) =>
   queryOptions({
     queryKey: ["medals", classId],
     queryFn: async () => {
-      const [schedules, deliveries] = await Promise.all([
-        supabase.from("schedules").select("phase_number, due_date").eq("class_id", classId),
-        supabase.rpc("class_medal_deliveries", { _class_id: classId }),
-      ]);
-      fail(schedules.error);
+      // Every group competing with this class (classes in the same medal pool), each with its own class deadline.
+      const deliveries = await supabase.rpc("medal_pool_deliveries", { _class_id: classId });
       fail(deliveries.error);
-      return { schedules: schedules.data ?? [], deliveries: deliveries.data ?? [] };
+      return { schedules: [] as { phase_number: number; due_date: string }[], deliveries: deliveries.data ?? [] };
     },
   });
 
@@ -332,7 +329,7 @@ export const teacherRosterQuery = queryOptions({
     const { data, error } = await supabase
       .from("classes")
       .select(
-        `id, name, late_penalty_per_day,
+        `id, name, late_penalty_per_day, medal_pool,
         schedules(phase_number, due_date),
         groups!groups_class_id_fkey(
           id, group_name,
