@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { groupResponsibilitiesQuery } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 
 type Member = { student_id: string; profiles: { name: string } | null };
 
@@ -12,9 +13,9 @@ export function GroupResponsibilities({ groupId, members, editable = false }: { 
   const qc = useQueryClient();
   const save = useMutation({
     mutationFn: async ({ field, value }: { field: "leader_student_id" | "diary_student_id"; value: string }) => {
-      const { error } = await supabase.from("group_responsibilities").upsert({
-        group_id: groupId, [field]: value === "none" ? null : value,
-      }, { onConflict: "group_id" });
+      const patch: Database["public"]["Tables"]["group_responsibilities"]["Insert"] = { group_id: groupId };
+      patch[field] = value === "none" ? null : value;
+      const { error } = await supabase.from("group_responsibilities").upsert(patch, { onConflict: "group_id" });
       if (error) throw error;
     },
     onSuccess: async () => {
