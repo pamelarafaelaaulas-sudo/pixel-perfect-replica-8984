@@ -114,7 +114,7 @@ export function TcleUploads({ groupId, editable }: { groupId: string; editable: 
   });
   async function open(name: string) {
     const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(`${groupId}/${name}`, 300);
-    if (error || !data) return toast.error("Não foi possível abrir o arquivo.");
+    if (error || !data) { toast.error("Não foi possível abrir o arquivo."); return; }
     window.open(data.signedUrl, "_blank", "noopener");
   }
   return (

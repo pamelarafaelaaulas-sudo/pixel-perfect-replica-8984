@@ -15,7 +15,7 @@ function Text({ value }: { value: string | null }) {
   return <p className="whitespace-pre-wrap leading-relaxed text-foreground">{value}</p>;
 }
 
-export function ProjectView({ project, groupId }: { project: Project; groupId?: string }) {
+export function ProjectView({ project, groupId }: { project: Project; groupId?: string | undefined }) {
   const articles = parseArticles(project.scientific_articles);
   return (
     <div className="space-y-8">

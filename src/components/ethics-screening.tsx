@@ -255,7 +255,7 @@ export function EthicsScreening({
 }
 
 /** Read-only summary for the teacher. */
-export function EthicsSummary({ project, groupId }: { project: EthicsProject; groupId?: string }) {
+export function EthicsSummary({ project, groupId }: { project: EthicsProject; groupId?: string | undefined }) {
   return (
     <>
       <EthicsSummaryBase project={project} />
