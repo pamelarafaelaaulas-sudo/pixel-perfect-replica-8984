@@ -23,6 +23,7 @@ import { Route as AuthenticatedProfessoraBannerRouteImport } from './routes/_aut
 import { Route as AuthenticatedProfessoraBimestresRouteImport } from './routes/_authenticated/professora/bimestres'
 import { Route as AuthenticatedProfessoraExportarRouteImport } from './routes/_authenticated/professora/exportar'
 import { Route as AuthenticatedProfessoraFeirasRouteImport } from './routes/_authenticated/professora/feiras'
+import { Route as AuthenticatedProfessoraIndicadoresRouteImport } from './routes/_authenticated/professora/indicadores'
 import { Route as AuthenticatedProfessoraLembretesRouteImport } from './routes/_authenticated/professora/lembretes'
 import { Route as AuthenticatedProfessoraMedalhasRouteImport } from './routes/_authenticated/professora/medalhas'
 import { Route as AuthenticatedProfessoraNumeracaoRouteImport } from './routes/_authenticated/professora/numeracao'
@@ -112,6 +113,12 @@ const AuthenticatedProfessoraFeirasRoute =
   AuthenticatedProfessoraFeirasRouteImport.update({
     id: '/feiras',
     path: '/feiras',
+    getParentRoute: () => AuthenticatedProfessoraRouteRoute,
+  } as any)
+const AuthenticatedProfessoraIndicadoresRoute =
+  AuthenticatedProfessoraIndicadoresRouteImport.update({
+    id: '/indicadores',
+    path: '/indicadores',
     getParentRoute: () => AuthenticatedProfessoraRouteRoute,
   } as any)
 const AuthenticatedProfessoraLembretesRoute =
@@ -211,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/professora/bimestres': typeof AuthenticatedProfessoraBimestresRoute
   '/professora/exportar': typeof AuthenticatedProfessoraExportarRoute
   '/professora/feiras': typeof AuthenticatedProfessoraFeirasRoute
+  '/professora/indicadores': typeof AuthenticatedProfessoraIndicadoresRoute
   '/professora/lembretes': typeof AuthenticatedProfessoraLembretesRoute
   '/professora/medalhas': typeof AuthenticatedProfessoraMedalhasRoute
   '/professora/numeracao': typeof AuthenticatedProfessoraNumeracaoRoute
@@ -238,6 +246,7 @@ export interface FileRoutesByTo {
   '/professora/bimestres': typeof AuthenticatedProfessoraBimestresRoute
   '/professora/exportar': typeof AuthenticatedProfessoraExportarRoute
   '/professora/feiras': typeof AuthenticatedProfessoraFeirasRoute
+  '/professora/indicadores': typeof AuthenticatedProfessoraIndicadoresRoute
   '/professora/lembretes': typeof AuthenticatedProfessoraLembretesRoute
   '/professora/medalhas': typeof AuthenticatedProfessoraMedalhasRoute
   '/professora/numeracao': typeof AuthenticatedProfessoraNumeracaoRoute
@@ -269,6 +278,7 @@ export interface FileRoutesById {
   '/_authenticated/professora/bimestres': typeof AuthenticatedProfessoraBimestresRoute
   '/_authenticated/professora/exportar': typeof AuthenticatedProfessoraExportarRoute
   '/_authenticated/professora/feiras': typeof AuthenticatedProfessoraFeirasRoute
+  '/_authenticated/professora/indicadores': typeof AuthenticatedProfessoraIndicadoresRoute
   '/_authenticated/professora/lembretes': typeof AuthenticatedProfessoraLembretesRoute
   '/_authenticated/professora/medalhas': typeof AuthenticatedProfessoraMedalhasRoute
   '/_authenticated/professora/numeracao': typeof AuthenticatedProfessoraNumeracaoRoute
@@ -300,6 +310,7 @@ export interface FileRouteTypes {
     | '/professora/bimestres'
     | '/professora/exportar'
     | '/professora/feiras'
+    | '/professora/indicadores'
     | '/professora/lembretes'
     | '/professora/medalhas'
     | '/professora/numeracao'
@@ -327,6 +338,7 @@ export interface FileRouteTypes {
     | '/professora/bimestres'
     | '/professora/exportar'
     | '/professora/feiras'
+    | '/professora/indicadores'
     | '/professora/lembretes'
     | '/professora/medalhas'
     | '/professora/numeracao'
@@ -357,6 +369,7 @@ export interface FileRouteTypes {
     | '/_authenticated/professora/bimestres'
     | '/_authenticated/professora/exportar'
     | '/_authenticated/professora/feiras'
+    | '/_authenticated/professora/indicadores'
     | '/_authenticated/professora/lembretes'
     | '/_authenticated/professora/medalhas'
     | '/_authenticated/professora/numeracao'
@@ -482,6 +495,13 @@ declare module '@tanstack/react-router' {
       path: '/feiras'
       fullPath: '/professora/feiras'
       preLoaderRoute: typeof AuthenticatedProfessoraFeirasRouteImport
+      parentRoute: typeof AuthenticatedProfessoraRouteRoute
+    }
+    '/_authenticated/professora/indicadores': {
+      id: '/_authenticated/professora/indicadores'
+      path: '/indicadores'
+      fullPath: '/professora/indicadores'
+      preLoaderRoute: typeof AuthenticatedProfessoraIndicadoresRouteImport
       parentRoute: typeof AuthenticatedProfessoraRouteRoute
     }
     '/_authenticated/professora/lembretes': {
@@ -613,6 +633,7 @@ interface AuthenticatedProfessoraRouteRouteChildren {
   AuthenticatedProfessoraBimestresRoute: typeof AuthenticatedProfessoraBimestresRoute
   AuthenticatedProfessoraExportarRoute: typeof AuthenticatedProfessoraExportarRoute
   AuthenticatedProfessoraFeirasRoute: typeof AuthenticatedProfessoraFeirasRoute
+  AuthenticatedProfessoraIndicadoresRoute: typeof AuthenticatedProfessoraIndicadoresRoute
   AuthenticatedProfessoraLembretesRoute: typeof AuthenticatedProfessoraLembretesRoute
   AuthenticatedProfessoraMedalhasRoute: typeof AuthenticatedProfessoraMedalhasRoute
   AuthenticatedProfessoraNumeracaoRoute: typeof AuthenticatedProfessoraNumeracaoRoute
@@ -633,6 +654,8 @@ const AuthenticatedProfessoraRouteRouteChildren: AuthenticatedProfessoraRouteRou
       AuthenticatedProfessoraBimestresRoute,
     AuthenticatedProfessoraExportarRoute: AuthenticatedProfessoraExportarRoute,
     AuthenticatedProfessoraFeirasRoute: AuthenticatedProfessoraFeirasRoute,
+    AuthenticatedProfessoraIndicadoresRoute:
+      AuthenticatedProfessoraIndicadoresRoute,
     AuthenticatedProfessoraLembretesRoute:
       AuthenticatedProfessoraLembretesRoute,
     AuthenticatedProfessoraMedalhasRoute: AuthenticatedProfessoraMedalhasRoute,
