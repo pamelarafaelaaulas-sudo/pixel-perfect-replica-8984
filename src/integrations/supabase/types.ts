@@ -497,6 +497,9 @@ export type Database = {
       }
       diary_submissions: {
         Row: {
+          ai_feedback: string | null
+          ai_status: string
+          approval_source: string
           diary_student_id: string
           entries_snapshot: Json
           group_id: string
@@ -510,6 +513,9 @@ export type Database = {
           teacher_note: string | null
         }
         Insert: {
+          ai_feedback?: string | null
+          ai_status?: string
+          approval_source?: string
           diary_student_id: string
           entries_snapshot: Json
           group_id: string
@@ -523,6 +529,9 @@ export type Database = {
           teacher_note?: string | null
         }
         Update: {
+          ai_feedback?: string | null
+          ai_status?: string
+          approval_source?: string
           diary_student_id?: string
           entries_snapshot?: Json
           group_id?: string
