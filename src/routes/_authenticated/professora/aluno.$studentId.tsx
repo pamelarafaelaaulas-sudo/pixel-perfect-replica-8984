@@ -26,12 +26,12 @@ import { AdjustmentEditor } from "@/components/grade-adjustment";
 export const Route = createFileRoute("/_authenticated/professora/aluno/$studentId")({
   head: () => ({
     meta: [
-      { title: "Revisão do aluno — PamLab" },
+      { title: "Revisão do aluno — FECITI Flow" },
       {
         name: "description",
         content: "Notas por etapa, total e histórico de atrasos de um aluno.",
       },
-      { property: "og:title", content: "Revisão do aluno — PamLab" },
+      { property: "og:title", content: "Revisão do aluno — FECITI Flow" },
       {
         property: "og:description",
         content: "Notas por etapa, total e histórico de atrasos de um aluno.",

@@ -53,7 +53,7 @@ export const BANNER_PROGRESS_LABEL: Record<BannerProgress, string> = {
   entregue: "Entregue",
 };
 
-/** Where a group is on the banner, from what it saved in PamLab (Canva itself does not tell us who is editing). */
+/** Where a group is on the banner, from what it saved in FECITI Flow (Canva itself does not tell us who is editing). */
 export function bannerProgress(p: {
   templateUrl: string | null | undefined;
   canvaUrl: string | null | undefined;

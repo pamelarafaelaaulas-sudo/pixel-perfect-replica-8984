@@ -21,9 +21,9 @@ import { TrailSettingsDialog } from "@/components/trail-settings";
 export const Route = createFileRoute("/_authenticated/professora/")({
   head: () => ({
     meta: [
-      { title: "Minhas turmas — PamLab" },
+      { title: "Minhas turmas — FECITI Flow" },
       { name: "description", content: "Turmas, grupos e prazos do projeto científico." },
-      { property: "og:title", content: "Minhas turmas — PamLab" },
+      { property: "og:title", content: "Minhas turmas — FECITI Flow" },
       { property: "og:description", content: "Turmas, grupos e prazos do projeto científico." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -14,9 +14,9 @@ import { plural } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/professora/bimestres")({
   head: () => ({
     meta: [
-      { title: "Notas do bimestre — PamLab" },
+      { title: "Notas do bimestre — FECITI Flow" },
       { name: "description", content: "Notas lançadas, desconto de atraso e total de cada grupo, nos 4 bimestres." },
-      { property: "og:title", content: "Notas do bimestre — PamLab" },
+      { property: "og:title", content: "Notas do bimestre — FECITI Flow" },
       { property: "og:description", content: "Notas lançadas, desconto de atraso e total de cada grupo, nos 4 bimestres." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -32,9 +32,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/professora/lembretes")({
   head: () => ({
     meta: [
-      { title: "Lembretes no WhatsApp — PamLab" },
+      { title: "Lembretes no WhatsApp — FECITI Flow" },
       { name: "description", content: "Envie aos alunos, pelo WhatsApp, quantos dias faltam para o prazo de cada etapa." },
-      { property: "og:title", content: "Lembretes no WhatsApp — PamLab" },
+      { property: "og:title", content: "Lembretes no WhatsApp — FECITI Flow" },
       { property: "og:description", content: "Envie aos alunos, pelo WhatsApp, quantos dias faltam para o prazo de cada etapa." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -128,7 +128,7 @@ function RemindersPage() {
       ) : o && !o.allowed ? (
         <div className="card-paper flex items-start gap-3 p-5 text-sm">
           <TriangleAlert className="mt-0.5 size-5 text-accent-foreground" />
-          <p>O WhatsApp ligado ao PamLab é o número da professora Pâmela. Para enviar lembretes da sua conta, peça para ligar um número seu.</p>
+          <p>O WhatsApp ligado ao FECITI Flow é o número da professora Pâmela. Para enviar lembretes da sua conta, peça para ligar um número seu.</p>
         </div>
       ) : (
         <>
@@ -157,7 +157,7 @@ function RemindersPage() {
             <div className="rounded-lg border border-border bg-muted/40 p-3 text-sm">
               <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">Mensagem</p>
               <p>
-                Olá, <b>{sample ? reminderParams(sample)[0] : "[nome]"}</b>! Lembrete do PamLab: faltam{" "}
+                Olá, <b>{sample ? reminderParams(sample)[0] : "[nome]"}</b>! Lembrete do FECITI Flow: faltam{" "}
                 <b>{sample ? daysText(sample.daysLeft) : "[3 dias]"}</b> para o término do prazo da etapa{" "}
                 <b>{sample?.phaseName ?? "[etapa]"}</b> do seu projeto científico. O prazo encerra em{" "}
                 <b>{sample ? dueText(sample.dueDate) : "[data]"}</b>. Esta é uma mensagem automática, não é necessário responder.
@@ -169,7 +169,7 @@ function RemindersPage() {
                 <div>
                   <p className="font-medium">Envio automático</p>
                   <p className="text-xs text-muted-foreground">
-                    Todo dia às 8h o PamLab confere e envia quando já se passaram os dias escolhidos.
+                    Todo dia às 8h o FECITI Flow confere e envia quando já se passaram os dias escolhidos.
                   </p>
                 </div>
                 <Switch

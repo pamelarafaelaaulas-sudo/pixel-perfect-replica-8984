@@ -84,13 +84,13 @@ export function FairTemplatesManager() {
     if (!row) return;
     await supabase.storage.from(BUCKET).remove([row.file_path]);
     await supabase.from("fair_doc_templates").delete().eq("teacher_id", row.teacher_id).eq("doc_type", key);
-    toast.success("Modelo removido. Volta a valer o modelo padrão do PamLab.");
+    toast.success("Modelo removido. Volta a valer o modelo padrão do FECITI Flow.");
     qc.invalidateQueries({ queryKey: ["fair-templates"] });
   }
   return (
     <div className="card-paper space-y-3 p-5">
       <h3 className="text-lg font-semibold">Modelos dos documentos da feira</h3>
-      <p className="text-sm text-muted-foreground">Envie seus próprios modelos (Word, PDF ou imagem). Os grupos aprovados baixam o seu arquivo; sem modelo enviado, usam o padrão do PamLab.</p>
+      <p className="text-sm text-muted-foreground">Envie seus próprios modelos (Word, PDF ou imagem). Os grupos aprovados baixam o seu arquivo; sem modelo enviado, usam o padrão do FECITI Flow.</p>
       <ul className="space-y-2">
         {FAIR_DOCS.map((d) => {
           const row = rows.find((r) => r.doc_type === d.key);
@@ -98,7 +98,7 @@ export function FairTemplatesManager() {
             <li key={d.key} className="flex flex-wrap items-center justify-between gap-2 rounded-md border p-3">
               <div>
                 <p className="text-sm font-medium">{d.label}</p>
-                <p className="text-xs text-muted-foreground">{row ? `Seu modelo: ${row.file_name}` : "Usando o modelo padrão do PamLab"}</p>
+                <p className="text-xs text-muted-foreground">{row ? `Seu modelo: ${row.file_name}` : "Usando o modelo padrão do FECITI Flow"}</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button size="sm" variant="ghost" onClick={() => (row ? openDoc(row.file_path) : downloadTemplate(d.key))}><Download /> Ver</Button>

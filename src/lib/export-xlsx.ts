@@ -10,7 +10,7 @@ const HEADER_FILL = { type: "pattern" as const, pattern: "solid" as const, fgCol
 export async function buildWorkbook(rows: Rows, title: string): Promise<Blob> {
   const { default: ExcelJS } = await import("exceljs");
   const wb = new ExcelJS.Workbook();
-  wb.creator = "PamLab";
+  wb.creator = "FECITI Flow";
   wb.title = title;
 
   const sheet = (name: string, cols: { header: string; key: string; width: number; fmt?: string; wrap?: boolean }[]) => {
@@ -101,7 +101,7 @@ type Col = { header: string; key: string; width: number; fmt?: string; wrap?: bo
 async function newWorkbook(title: string) {
   const { default: ExcelJS } = await import("exceljs");
   const wb = new ExcelJS.Workbook();
-  wb.creator = "PamLab";
+  wb.creator = "FECITI Flow";
   wb.title = title;
   const used = new Set<string>();
   const addSheet = (rawName: string, cols: Col[]) => {

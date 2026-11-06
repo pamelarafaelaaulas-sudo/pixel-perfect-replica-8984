@@ -200,7 +200,7 @@ export function StudentWrittenResubmit({
         {send.isPending ? <Loader2 className="animate-spin" /> : <Send />} Enviar versão {next}
       </Button>
       <p className="text-xs text-muted-foreground">
-        O PamLab registra a data e a hora do envio. Se o texto for idêntico ao anterior, o envio é recusado. A professora recebe a sua
+        O FECITI Flow registra a data e a hora do envio. Se o texto for idêntico ao anterior, o envio é recusado. A professora recebe a sua
         resposta e uma comparação entre as duas versões.
       </p>
     </div>

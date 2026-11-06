@@ -192,7 +192,7 @@ function ResubmitForm({ groupId, project, review }: { groupId: string; project: 
         {busy ? <Loader2 className="animate-spin" /> : <Send />} Escolher arquivo e enviar versão {next}
       </Button>
       <p className="text-xs text-muted-foreground">
-        O PamLab registra a data e a hora do envio. Se o arquivo for idêntico ao anterior, o envio é recusado. A professora recebe a
+        O FECITI Flow registra a data e a hora do envio. Se o arquivo for idêntico ao anterior, o envio é recusado. A professora recebe a
         sua resposta e uma comparação entre as duas versões.
       </p>
     </div>

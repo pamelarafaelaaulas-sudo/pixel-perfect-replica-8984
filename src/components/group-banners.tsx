@@ -122,7 +122,7 @@ export function GroupBanners({
             <p className="max-w-xs text-xs text-muted-foreground">
               {drive.isError
                 ? "Não foi possível falar com o Google Drive agora."
-                : "A pasta no Google Drive fica na conta da professora que conectou o Drive ao PamLab."}
+                : "A pasta no Google Drive fica na conta da professora que conectou o Drive ao FECITI Flow."}
             </p>
           )}
         </div>

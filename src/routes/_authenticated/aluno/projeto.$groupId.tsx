@@ -75,9 +75,9 @@ import { writtenPhaseText } from "@/lib/written-review";
 export const Route = createFileRoute("/_authenticated/aluno/projeto/$groupId")({
   head: () => ({
     meta: [
-      { title: "Projeto do grupo — PamLab" },
+      { title: "Projeto do grupo — FECITI Flow" },
       { name: "description", content: "Escreva o projeto científico do grupo, etapa por etapa." },
-      { property: "og:title", content: "Projeto do grupo — PamLab" },
+      { property: "og:title", content: "Projeto do grupo — FECITI Flow" },
       { property: "og:description", content: "Escreva o projeto científico do grupo, etapa por etapa." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

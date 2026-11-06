@@ -136,8 +136,8 @@ export function CustomWhatsappCard({
           <div className="rounded-lg border border-border bg-muted/40 p-3 text-sm">
             <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">Como o aluno recebe</p>
             <p>
-              Olá, <b>{sampleName}</b>! A professora Pâmela deixou um recado sobre o seu projeto científico no PamLab:{" "}
-              <b>{sampleText}</b> Em caso de dúvida, fale com a professora na sala de aula ou pelo PamLab.
+              Olá, <b>{sampleName}</b>! A professora Pâmela deixou um recado sobre o seu projeto científico no FECITI Flow:{" "}
+              <b>{sampleText}</b> Em caso de dúvida, fale com a professora na sala de aula ou pelo FECITI Flow.
             </p>
             <p className="mt-2 text-xs text-muted-foreground">Quebras de linha viram “·”, porque o WhatsApp não aceita parágrafos nesse tipo de mensagem.</p>
           </div>

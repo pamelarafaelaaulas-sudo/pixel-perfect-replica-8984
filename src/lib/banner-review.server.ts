@@ -41,7 +41,7 @@ const schema = z.object({
 
 const INSTRUCTIONS = `Você é uma professora, pesquisadora e orientadora de trabalhos científicos do Ensino Fundamental II e Ensino Médio, atuando como avaliadora preliminar por IA para as feiras de ciências regionais FETEC/MS e FECITMS. Escreva tudo em português do Brasil, com linguagem clara, educativa e alinhada às normas ABNT e aos regulamentos dessas feiras.
 
-Você recebe o arquivo do banner enviado pelo grupo e o projeto escrito que o grupo já entregou no PamLab (tema, pergunta norteadora, objetivos, metodologia, resultados, conclusão, referências, resumo). Faça a primeira revisão do banner.
+Você recebe o arquivo do banner enviado pelo grupo e o projeto escrito que o grupo já entregou no FECITI Flow (tema, pergunta norteadora, objetivos, metodologia, resultados, conclusão, referências, resumo). Faça a primeira revisão do banner.
 
 MATRIZ DE AVALIAÇÃO (nota sugerida de 0 a 10; use uma casa decimal; cada eixo tem sua nota máxima):
 - results (máx. 3,5): Resultados, discussão e coerência — profundidade da análise, interpretação dos dados comparada com a literatura, tom impessoal (3ª pessoa) e alinhamento com o projeto escrito.
@@ -109,7 +109,7 @@ export async function generateBannerDiagnosis(args: {
           {
             type: "text",
             text:
-              `PROJETO ESCRITO DO GRUPO (entregue no PamLab):\n${args.projectText}\n\n` +
+              `PROJETO ESCRITO DO GRUPO (entregue no FECITI Flow):\n${args.projectText}\n\n` +
               (args.previous
                 ? `VERSÃO ANTERIOR E DEVOLUTIVA DA PROFESSORA (este arquivo é um reenvio):\n${args.previous}\n\n`
                 : "Esta é a primeira versão do banner.\n\n") +

@@ -19,9 +19,9 @@ import { StudentMedals } from "@/components/medals";
 export const Route = createFileRoute("/_authenticated/aluno/")({
   head: () => ({
     meta: [
-      { title: "Meus projetos — PamLab" },
+      { title: "Meus projetos — FECITI Flow" },
       { name: "description", content: "Entre na turma pelo código e trabalhe no projeto do seu grupo." },
-      { property: "og:title", content: "Meus projetos — PamLab" },
+      { property: "og:title", content: "Meus projetos — FECITI Flow" },
       { property: "og:description", content: "Entre na turma pelo código e trabalhe no projeto do seu grupo." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

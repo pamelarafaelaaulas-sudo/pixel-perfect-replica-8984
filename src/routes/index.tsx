@@ -10,16 +10,16 @@ import { PHASES, WRITTEN_END, WRITTEN_START } from "@/lib/phases";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "PamLab — Projeto científico da turma" },
+      { title: "FECITI Flow — Projeto científico da turma" },
       {
         name: "description",
         content:
           "Grupos de até 3 alunos constroem o projeto científico etapa por etapa, com prazos, banner no Canva, feira, avaliação entre colegas e notas nos 4 bimestres.",
       },
-      { property: "og:title", content: "PamLab — Projeto científico da turma" },
+      { property: "og:title", content: "FECITI Flow — Projeto científico da turma" },
       {
         property: "og:description",
-        content: "Tema, artigos, pergunta norteadora, projeto escrito, banner e feira — tudo no PamLab.",
+        content: "Tema, artigos, pergunta norteadora, projeto escrito, banner e feira — tudo no FECITI Flow.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -62,7 +62,7 @@ function Index() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
                 <Link to={signedIn ? "/painel" : "/auth"}>
-                  <span key={signedIn ? "in" : "out"}>{signedIn ? "Abrir o PamLab" : "Começar agora"}</span> <ArrowRight />
+                  <span key={signedIn ? "in" : "out"}>{signedIn ? "Abrir o FECITI Flow" : "Começar agora"}</span> <ArrowRight />
                 </Link>
               </Button>
             </div>
@@ -80,7 +80,7 @@ function Index() {
               className="relative z-10 h-[440px] w-auto drop-shadow-xl md:h-[520px]"
             />
             <figcaption className="absolute -bottom-5 right-0 z-20 rotate-2 rounded-xl bg-highlight px-4 py-2 font-display text-lg font-semibold text-highlight-foreground shadow-lift">
-              Bem-vindos ao PamLab!
+              Bem-vindos ao FECITI Flow!
             </figcaption>
           </figure>
         </section>

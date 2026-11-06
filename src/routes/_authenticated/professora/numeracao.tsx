@@ -16,9 +16,9 @@ import { NumberingSheetButton } from "@/components/sheet-downloads";
 export const Route = createFileRoute("/_authenticated/professora/numeracao")({
   head: () => ({
     meta: [
-      { title: "Numeração dos trabalhos — PamLab" },
+      { title: "Numeração dos trabalhos — FECITI Flow" },
       { name: "description", content: "Escolha a turma que começa a contagem e numere todos os trabalhos a partir do 01." },
-      { property: "og:title", content: "Numeração dos trabalhos — PamLab" },
+      { property: "og:title", content: "Numeração dos trabalhos — FECITI Flow" },
       { property: "og:description", content: "Escolha a turma que começa a contagem e numere todos os trabalhos a partir do 01." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

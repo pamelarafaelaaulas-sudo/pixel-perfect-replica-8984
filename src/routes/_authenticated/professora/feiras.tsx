@@ -15,9 +15,9 @@ import { FairTemplatesManager } from "@/components/fair-accreditation";
 export const Route = createFileRoute("/_authenticated/professora/feiras")({
   head: () => ({
     meta: [
-      { title: "Feiras externas — PamLab" },
+      { title: "Feiras externas — FECITI Flow" },
       { name: "description", content: "Grupos que querem ir para a FETEC/MS e a FECINTEC, com a triagem de ética." },
-      { property: "og:title", content: "Feiras externas — PamLab" },
+      { property: "og:title", content: "Feiras externas — FECITI Flow" },
       { property: "og:description", content: "Grupos que querem ir para a FETEC/MS e a FECINTEC, com a triagem de ética." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -48,7 +48,7 @@ function FairsPage() {
     try {
       const { default: ExcelJS } = await import("exceljs");
       const wb = new ExcelJS.Workbook();
-      wb.creator = "PamLab";
+      wb.creator = "FECITI Flow";
       const ws = wb.addWorksheet("Feiras externas", { views: [{ state: "frozen", ySplit: 1 }] });
       ws.columns = [
         { header: "Código", key: "code", width: 16 },

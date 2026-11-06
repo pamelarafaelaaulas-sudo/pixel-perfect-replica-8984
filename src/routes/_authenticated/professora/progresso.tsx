@@ -15,9 +15,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/professora/progresso")({
   head: () => ({
     meta: [
-      { title: "Progresso dos grupos — PamLab" },
+      { title: "Progresso dos grupos — FECITI Flow" },
       { name: "description", content: "Cada grupo por etapa: o que falta entregar e o atraso de cada bimestre." },
-      { property: "og:title", content: "Progresso dos grupos — PamLab" },
+      { property: "og:title", content: "Progresso dos grupos — FECITI Flow" },
       { property: "og:description", content: "Cada grupo por etapa: o que falta entregar e o atraso de cada bimestre." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
