@@ -22,8 +22,9 @@ import {
 } from "@/lib/ethics";
 import { downloadBlob } from "@/lib/export-xlsx";
 import { projectCode } from "@/lib/project-code";
+import { EthicsStatusBanner, LabScreening, SampleCalculator, TcleUploads, TeacherEthicsReview, type EthicsExtraProject } from "@/components/ethics-extra";
 
-type EthicsProject = {
+type EthicsProject = EthicsExtraProject & {
   id: string;
   title: string | null;
   general_objective: string | null;
@@ -58,7 +59,9 @@ export function EthicsScreening({
   studentId,
   students,
   editable,
+  delivered = false,
 }: {
+  delivered?: boolean;
   project: EthicsProject;
   cls: Cls;
   groupId: string;
@@ -128,6 +131,7 @@ export function EthicsScreening({
           <p className="text-sm text-muted-foreground">{HUMAN_RESEARCH_QUESTION}</p>
         </div>
       </div>
+      <EthicsStatusBanner project={project} delivered={delivered} />
 
       <RadioGroup
         className="flex flex-wrap gap-6"
@@ -157,6 +161,8 @@ export function EthicsScreening({
               (assinado pelo responsável, se for menor de 18 anos). Sem ele, o trabalho pode ser desclassificado nas feiras.
             </p>
           </div>
+
+          <SampleCalculator project={project} groupId={groupId} editable={editable} />
 
           <div className="space-y-2">
             <p className="text-sm font-medium text-foreground">Como os dados serão coletados? (pode marcar os dois)</p>
@@ -235,10 +241,13 @@ export function EthicsScreening({
                   {busyDoc === "imagem" ? <Loader2 className="animate-spin" /> : <FileDown />} Termo de uso de imagem (.docx)
                 </Button>
               </div>
+              <TcleUploads groupId={groupId} editable={editable} />
             </div>
           )}
         </div>
       )}
+
+      <LabScreening project={project} groupId={groupId} editable={editable} />
 
       {editable && problems.length > 0 && <p className="text-xs text-destructive">{problems[0]}</p>}
     </section>
@@ -246,7 +255,16 @@ export function EthicsScreening({
 }
 
 /** Read-only summary for the teacher. */
-export function EthicsSummary({ project }: { project: Pick<EthicsProject, "ethics_human_research" | "ethics_collection" | "ethics_form_url"> }) {
+export function EthicsSummary({ project, groupId }: { project: EthicsProject; groupId?: string }) {
+  return (
+    <>
+      <EthicsSummaryBase project={project} />
+      {groupId && <TeacherEthicsReview project={project} groupId={groupId} />}
+    </>
+  );
+}
+
+function EthicsSummaryBase({ project }: { project: Pick<EthicsProject, "ethics_human_research" | "ethics_collection" | "ethics_form_url"> }) {
   if (project.ethics_human_research === null)
     return <p className="text-sm italic text-muted-foreground">Triagem ética ainda não respondida.</p>;
   if (!project.ethics_human_research)

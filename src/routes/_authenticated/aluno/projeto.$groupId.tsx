@@ -413,7 +413,8 @@ function StudentProjectPage() {
                 groupId={groupId}
                 studentId={me!.id}
                 students={members.map((m) => m.profiles?.name ?? "").filter(Boolean)}
-                editable={editable}
+                editable={editable || project.ethics_review_status === "refazer"}
+                delivered={isSubmitted}
               />
             </div>
           )}
