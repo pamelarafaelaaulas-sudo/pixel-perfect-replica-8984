@@ -3,6 +3,7 @@ import { Download, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { downloadBannerModel } from "@/components/fair-accreditation";
 import { toast } from "sonner";
+import { FairAttendees } from "@/components/fair-attendees";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -69,6 +70,7 @@ export function ExternalFairsCard({
             </Button>
           ))}
           {fairs.length === 0 && <p className="text-xs text-warning-foreground">Marque pelo menos uma feira.</p>}
+          {fairs.length > 0 && <FairAttendees groupId={groupId} />}
         </div>
       )}
     </div>

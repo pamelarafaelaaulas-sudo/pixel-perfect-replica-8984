@@ -10,6 +10,8 @@ import { teacherExternalFairsQuery } from "@/lib/queries";
 import { EXTERNAL_FAIRS } from "@/lib/ethics";
 import { ETHICS_STATUS_LABEL, externalFairRows, type EthicsStatus } from "@/lib/external-fairs-list";
 import { downloadBlob } from "@/lib/export-xlsx";
+import { supabase } from "@/integrations/supabase/client";
+import { SHIRT_SIZES, formatCpf } from "@/lib/fair-attendees";
 import { FairBannerModelsManager, FairTemplatesManager } from "@/components/fair-accreditation";
 
 export const Route = createFileRoute("/_authenticated/professora/feiras")({
@@ -78,6 +80,51 @@ function FairsPage() {
     }
   }
 
+  async function exportAttendees() {
+    try {
+      const { data: att, error } = await supabase
+        .from("fair_attendees")
+        .select("*, groups(group_name, classes(name), projects(external_fairs))")
+        .order("full_name");
+      if (error) throw error;
+      const { default: ExcelJS } = await import("exceljs");
+      const wb = new ExcelJS.Workbook();
+      const ws = wb.addWorksheet("Inscrições", { views: [{ state: "frozen", ySplit: 1 }] });
+      ws.columns = [
+        { header: "Nome completo", key: "n", width: 34 },
+        { header: "CPF", key: "cpf", width: 16 },
+        { header: "Nascimento", key: "b", width: 12 },
+        { header: "Camiseta", key: "s", width: 10 },
+        { header: "WhatsApp", key: "w", width: 16 },
+        { header: "Responsável", key: "gn", width: 28 },
+        { header: "Tel. responsável", key: "gp", width: 16 },
+        { header: "Restrição alimentar", key: "d", width: 28 },
+        { header: "Turma", key: "c", width: 14 },
+        { header: "Grupo", key: "g", width: 22 },
+        { header: "Feiras", key: "f", width: 22 },
+      ];
+      ws.getRow(1).font = { bold: true };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (att ?? []).forEach((a: any) => {
+        const proj = Array.isArray(a.groups?.projects) ? a.groups.projects[0] : a.groups?.projects;
+        ws.addRow({
+          n: a.full_name, cpf: formatCpf(a.cpf), b: a.birth_date ? a.birth_date.split("-").reverse().join("/") : "",
+          s: a.shirt_size, w: a.whatsapp ?? "", gn: a.guardian_name ?? "", gp: a.guardian_phone ?? "", d: a.dietary ?? "",
+          c: a.groups?.classes?.name ?? "", g: a.groups?.group_name ?? "", f: (proj?.external_fairs ?? []).join(" + "),
+        });
+      });
+      const sizes = new Map<string, number>();
+      (att ?? []).forEach((a) => sizes.set(a.shirt_size, (sizes.get(a.shirt_size) ?? 0) + 1));
+      const t = wb.addWorksheet("Camisetas");
+      t.addRow(["Tamanho", "Quantidade"]).font = { bold: true };
+      SHIRT_SIZES.forEach((s) => t.addRow([s, sizes.get(s) ?? 0]));
+      const buf = await wb.xlsx.writeBuffer();
+      downloadBlob(new Blob([buf]), "inscricoes-feiras-externas.xlsx");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Não foi possível gerar a planilha.");
+    }
+  }
+
   return (
     <div className="space-y-6">
       <Button variant="ghost" size="sm" asChild>
@@ -98,6 +145,9 @@ function FairsPage() {
         ))}
         <Button size="sm" variant="secondary" className="ml-auto" onClick={exportSheet} disabled={!rows.length}>
           <Download /> Baixar planilha
+        </Button>
+        <Button size="sm" variant="secondary" onClick={exportAttendees}>
+          <Download /> Planilha de inscrições (CPF, camiseta)
         </Button>
       </div>
       {rows.length === 0 ? (
