@@ -50,8 +50,27 @@ async function downloadTemplate(key: string) {
   URL.revokeObjectURL(a.href);
 }
 
+/** Key used in fair_doc_templates for an external fair's official banner model. */
+export const bannerModelKey = (fair: string) => `banner:${fair}`;
+
+/** Student: download the official banner model the teacher uploaded for a fair. */
+export async function downloadBannerModel(fair: string) {
+  const { data } = await supabase.from("fair_doc_templates").select("file_path").eq("doc_type", bannerModelKey(fair)).limit(1).maybeSingle();
+  if (!data?.file_path) { toast.error("A professora ainda não enviou o modelo desta feira."); return; }
+  await openDoc(data.file_path);
+}
+
+/** Teacher: upload the official banner model of each external fair. */
+export function FairBannerModelsManager({ fairs }: { fairs: readonly string[] }) {
+  return <TemplateList title="Modelos oficiais de banner" text="Envie o modelo de banner de cada feira quando quiser (PDF, PPTX, Word ou imagem). Os grupos que marcarem a feira baixam este arquivo." items={fairs.map((f) => ({ key: bannerModelKey(f), label: `Banner ${f}` }))} />;
+}
+
 /** Teacher: upload her own model file for each accreditation document (used by all her groups). */
 export function FairTemplatesManager() {
+  return <TemplateList title="Modelos dos documentos da feira" text="Envie seus próprios modelos (Word, PDF ou imagem). Os grupos aprovados baixam o seu arquivo; sem modelo enviado, usam o padrão do FECITI Flow." items={FAIR_DOCS.map((d) => ({ key: d.key, label: d.label, builtIn: true }))} />;
+}
+
+function TemplateList({ title, text, items }: { title: string; text: string; items: { key: string; label: string; builtIn?: boolean }[] }) {
   const qc = useQueryClient();
   const inputs = useRef<Record<string, HTMLInputElement | null>>({});
   const [busy, setBusy] = useState<string | null>(null);
@@ -84,35 +103,35 @@ export function FairTemplatesManager() {
     if (!row) return;
     await supabase.storage.from(BUCKET).remove([row.file_path]);
     await supabase.from("fair_doc_templates").delete().eq("teacher_id", row.teacher_id).eq("doc_type", key);
-    toast.success("Modelo removido. Volta a valer o modelo padrão do FECITI Flow.");
+    toast.success("Modelo removido.");
     qc.invalidateQueries({ queryKey: ["fair-templates"] });
   }
   return (
     <div className="card-paper space-y-3 p-5">
-      <h3 className="text-lg font-semibold">Modelos dos documentos da feira</h3>
-      <p className="text-sm text-muted-foreground">Envie seus próprios modelos (Word, PDF ou imagem). Os grupos aprovados baixam o seu arquivo; sem modelo enviado, usam o padrão do FECITI Flow.</p>
+      <h3 className="text-lg font-semibold">{title}</h3>
+      <p className="text-sm text-muted-foreground">{text}</p>
       <ul className="space-y-2">
-        {FAIR_DOCS.map((d) => {
+        {items.map((d) => {
           const row = rows.find((r) => r.doc_type === d.key);
           return (
             <li key={d.key} className="flex flex-wrap items-center justify-between gap-2 rounded-md border p-3">
               <div>
                 <p className="text-sm font-medium">{d.label}</p>
-                <p className="text-xs text-muted-foreground">{row ? `Seu modelo: ${row.file_name}` : "Usando o modelo padrão do FECITI Flow"}</p>
+                <p className="text-xs text-muted-foreground">{row ? `Seu modelo: ${row.file_name}` : d.builtIn ? "Usando o modelo padrão do FECITI Flow" : "Nenhum modelo enviado ainda"}</p>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Button size="sm" variant="ghost" onClick={() => (row ? openDoc(row.file_path) : downloadTemplate(d.key))}><Download /> Ver</Button>
+                {(row || d.builtIn) && <Button size="sm" variant="ghost" onClick={() => (row ? openDoc(row.file_path) : downloadTemplate(d.key))}><Download /> Ver</Button>}
                 <input
                   ref={(el) => { inputs.current[d.key] = el; }}
                   type="file"
-                  accept=".doc,.docx,.pdf,.odt,image/png,image/jpeg"
+                  accept=".doc,.docx,.pdf,.odt,.ppt,.pptx,image/png,image/jpeg"
                   className="hidden"
                   onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(d.key, f); e.target.value = ""; }}
                 />
                 <Button size="sm" onClick={() => inputs.current[d.key]?.click()} disabled={busy === d.key}>
                   {busy === d.key ? <Loader2 className="animate-spin" /> : <FileUp />} {row ? "Trocar modelo" : "Enviar meu modelo"}
                 </Button>
-                {row && <Button size="sm" variant="outline" onClick={() => remove(d.key)}><RotateCcw /> Usar padrão</Button>}
+                {row && <Button size="sm" variant="outline" onClick={() => remove(d.key)}><RotateCcw /> {d.builtIn ? "Usar padrão" : "Remover"}</Button>}
               </div>
             </li>
           );
