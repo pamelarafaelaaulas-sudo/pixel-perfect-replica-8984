@@ -185,6 +185,10 @@ export type Article = {
   url: string;
   source_type: string;
   abnt_citation: string;
+  objective?: string;
+  method?: string;
+  findings?: string;
+  contribution?: string;
 };
 
 export function parseArticles(value: unknown): Article[] {
@@ -196,6 +200,10 @@ export function parseArticles(value: unknown): Article[] {
       url: String(o["url"] ?? ""),
       source_type: String(o["source_type"] ?? SOURCE_TYPES[0]),
       abnt_citation: String(o["abnt_citation"] ?? ""),
+      objective: String(o["objective"] ?? ""),
+      method: String(o["method"] ?? ""),
+      findings: String(o["findings"] ?? ""),
+      contribution: String(o["contribution"] ?? ""),
     };
   });
 }

@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tansta
 import { useMemo, useState } from "react";
 import { ArrowLeft, CheckCircle2, Lock, MessageCircle, Plus, Save, Send, Star, Trash2, XCircle } from "lucide-react";
 import { toast } from "sonner";
+import { ResearchPromptCard } from "@/components/research-prompt";
 import { PageHeader } from "@/components/page-header";
 import { PhaseTimeline } from "@/components/phase-timeline";
 import { AiFeedback } from "@/components/ai-feedback";
@@ -355,7 +356,10 @@ function StudentProjectPage() {
           <StudentWrittenFeedback reviews={writtenRounds} perDay={Number(cls.late_penalty_per_day)} />
           <fieldset disabled={!editable} className="space-y-5">
             {isBanner ? null : selected === 2 ? (
-              <ArticlesEditor value={draft.scientific_articles} onChange={(v) => set("scientific_articles", v)} editable={editable} />
+              <div className="space-y-5">
+                <ResearchPromptCard theme={draft.theme ?? ""} />
+                <ArticlesEditor value={draft.scientific_articles} onChange={(v) => set("scientific_articles", v)} editable={editable} />
+              </div>
             ) : (
               (PHASE_FORM[selected] ?? []).map((f) => (
                 <Field
@@ -684,6 +688,13 @@ function FieldMeter({ field, value }: { field: TextFieldKey; value: string }) {
   );
 }
 
+const FICHAMENTO = [
+  ["objective", "Objetivo / pergunta da pesquisa"],
+  ["method", "Metodologia / amostra"],
+  ["findings", "Principais resultados"],
+  ["contribution", "Contribuição para o nosso projeto"],
+] as const;
+
 function ArticlesEditor({
   value,
   onChange,
@@ -730,6 +741,18 @@ function ArticlesEditor({
             onChange={(e) => update(i, { abnt_citation: e.target.value })}
             aria-label="Citação ABNT"
           />
+          <div className="grid gap-3 sm:grid-cols-2">
+            {FICHAMENTO.map(([k, label]) => (
+              <Textarea
+                key={k}
+                rows={2}
+                placeholder={label}
+                aria-label={label}
+                value={a[k] ?? ""}
+                onChange={(e) => update(i, { [k]: e.target.value })}
+              />
+            ))}
+          </div>
         </div>
       ))}
       {editable && (
