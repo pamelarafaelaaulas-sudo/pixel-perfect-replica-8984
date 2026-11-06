@@ -25,7 +25,7 @@ export function DiaryApproval({ groupId, teacher = false, nameOf }: { groupId: s
   const qc = useQueryClient();
   const latest = submissions[0];
   const pending = latest?.status === "pending";
-  const problems = diarySubmissionProblems({ leaderId: roles?.leader_student_id, diaryId: roles?.diary_student_id, entryCount: entries.length, pending });
+  const problems = diarySubmissionProblems({ leaderId: roles?.leader_student_id ?? null, diaryId: roles?.diary_student_id ?? null, entryCount: entries.length, pending });
   const action = useMutation({
     mutationFn: async (decision: "submit" | "approve" | "return") => {
       if (decision === "submit") {
@@ -33,7 +33,7 @@ export function DiaryApproval({ groupId, teacher = false, nameOf }: { groupId: s
         if (error) throw error;
       } else {
         if (!latest) throw new Error("Nenhum diário enviado.");
-        const { error } = await supabase.rpc("review_group_diary", { _submission_id: latest.id, _approve: decision === "approve", _note: note.trim() || null });
+        const { error } = await supabase.rpc("review_group_diary", { _submission_id: latest.id, _approve: decision === "approve", _note: note.trim() });
         if (error) throw error;
       }
     },
