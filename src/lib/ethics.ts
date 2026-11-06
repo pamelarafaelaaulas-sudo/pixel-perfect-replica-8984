@@ -46,6 +46,58 @@ export function ethicsProblems(v: EthicsValues): string[] {
   return [];
 }
 
+/** Recommended sample (95% confidence, 5% margin, p = 0.5) with finite-population correction. */
+export function recommendedSample(population: number, margin = 0.05, z = 1.96): number {
+  if (!Number.isFinite(population) || population <= 0) return 0;
+  const n0 = (z * z * 0.25) / (margin * margin);
+  return Math.ceil(n0 / (1 + (n0 - 1) / population));
+}
+
+export const TCLE_MAX_BYTES = 10 * 1024 * 1024;
+/** TCLE uploads: strictly PDF or DOCX, at most 10 MB. Returns the problem or null. */
+export function tcleFileProblem(name: string, size: number): string | null {
+  if (!/\.(pdf|docx)$/i.test(name.trim())) return "O TCLE precisa ser PDF ou DOCX.";
+  if (size > TCLE_MAX_BYTES) return "O arquivo passa de 10 MB.";
+  return null;
+}
+
+export type EthicsExtraValues = {
+  ethics_human_research: boolean | null | undefined;
+  ethics_collection: string[] | null | undefined;
+  ethics_lab: boolean | null | undefined;
+  ethics_lab_epis: string | null | undefined;
+  ethics_biosafety_declared_at: string | null | undefined;
+  ethics_population: number | null | undefined;
+  ethics_sample_size: number | null | undefined;
+  ethics_review_status?: string | null | undefined;
+  tcle_count?: number;
+};
+
+/** Needs the mentor's formal ethics validation (people or lab involved). */
+export const needsEthicsReview = (v: Pick<EthicsExtraValues, "ethics_human_research" | "ethics_lab">) =>
+  v.ethics_human_research === true || v.ethics_lab === true;
+
+/** Mirrors SQL ethics_extra_problem: stage 7 sample/lab/TCLE rules and the gate before stage 8. */
+export function ethicsExtraProblems(phase: number, v: EthicsExtraValues): string[] {
+  if (phase === 7) {
+    if (v.ethics_lab == null) return ["Responda se a pesquisa usa laboratório ou reagentes (biossegurança)."];
+    if (v.ethics_human_research) {
+      if (!v.ethics_population || !v.ethics_sample_size)
+        return ["Preencha a calculadora de amostragem: tamanho da população e da amostra."];
+      if (v.ethics_sample_size > v.ethics_population) return ["A amostra não pode ser maior que a população."];
+      if ((v.ethics_collection ?? []).includes("presencial") && v.tcle_count !== undefined && v.tcle_count < 1)
+        return ["Envie pelo menos um TCLE assinado (PDF ou DOCX) para a coleta presencial."];
+    }
+    if (v.ethics_lab) {
+      if (!v.ethics_lab_epis?.trim()) return ["Liste os EPIs que o grupo vai usar no laboratório."];
+      if (!v.ethics_biosafety_declared_at) return ["Marque a declaração de EPIs e biossegurança."];
+    }
+  }
+  if (phase === 8 && needsEthicsReview(v) && v.ethics_review_status !== "aprovado")
+    return ["Aguardando validação ética da professora: a próxima etapa só abre depois da aprovação."];
+  return [];
+}
+
 /** Keeps only valid fairs, in the official order; none when the group said it won't take part. */
 export function normalizeFairs(interest: boolean, fairs: string[]): ExternalFair[] {
   if (!interest) return [];

@@ -888,9 +888,17 @@ export type Database = {
           current_phase: number
           diary_video_watched_at: string | null
           diary_video_watched_by: string | null
+          ethics_biosafety_declared_at: string | null
           ethics_collection: string[]
           ethics_form_url: string | null
           ethics_human_research: boolean | null
+          ethics_lab: boolean | null
+          ethics_lab_epis: string | null
+          ethics_population: number | null
+          ethics_review_note: string | null
+          ethics_review_status: string | null
+          ethics_reviewed_at: string | null
+          ethics_sample_size: number | null
           external_fairs: string[]
           external_fairs_interest: boolean
           general_objective: string | null
@@ -924,9 +932,17 @@ export type Database = {
           current_phase?: number
           diary_video_watched_at?: string | null
           diary_video_watched_by?: string | null
+          ethics_biosafety_declared_at?: string | null
           ethics_collection?: string[]
           ethics_form_url?: string | null
           ethics_human_research?: boolean | null
+          ethics_lab?: boolean | null
+          ethics_lab_epis?: string | null
+          ethics_population?: number | null
+          ethics_review_note?: string | null
+          ethics_review_status?: string | null
+          ethics_reviewed_at?: string | null
+          ethics_sample_size?: number | null
           external_fairs?: string[]
           external_fairs_interest?: boolean
           general_objective?: string | null
@@ -960,9 +976,17 @@ export type Database = {
           current_phase?: number
           diary_video_watched_at?: string | null
           diary_video_watched_by?: string | null
+          ethics_biosafety_declared_at?: string | null
           ethics_collection?: string[]
           ethics_form_url?: string | null
           ethics_human_research?: boolean | null
+          ethics_lab?: boolean | null
+          ethics_lab_epis?: string | null
+          ethics_population?: number | null
+          ethics_review_note?: string | null
+          ethics_review_status?: string | null
+          ethics_reviewed_at?: string | null
+          ethics_sample_size?: number | null
           external_fairs?: string[]
           external_fairs_interest?: boolean
           general_objective?: string | null
@@ -1478,6 +1502,13 @@ export type Database = {
           _code: string
           _group_name: string
           _whatsapp: string
+        }
+        Returns: string
+      }
+      ethics_extra_problem: {
+        Args: {
+          _p: Database["public"]["Tables"]["projects"]["Row"]
+          _phase: number
         }
         Returns: string
       }

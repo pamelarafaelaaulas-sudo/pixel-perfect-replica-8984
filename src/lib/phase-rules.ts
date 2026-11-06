@@ -4,7 +4,7 @@
  * The database (phase_rule_problem in submit_phase) enforces the same word limits.
  */
 import { checkCitations, citedWorks, missingReferences, workKey, type CitedWork } from "./citations";
-import { ethicsProblems } from "./ethics";
+import { ethicsExtraProblems, ethicsProblems, type EthicsExtraValues } from "./ethics";
 import { diaryVideoProblems } from "./diary";
 
 /** Parts where ABNT in-text citations are mandatory. */
@@ -239,5 +239,7 @@ export function phaseProblems(
       break;
     }
   }
+  // Biossegurança, amostragem, TCLE e validação ética (only when the caller passes the ethics fields).
+  if ("ethics_lab" in values) problems.push(...ethicsExtraProblems(phase, values as unknown as EthicsExtraValues));
   return problems;
 }
