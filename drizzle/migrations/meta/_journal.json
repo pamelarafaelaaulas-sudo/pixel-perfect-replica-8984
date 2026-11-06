@@ -211,6 +211,13 @@
       "when": 1793998120608,
       "tag": "0029_fair_attendees",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1793999412745,
+      "tag": "0030_group_responsibilities",
+      "breakpoints": true
     }
   ]
 }
