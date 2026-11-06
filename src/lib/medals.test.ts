@@ -36,6 +36,27 @@ describe("stage medals", () => {
   });
 });
 
+describe("competing classes", () => {
+  const cls = (id: string, pool: string | null, day: number) => ({
+    id,
+    name: id,
+    medal_pool: pool,
+    schedules,
+    groups: [{ id: `g-${id}`, name: id, members: [], submissions: [{ phase_number: 1, submitted_at: at(day) }] }],
+  });
+  it("classes with the same pool share one podium", () => {
+    const m = poolMedals([cls("A", "Manhã", 2), cls("B", "manhã", 1)]);
+    expect(m.map((x) => [x.groupId, x.kind])).toEqual([
+      ["g-B", "ouro"],
+      ["g-A", "prata"],
+    ]);
+  });
+  it("a class without a pool competes alone", () => {
+    const m = poolMedals([cls("A", null, 2), cls("B", null, 1)]);
+    expect(m.map((x) => x.kind)).toEqual(["ouro", "ouro"]);
+  });
+});
+
 describe("medal points and ranking", () => {
   it("counts gold 3, silver 2, bronze 1 and Honra ao Mérito 0,5", () => {
     expect(tallyMedals([{ kind: "ouro" }, { kind: "prata" }, { kind: "bronze" }, { kind: "honra" }]).points).toBe(6.5);
