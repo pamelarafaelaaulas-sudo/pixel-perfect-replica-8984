@@ -49,7 +49,7 @@ export function fairIndicators(projects: IndicatorProject[]) {
   return {
     totalProjects: projects.length,
     totalStudents: projects.reduce((s, p) => s + p.members, 0),
-    byArea: count(projects.map((p) => (p.area ? areaLabel(p.area) : "Sem área"))),
+    byArea: count(projects.map((p) => (p.area ? areaLabel(p.area) ?? p.area : "Sem área"))),
     byClass: count(projects.map((p) => p.className)),
     /** % of answered projects that are compliant (no humans, or complete consent). null when none answered. */
     ethicsCompliance: answered.length ? Math.round((ok.length / answered.length) * 100) : null,
@@ -68,7 +68,8 @@ const ETHICS_LABEL: Record<EthicsState, string> = {
   incompleta: "Incompleta",
 };
 
-const cell = (v: string | number) => {
+const cell = (v: string | number | null) => {
+  if (v === null) return "";
   const s = String(v);
   return /[";\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 };

@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/professora/indicadores")({
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(teacherIndicatorsQuery),
-  errorComponent: ({ error }) => <div role="alert">{error.message}</div>,
+  errorComponent: ({ error }) => <div role="alert">{error instanceof Error ? error.message : String(error)}</div>,
   notFoundComponent: () => <div>Nada encontrado.</div>,
   component: IndicatorsPage,
 });

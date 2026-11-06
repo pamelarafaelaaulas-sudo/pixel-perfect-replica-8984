@@ -22,7 +22,7 @@ export function StudentAlerts({ groupId }: { groupId: string }) {
     now: new Date(),
     currentPhase: p.current_phase,
     schedules: cls?.schedules ?? [],
-    submittedPhases: (p.phase_submissions ?? []).map((s) => s.phase_number),
+    submittedPhases: (p.phase_submissions ?? []).map((s: { phase_number: number }) => s.phase_number),
     bannerReviews: p.banner_reviews ?? [],
     writtenReviews: p.written_reviews ?? [],
     lastDiaryDate: lastDiary ?? null,

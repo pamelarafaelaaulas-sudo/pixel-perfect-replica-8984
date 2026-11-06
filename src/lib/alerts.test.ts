@@ -11,9 +11,9 @@ const base: AlertInput = {
 describe("student alerts", () => {
   it("red when current deadline is within 48h or passed", () => {
     const soon = studentAlerts({ ...base, schedules: [{ phase_number: 2, due_date: "2026-05-11T12:00:00Z" }] });
-    expect(soon[0].tone).toBe("red");
+    expect(soon[0]?.tone).toBe("red");
     const late = studentAlerts({ ...base, schedules: [{ phase_number: 2, due_date: "2026-05-08T12:00:00Z" }] });
-    expect(late[0].title).toMatch(/vencido/);
+    expect(late[0]?.title).toMatch(/vencido/);
     const far = studentAlerts({ ...base, schedules: [{ phase_number: 2, due_date: "2026-05-20T12:00:00Z" }] });
     expect(far.some((a) => a.tone === "red")).toBe(false);
   });
