@@ -15,6 +15,7 @@ export type ReminderInputClass = {
     | {
         id: string;
         group_name: string;
+        group_responsibilities?: { leader_student_id: string | null; diary_student_id: string | null } | null;
         projects: { current_phase: number; phase_submissions: { phase_number: number }[] | null } | null;
         group_members: { student_id: string; whatsapp: string; profiles: { name: string } | null }[] | null;
       }[]
@@ -101,7 +102,9 @@ export function buildReminders(
       const phase = project?.current_phase ?? 1;
       const delivered = (project?.phase_submissions ?? []).some((s) => s.phase_number === phase);
       const due = (c.schedules ?? []).find((s) => s.phase_number === phase)?.due_date;
+      const leader = g.group_responsibilities?.leader_student_id;
       for (const m of g.group_members ?? []) {
+        if (leader && m.student_id !== leader) continue;
         const studentName = m.profiles?.name ?? "";
         const skip = (reason: string) => skipped.push({ className: c.name, groupName: g.group_name, studentName, reason });
         if (delivered && phase >= LAST_PHASE) {

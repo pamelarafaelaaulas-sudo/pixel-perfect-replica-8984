@@ -181,6 +181,7 @@ function TeacherGroupPage() {
         }
       />
 
+      <GroupResponsibilities groupId={groupId} members={members} />
       <section className="mb-6 grid gap-3 sm:grid-cols-3">
         {members.map((m) => (
           <div key={m.id} className="card-paper flex items-center justify-between gap-3 p-4">
