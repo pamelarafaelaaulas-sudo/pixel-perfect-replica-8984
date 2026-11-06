@@ -225,6 +225,13 @@
       "when": 1793999905449,
       "tag": "0031_diary_submission_approval",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1794000409134,
+      "tag": "0032_diary_automatic_approval",
+      "breakpoints": true
     }
   ]
 }
