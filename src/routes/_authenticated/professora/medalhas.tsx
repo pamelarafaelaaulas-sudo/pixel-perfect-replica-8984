@@ -1,6 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { supabase } from "@/integrations/supabase/client";
+import { medalPoolKey } from "@/lib/medals";
 import { ArrowLeft, Award, Gift } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -39,6 +45,7 @@ function MedalsPage() {
       classes.map((c) => ({
         id: c.id,
         name: c.name,
+        medal_pool: c.medal_pool,
         schedules: c.schedules ?? [],
         groups: (c.groups ?? []).map((g) => ({
           id: g.id,
@@ -84,6 +91,8 @@ function MedalsPage() {
           ))}
         </div>
       </div>
+
+      <MedalPools classes={classes.map((c) => ({ id: c.id, name: c.name, medal_pool: c.medal_pool }))} />
 
       {leaders.length > 0 && (
         <div className="mb-6 flex flex-wrap items-center gap-2 rounded-lg border border-highlight bg-highlight/20 p-4">
@@ -131,5 +140,65 @@ function MedalsPage() {
         </div>
       )}
     </>
+  );
+}
+
+/** Teacher picks which classes compete together: same label = one shared podium; empty = the class competes alone. */
+function MedalPools({ classes }: { classes: { id: string; name: string; medal_pool: string | null }[] }) {
+  const qc = useQueryClient();
+  const [pools, setPools] = useState<Record<string, string>>(() => Object.fromEntries(classes.map((c) => [c.id, c.medal_pool ?? ""])));
+  const dirty = classes.some((c) => (c.medal_pool ?? "") !== (pools[c.id] ?? "").trim());
+  const save = useMutation({
+    mutationFn: async () => {
+      for (const c of classes) {
+        const v = (pools[c.id] ?? "").trim();
+        if ((c.medal_pool ?? "") === v) continue;
+        const { error } = await supabase.from("classes").update({ medal_pool: v || null }).eq("id", c.id);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      toast.success("Disputas salvas");
+      qc.invalidateQueries({ queryKey: ["teacher", "roster"] });
+      qc.invalidateQueries({ queryKey: ["medals"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const groups = new Map<string, string[]>();
+  for (const c of classes) {
+    const k = medalPoolKey({ id: c.id, medal_pool: pools[c.id] });
+    groups.set(k, [...(groups.get(k) ?? []), c.name]);
+  }
+  const shared = [...groups.values()].filter((g) => g.length > 1);
+  return (
+    <div className="card-paper mb-6 space-y-4 p-5">
+      <div>
+        <h2 className="text-lg font-semibold text-foreground">Quais turmas disputam entre si?</h2>
+        <p className="text-sm text-muted-foreground">
+          Dê o mesmo nome de disputa (ex.: "Manhã" ou "1º anos") às turmas que vão concorrer juntas pelo pódio de cada etapa. Turma sem nome
+          disputa sozinha. Cada grupo continua sendo julgado pelo prazo da própria turma.
+        </p>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {classes.map((c) => (
+          <div key={c.id} className="space-y-1">
+            <Label htmlFor={`pool-${c.id}`}>{c.name}</Label>
+            <Input
+              id={`pool-${c.id}`}
+              value={pools[c.id] ?? ""}
+              maxLength={40}
+              placeholder="Disputa sozinha"
+              onChange={(e) => setPools((p) => ({ ...p, [c.id]: e.target.value }))}
+            />
+          </div>
+        ))}
+      </div>
+      {shared.length > 0 && (
+        <p className="text-sm text-foreground">Disputam juntas: {shared.map((g) => g.join(" + ")).join(" · ")}</p>
+      )}
+      <Button onClick={() => save.mutate()} disabled={!dirty || save.isPending}>
+        Salvar disputas
+      </Button>
+    </div>
   );
 }
