@@ -39,3 +39,4 @@
 - [x] Testar o corretor de banner com arquivo real (Gemini substitui as anotações antigas)
 - [x] Tela de progresso de cada grupo por etapa: o que falta e atraso no bimestre
 - [x] Tela de prazos e metas da turma: definir prazo de cada etapa e desconto por dia
+- [ ] Medalhas: professora escolhe quais turmas concorrem entre si
