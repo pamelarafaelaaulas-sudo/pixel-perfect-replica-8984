@@ -97,7 +97,7 @@ function IndicatorsPage() {
       <PageHeader
         eyebrow="Painel da mentora"
         title={`Indicadores da ${fairName}`}
-        description={`Relatório gerado em ${new Date().toLocaleDateString("pt-BR")} para prestação de contas com a direção escolar.`}
+        description={`Relatório gerado em ${new Date().toLocaleDateString("pt-BR")}.`}
         actions={
           <div className="flex flex-wrap gap-2 print:hidden">
             <Button variant="outline" onClick={downloadCsv}><FileDown /> Baixar CSV</Button>
