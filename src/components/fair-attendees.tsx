@@ -46,7 +46,7 @@ export function FairAttendees({ groupId }: { groupId: string }) {
   );
 }
 
-function MemberRow({ groupId, member, saved }: { groupId: string; member: Member; saved?: Row }) {
+function MemberRow({ groupId, member, saved }: { groupId: string; member: Member; saved?: Row | undefined }) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(!!saved);
   const [f, setF] = useState<AttendeeForm>(
