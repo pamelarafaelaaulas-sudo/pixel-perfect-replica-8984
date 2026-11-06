@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Trophy } from "lucide-react";
+import { Download, Trophy } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { downloadBannerModel } from "@/components/fair-accreditation";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -60,6 +62,11 @@ export function ExternalFairsCard({
               />
               {f}
             </label>
+          ))}
+          {fairs.map((f) => (
+            <Button key={`m-${f}`} size="sm" variant="outline" onClick={() => downloadBannerModel(f)}>
+              <Download /> Baixar modelo de banner {f}
+            </Button>
           ))}
           {fairs.length === 0 && <p className="text-xs text-warning-foreground">Marque pelo menos uma feira.</p>}
         </div>
