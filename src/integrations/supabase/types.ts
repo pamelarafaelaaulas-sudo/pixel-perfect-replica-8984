@@ -530,6 +530,63 @@ export type Database = {
           },
         ]
       }
+      fair_attendees: {
+        Row: {
+          birth_date: string | null
+          cpf: string
+          dietary: string | null
+          full_name: string
+          group_id: string
+          guardian_name: string | null
+          guardian_phone: string | null
+          shirt_size: string
+          student_id: string
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          birth_date?: string | null
+          cpf: string
+          dietary?: string | null
+          full_name: string
+          group_id: string
+          guardian_name?: string | null
+          guardian_phone?: string | null
+          shirt_size: string
+          student_id: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          birth_date?: string | null
+          cpf?: string
+          dietary?: string | null
+          full_name?: string
+          group_id?: string
+          guardian_name?: string | null
+          guardian_phone?: string | null
+          shirt_size?: string
+          student_id?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fair_attendees_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fair_attendees_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fair_doc_templates: {
         Row: {
           doc_type: string
