@@ -45,9 +45,9 @@ import { SocialApplicationCard } from "@/components/social-application";
 export const Route = createFileRoute("/_authenticated/professora/grupo/$groupId")({
   head: () => ({
     meta: [
-      { title: "Grupo — PamLab" },
+      { title: "Grupo — FECITI Flow" },
       { name: "description", content: "Projeto, contribuições, avaliações e notas do grupo." },
-      { property: "og:title", content: "Grupo — PamLab" },
+      { property: "og:title", content: "Grupo — FECITI Flow" },
       { property: "og:description", content: "Projeto, contribuições, avaliações e notas do grupo." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

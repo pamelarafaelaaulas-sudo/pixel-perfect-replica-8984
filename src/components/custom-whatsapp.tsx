@@ -45,11 +45,15 @@ export function CustomWhatsappCard({
   skipped,
   templateStatus,
   rejectedReason,
+  allowed = true,
+  teacherName = "Pâmela",
 }: {
   recipients: MessageRecipient[];
   skipped: SkippedReminder[];
   templateStatus: string;
   rejectedReason: string | null;
+  allowed?: boolean;
+  teacherName?: string;
 }) {
   const qc = useQueryClient();
   const sendFn = useServerFn(sendCustomWhatsapp);
@@ -114,7 +118,7 @@ export function CustomWhatsappCard({
         <b>Grátis:</b> escreva o recado e clique em “Abrir no WhatsApp” ao lado de cada aluno. Seu WhatsApp abre com a
         mensagem pronta — é só apertar enviar. Não usa o envio pago da Meta.
       </p>
-      {!approved && (
+      {allowed && !approved && (
         <p className="mt-3 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
           {TEMPLATE_NOTE[templateStatus] ?? TEMPLATE_NOTE["UNKNOWN"]}
           {rejectedReason && ` Motivo: ${rejectedReason}`}
@@ -136,8 +140,8 @@ export function CustomWhatsappCard({
           <div className="rounded-lg border border-border bg-muted/40 p-3 text-sm">
             <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">Como o aluno recebe</p>
             <p>
-              Olá, <b>{sampleName}</b>! A professora Pâmela deixou um recado sobre o seu projeto científico no PamLab:{" "}
-              <b>{sampleText}</b> Em caso de dúvida, fale com a professora na sala de aula ou pelo PamLab.
+              Olá, <b>{sampleName}</b>! A professora {teacherName} deixou um recado sobre o seu projeto científico no FECITI Flow:{" "}
+              <b>{sampleText}</b> Em caso de dúvida, fale com a professora na sala de aula ou pelo FECITI Flow.
             </p>
             <p className="mt-2 text-xs text-muted-foreground">Quebras de linha viram “·”, porque o WhatsApp não aceita parágrafos nesse tipo de mensagem.</p>
           </div>
@@ -148,6 +152,7 @@ export function CustomWhatsappCard({
               ))}
             </ul>
           )}
+          {allowed && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button className="w-full" disabled={!approved || problems.length > 0 || send.isPending}>
@@ -168,6 +173,7 @@ export function CustomWhatsappCard({
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          )}
         </div>
 
         <div className="rounded-lg border border-border">
@@ -214,7 +220,7 @@ export function CustomWhatsappCard({
                       </span>
                       {text.trim() && (
                         <a
-                          href={waLink(r.phone, customText(r.studentName, text))}
+                          href={waLink(r.phone, customText(r.studentName, text, teacherName))}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}

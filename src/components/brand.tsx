@@ -1,15 +1,10 @@
-import { FlaskConical } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import logo from "@/assets/feciti-flow-logo.png.asset.json";
 
 export function Brand({ to = "/" }: { to?: "/" | "/painel" }) {
   return (
     <Link to={to} className="group inline-flex items-center gap-2.5">
-      <span className="grid size-9 place-items-center rounded-full bg-brand-gradient text-primary-foreground shadow-paper transition-transform group-hover:-rotate-12">
-        <FlaskConical className="size-4.5" />
-      </span>
-      <span className="font-display text-xl font-semibold leading-none text-foreground">
-        Pam<span className="text-primary">Lab</span>
-      </span>
+      <img src={logo.url} alt="FECITI Flow" className="h-11 w-auto rounded-md transition-transform group-hover:scale-105" />
     </Link>
   );
 }

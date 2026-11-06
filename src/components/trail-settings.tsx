@@ -106,7 +106,7 @@ export function TrailSettingsDialog({ teacherId, classes }: { teacherId: string;
             <p className="text-xs text-muted-foreground">
               Sem link, os alunos baixam o{" "}
               <a href={DEFAULT_HIGHLIGHTED_ARTICLE} target="_blank" rel="noreferrer" className="text-primary underline">
-                modelo do PamLab
+                modelo do FECITI Flow
               </a>
               .
             </p>

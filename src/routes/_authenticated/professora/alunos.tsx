@@ -16,9 +16,9 @@ import { StudentGradesSheetButton } from "@/components/sheet-downloads";
 export const Route = createFileRoute("/_authenticated/professora/alunos")({
   head: () => ({
     meta: [
-      { title: "Alunos — PamLab" },
+      { title: "Alunos — FECITI Flow" },
       { name: "description", content: "Todos os alunos com turma, grupo, etapas entregues e atrasos." },
-      { property: "og:title", content: "Alunos — PamLab" },
+      { property: "og:title", content: "Alunos — FECITI Flow" },
       { property: "og:description", content: "Todos os alunos com turma, grupo, etapas entregues e atrasos." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

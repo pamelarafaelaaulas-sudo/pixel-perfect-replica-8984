@@ -19,9 +19,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/professora/medalhas")({
   head: () => ({
     meta: [
-      { title: "Medalhas e ranking — PamLab" },
+      { title: "Medalhas e ranking — FECITI Flow" },
       { name: "description", content: "Medalhas de ouro, prata, bronze e Honra ao Mérito por entregas no prazo, e o ranking do ano." },
-      { property: "og:title", content: "Medalhas e ranking — PamLab" },
+      { property: "og:title", content: "Medalhas e ranking — FECITI Flow" },
       { property: "og:description", content: "Medalhas de ouro, prata, bronze e Honra ao Mérito por entregas no prazo, e o ranking do ano." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

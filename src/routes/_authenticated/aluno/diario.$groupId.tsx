@@ -13,9 +13,9 @@ import { fmtDateTime } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/aluno/diario/$groupId")({
   head: () => ({
     meta: [
-      { title: "Diário de bordo — PamLab" },
+      { title: "Diário de bordo — FECITI Flow" },
       { name: "description", content: "Registros datados da pesquisa: acertos, erros e mudanças de rota do grupo." },
-      { property: "og:title", content: "Diário de bordo — PamLab" },
+      { property: "og:title", content: "Diário de bordo — FECITI Flow" },
       { property: "og:description", content: "Registros datados da pesquisa: acertos, erros e mudanças de rota do grupo." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -23,9 +23,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/professora/banner")({
   head: () => ({
     meta: [
-      { title: "Modelo do banner — PamLab" },
+      { title: "Modelo do banner — FECITI Flow" },
       { name: "description", content: "Monte o modelo do banner da turma no Canva e deixe o link pronto para os grupos." },
-      { property: "og:title", content: "Modelo do banner — PamLab" },
+      { property: "og:title", content: "Modelo do banner — FECITI Flow" },
       { property: "og:description", content: "Modelo do banner da turma, com link do Canva, tamanho e seções." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -149,7 +149,7 @@ export async function buildProjectDocx(model: AbntModel): Promise<Blob> {
   });
 
   const doc = new Document({
-    creator: "PamLab",
+    creator: "FECITI Flow",
     title: model.cover.title,
     styles: { default: { document: { run: { font: ABNT.font, size } } } },
     sections: [

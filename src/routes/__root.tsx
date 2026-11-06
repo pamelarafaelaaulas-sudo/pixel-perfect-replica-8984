@@ -83,7 +83,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       // The app is already in Portuguese; browser auto-translation rewrites
       // text nodes React owns and crashes the page ("removeChild" error).
       { name: "google", content: "notranslate" },
-      { title: "PamLab — Projeto científico escolar" },
+      { title: "FECITI Flow — Projeto científico escolar" },
       {
         name: "description",
         content: "Acompanhe o projeto científico da turma: tema, artigos, pergunta norteadora e projeto escrito.",
@@ -93,7 +93,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

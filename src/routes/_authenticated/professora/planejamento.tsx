@@ -13,9 +13,9 @@ import { fmtDate, fmtDateTime } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/professora/planejamento")({
   head: () => ({
     meta: [
-      { title: "Planejamento — PamLab" },
+      { title: "Planejamento — FECITI Flow" },
       { name: "description", content: "Todas as etapas do projeto com prazos e o progresso de cada grupo." },
-      { property: "og:title", content: "Planejamento — PamLab" },
+      { property: "og:title", content: "Planejamento — FECITI Flow" },
       { property: "og:description", content: "Todas as etapas do projeto com prazos e o progresso de cada grupo." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
