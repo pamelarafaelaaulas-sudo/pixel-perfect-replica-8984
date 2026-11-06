@@ -85,6 +85,7 @@ export async function loadReminderClasses(db: Db, teacherId: string): Promise<Re
       `id, name,
       schedules(phase_number, due_date),
       groups!groups_class_id_fkey(id, group_name,
+        group_responsibilities(leader_student_id, diary_student_id),
         projects(current_phase, phase_submissions(phase_number)),
         group_members(student_id, whatsapp, profiles(name))
       )`,

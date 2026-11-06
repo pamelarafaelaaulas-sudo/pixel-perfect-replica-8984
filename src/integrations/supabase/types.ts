@@ -742,6 +742,49 @@ export type Database = {
           },
         ]
       }
+      group_responsibilities: {
+        Row: {
+          diary_student_id: string | null
+          group_id: string
+          leader_student_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          diary_student_id?: string | null
+          group_id: string
+          leader_student_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          diary_student_id?: string | null
+          group_id?: string
+          leader_student_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_responsibilities_diary_student_id_fkey"
+            columns: ["diary_student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_responsibilities_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: true
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_responsibilities_leader_student_id_fkey"
+            columns: ["leader_student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       groups: {
         Row: {
           class_id: string

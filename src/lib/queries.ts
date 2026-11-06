@@ -95,6 +95,15 @@ export const groupDetailQuery = (groupId: string) =>
     },
   });
 
+export const groupResponsibilitiesQuery = (groupId: string) => queryOptions({
+  queryKey: ["group", groupId, "responsibilities"],
+  queryFn: async () => {
+    const { data, error } = await supabase.from("group_responsibilities").select("*").eq("group_id", groupId).maybeSingle();
+    fail(error);
+    return data;
+  },
+});
+
 export const peerEvaluationsForGroupQuery = (groupId: string) =>
   queryOptions({
     queryKey: ["peer", "group", groupId],

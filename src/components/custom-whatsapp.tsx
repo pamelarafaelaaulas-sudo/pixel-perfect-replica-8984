@@ -1,12 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
-import { Loader2, MessageSquareText, Send } from "lucide-react";
+import { Copy, Loader2, MessageSquareText, Send } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
+import { WhatsappSendQueue } from "@/components/whatsapp-send-queue";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +26,7 @@ import {
   customMessageProblems,
   customParams,
   customText,
+  generalMessageText,
   waLink,
   type MessageRecipient,
   type SkippedReminder,
@@ -105,6 +107,10 @@ export function CustomWhatsappCard({
 
   const firstSelected = recipients.find((r) => selected.has(r.studentId));
   const [sampleName, sampleText] = customParams(firstSelected?.studentName ?? "[nome]", text || "[sua mensagem]");
+  const queueMessages = recipients.filter((r) => selected.has(r.studentId)).map((r) => ({
+    id: r.studentId, name: r.studentName, detail: `${r.className} · ${r.groupName}`,
+    phone: r.phone, text: customText(r.studentName, text, teacherName),
+  }));
 
   return (
     <section className="card-paper mt-8 p-5">
@@ -137,6 +143,18 @@ export function CustomWhatsappCard({
           <p className={cn("text-right text-xs", length > CUSTOM_MAX_CHARS ? "text-destructive" : "text-muted-foreground")}>
             {length}/{CUSTOM_MAX_CHARS} caracteres
           </p>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" disabled={!text.trim()} onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(generalMessageText(text, teacherName));
+                toast.success("Recado geral copiado. Cole na sua lista de transmissão do WhatsApp.");
+              } catch {
+                toast.error("Não foi possível copiar. Selecione e copie o texto da mensagem.");
+              }
+            }}><Copy /> Copiar recado geral</Button>
+            <WhatsappSendQueue messages={queueMessages} disabled={!text.trim()} />
+          </div>
+          <p className="text-xs text-muted-foreground">Lista de transmissão: cole o recado no WhatsApp. Os alunos precisam ter seu número salvo para recebê-lo. A fila usa os alunos selecionados abaixo.</p>
           <div className="rounded-lg border border-border bg-muted/40 p-3 text-sm">
             <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">Como o aluno recebe</p>
             <p>

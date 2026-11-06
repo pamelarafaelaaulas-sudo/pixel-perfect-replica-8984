@@ -7,6 +7,7 @@ import { ArrowLeft, CheckCircle2, Lock, MessageCircle, Plus, Save, Send, Star, T
 import { toast } from "sonner";
 import { ResearchPromptCard } from "@/components/research-prompt";
 import { PageHeader } from "@/components/page-header";
+import { GroupResponsibilities } from "@/components/group-responsibilities";
 import { PhaseTimeline } from "@/components/phase-timeline";
 import { AiFeedback } from "@/components/ai-feedback";
 import { useServerFn } from "@tanstack/react-start";
@@ -315,6 +316,7 @@ function StudentProjectPage() {
       />
 
       <PhaseTimeline phases={lateness.phases} active={selected} onSelect={setSelected} />
+      <GroupResponsibilities groupId={groupId} members={members} editable />
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_300px]">
         <section className="card-paper p-6 md:p-8">

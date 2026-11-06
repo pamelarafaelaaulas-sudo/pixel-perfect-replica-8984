@@ -1,42 +1,6 @@
-# Roadmap
-
-- [x] Tela de prazos e atrasos por turma (professora): entrega de cada etapa por grupo, dias de atraso e total descontado
-- [x] Avaliação automática da IA por etapa: nota geral + pontuação por critério, junto com dicas de clareza, organização e citações
-- [x] Guardar a avaliação da IA de cada etapa e mostrar na página do grupo para a professora comparar com a nota dela
-- [x] Tela por aluno (professora): notas de cada etapa, total e histórico de atrasos, para revisar antes de lançar o trimestre
-- [x] Outras professoras podem se cadastrar com código de convite (cada uma vê só as próprias turmas)
-- [x] Tela de alunos (professora): lista completa com turma, grupo, etapas entregues e atrasos, sem abrir cada grupo
-- [x] Aluno não vê a nota da IA, só as sugestões (a professora continua vendo a nota)
-- [x] Tela por trimestre (professora): todas as turmas com nota lançada, desconto de atraso e total de cada grupo; cada grupo vê só a própria linha
-- [x] Tela de prazos e atrasos por etapa: ajustar prazo de cada etapa e desconto, com prévia ao vivo e explicação/simulação do cálculo do atraso
-- [x] Projeto escrito dividido em partes com prazo próprio (Título → Objetivo geral → Objetivos específicos → Metodologia → Introdução → Resultados e discussão → Conclusão → Referências → Resumo), com as regras do arquivo Word e entrega bloqueada fora dos limites
-- [x] Citações ABNT obrigatórias na Introdução e em Resultados e discussão, com exemplos acima do campo e entrega bloqueada sem citação correta
-- [x] Referências conferem cada obra citada na Introdução e em Resultados e discussão (entrega bloqueada se faltar alguma)
-- [x] 4 bimestres: 1º = Tema até Metodologia, 2º = Introdução até Resumo, 3º = Banner (Canva), 4º = Feira (detalhes depois); atraso desconta só do próprio bimestre
-- [x] Etapa Banner: modelo do Canva da professora, link do Canva + arquivo final, com prazo e desconto
-- [x] Tela "Modelo do banner" no painel: link do Canva, tamanho, seções e orientações por turma, com prévia do que o grupo vê
-- [x] Exportar em planilha as notas e feedbacks (painel da professora)
-- [x] Nome PamLab, cores roxo/azul/amarelo e caricatura da professora na tela inicial
-- [x] Código de cada projeto: ÁREA-SIGLA DA TURMA-000 (área escolhida ao criar o grupo; número segue a ordem de cadastro no site todo; sigla definida pela professora)
-- [x] Baixar o projeto em Word nas normas ABNT (professora e alunos)
-- [x] Banner: cada grupo com sua própria cópia do modelo do Canva + pasta no Google Drive da professora com todos os banners e situação de cada grupo
-- [x] Aplicação ou intervenção social na etapa da Pergunta norteadora, obrigatória para entregar
-- [x] Tela de planejamento (professora): todas as etapas com prazos e o progresso de cada grupo
-- [x] Baixar o plano do projeto em Word ABNT (com a aplicação social) para cada grupo
-- [x] Código do projeto: ÁREA-SIGLA-01, contagem única por professora em todas as turmas, começando pela turma que ela escolher
-- [x] Campo da aplicação/intervenção social: aluno consegue escrever e aparece no painel da professora e do aluno
-- [x] Menu: tirar "Exportar planilha" e pôr a planilha da numeração; na aba Alunos, planilha com nome e nota de cada aluno por turma
-- [x] Relógio de contagem regressiva até a FECITI/MS no painel da professora e dos alunos
-- [x] Mensagem teste no WhatsApp para as alunas — mensagem de lembrete aprovada
-- [x] Planilha de notas com a nota final (atraso + ajuste da professora por aluno)
-- [x] Lembretes WhatsApp dentro do PamLab: prazos de cada etapa, envio automático a cada 3 dias e botão de envio
-- [x] Bloco 1 — Corretor de banner: guia + checklist que trava o envio, diagnóstico da IA (matriz 3,5/2,5/2,0/2,0, coerência com o projeto, 5 perguntas da banca, fluxograma, prompts do Canva, títulos), filtro de atenção crítica, devolutiva da professora (banner anotado, observações, prazo V2) e desconto por atraso no reenvio
-- [x] Bloco 2 — Feiras externas (FETEC/MS, FECINTEC) e triagem ética/TCLE na Metodologia (modelo do Forms, link obrigatório, TCLE e termo de imagem em Word)
-- [x] Bloco 3 — Diário de bordo (registros dos alunos, avaliação 0–10 no 3º bimestre) e trilha de vídeos (Diário no Tema, referências e grifos com artigo modelo)
-- [x] Aplicação/intervenção social só dentro da etapa 3 (sem o quadro lateral), logo abaixo da pergunta norteadora e obrigatória
-- [ ] Recado personalizado no WhatsApp para alunos escolhidos ou todos — pronto; aguardando o WhatsApp aprovar a mensagem "recado_professora"
-- [x] IA do PamLab usando o Gemini com a chave da professora
-- [x] Testar o corretor de banner com arquivo real (Gemini substitui as anotações antigas)
-- [x] Tela de progresso de cada grupo por etapa: o que falta e atraso no bimestre
-- [x] Tela de prazos e metas da turma: definir prazo de cada etapa e desconto por dia
-- [x] Medalhas: professora escolhe quais turmas concorrem entre si
+- [x] Add a general note copy button for WhatsApp broadcast lists.
+- [x] Add individual free send queues for selected students and deadline reminders.
+- [x] Verify copying and queue progression in the teacher screen (desktop/mobile; no messages sent).
+- [x] Let group members choose a group leader for reminders and a diary-writing responsible student.
+- [x] Show responsibilities read-only to the teacher and test leader-only reminder targeting.
+- [ ] Verify saved choices end-to-end as a student — blocked on selecting/authorizing a student account; requester account has no group membership.

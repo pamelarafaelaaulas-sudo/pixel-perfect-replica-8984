@@ -19,6 +19,19 @@ const cls = (current: number, due: string, submitted: number[] = [], whatsapp = 
 });
 
 describe("WhatsApp stage reminders", () => {
+  it("targets only the chosen group leader for deadline reminders", () => {
+    const c = cls(8, "2026-11-01T12:00:00Z");
+    const g = c.groups?.[0];
+    if (!g) throw new Error("Missing fixture group");
+    g.group_members?.push({ student_id: "s2", whatsapp: "67991234567", profiles: { name: "Bruno" } });
+    g.group_responsibilities = { leader_student_id: "s2", diary_student_id: "s1" };
+    expect(buildReminders([c], now).reminders.map((r) => r.studentId)).toEqual(["s2"]);
+  });
+  it("keeps all members as reminder recipients when no leader has been chosen", () => {
+    const c = cls(8, "2026-11-01T12:00:00Z");
+    c.groups?.[0]?.group_members?.push({ student_id: "s2", whatsapp: "67991234567", profiles: { name: "Bruno" } });
+    expect(buildReminders([c], now).reminders.map((r) => r.studentId)).toEqual(["s1", "s2"]);
+  });
   it("tells each student how many days are left on the group's current stage", () => {
     const { reminders } = buildReminders([cls(8, "2026-11-01T12:00:00Z")], now);
     expect(reminders).toHaveLength(1);
