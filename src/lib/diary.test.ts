@@ -1,6 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { diaryReviewWindow, diaryStats, diaryVideoProblems, isDiaryReviewOpen, videoEmbedUrl } from "./diary";
+import { diaryReviewWindow, diaryStats, diaryVideoProblems, isDiaryReviewOpen, videoEmbedUrl, diarySubmissionProblems } from "./diary";
 import { phaseProblems } from "./phase-rules";
+
+describe("group diary approval submission", () => {
+  it("requires both a chosen leader and diary responsible student", () => {
+    expect(diarySubmissionProblems({ leaderId: "a", diaryId: null, entryCount: 1, pending: false })).toHaveLength(1);
+    expect(diarySubmissionProblems({ leaderId: null, diaryId: "b", entryCount: 1, pending: false })).toHaveLength(1);
+    expect(diarySubmissionProblems({ leaderId: "a", diaryId: "b", entryCount: 1, pending: false })).toEqual([]);
+  });
+  it("requires at least one diary record", () => {
+    expect(diarySubmissionProblems({ leaderId: "a", diaryId: "b", entryCount: 0, pending: false })).toHaveLength(1);
+  });
+  it("blocks another submission while approval is pending", () => {
+    expect(diarySubmissionProblems({ leaderId: "a", diaryId: "b", entryCount: 2, pending: true })).toHaveLength(1);
+  });
+});
 
 describe("Diário de Bordo video (stage 1)", () => {
   it("blocks the Tema until the group confirms it watched the teacher's video", () => {

@@ -186,6 +186,15 @@ export const aiSuggestionsForGroupQuery = (groupId: string) =>
 
 /* ---------------- Diário de Bordo ---------------- */
 
+export const diarySubmissionsQuery = (groupId: string) => queryOptions({
+  queryKey: ["diary", "submissions", groupId],
+  queryFn: async () => {
+    const { data, error } = await supabase.from("diary_submissions").select("*").eq("group_id", groupId).order("submitted_at", { ascending: false });
+    fail(error);
+    return data ?? [];
+  },
+});
+
 /** Every entry of the group's diary, oldest first (members and the class teacher). */
 export const diaryEntriesQuery = (groupId: string) =>
   queryOptions({
