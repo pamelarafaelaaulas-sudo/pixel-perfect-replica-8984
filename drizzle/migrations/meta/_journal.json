@@ -232,6 +232,13 @@
       "when": 1794000409134,
       "tag": "0032_diary_automatic_approval",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1794176950689,
+      "tag": "0033_idea_bank",
+      "breakpoints": true
     }
   ]
 }

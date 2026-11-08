@@ -6,18 +6,20 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AREAS, areaLabel } from "@/lib/project-code";
-import { IDEAS, type Idea } from "@/lib/idea-bank";
+import { useQuery } from "@tanstack/react-query";
+import { ideaBankQuery, type Idea } from "@/lib/idea-bank";
 
 export function IdeaBank({ onUse, disabled }: { onUse: (idea: Idea) => void; disabled?: boolean }) {
   const [open, setOpen] = useState(false);
   const [area, setArea] = useState<string>("");
   const [q, setQ] = useState("");
+  const { data: ideas = [] } = useQuery(ideaBankQuery);
   const list = useMemo(
     () =>
-      IDEAS.filter(
+      ideas.filter(
         (i) => (!area || i.area === area) && (!q || (i.theme + i.question + i.summary).toLowerCase().includes(q.toLowerCase())),
       ),
-    [area, q],
+    [ideas, area, q],
   );
   return (
     <div className="rounded-xl border border-accent/40 bg-accent/10 p-4">
@@ -47,7 +49,7 @@ export function IdeaBank({ onUse, disabled }: { onUse: (idea: Idea) => void; dis
             <div className="grid gap-3">
               {list.length === 0 && <p className="text-sm text-muted-foreground">Nenhuma ideia encontrada.</p>}
               {list.map((i) => (
-                <div key={i.theme} className="rounded-lg border p-4">
+                <div key={i.id} className="rounded-lg border p-4">
                   <div className="mb-2 flex flex-wrap gap-1">
                     <Badge variant="secondary">{areaLabel(i.area)}</Badge>
                     {i.bncc.map((b) => (

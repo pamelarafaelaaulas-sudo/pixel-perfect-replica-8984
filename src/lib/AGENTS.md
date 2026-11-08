@@ -7,3 +7,4 @@
 - AI calls (stage evaluation, banner diagnosis) go to Google Gemini with the teacher's own `GEMINI_API_KEY` through `gemini.server.ts` (one model + low thinking level for speed), not the Lovable AI Gateway, because she chose to bill her own Google account.
 - Medals: podium/points rules in `medals.ts` (tested); competing classes share `classes.medal_pool`; students read pool deliveries only via security-definer `medal_pool_deliveries` so no project data leaks.
 - Student home alerts (`alerts.ts`) and the teacher fair indicators/CSV (`indicators.ts`) are pure and tested; the PDF report is the browser print of `/professora/indicadores`.
+- Banco de Inspirações: per-teacher rows in `idea_bank` (teacher writes own; students read their class teacher's via RLS), seeded with 16 defaults by `seed_teacher_ideas` when a teacher role is created; read through `ideaBankQuery` in `idea-bank.ts`.
