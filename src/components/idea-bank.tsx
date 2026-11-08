@@ -7,13 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AREAS, areaLabel } from "@/lib/project-code";
 import { useQuery } from "@tanstack/react-query";
-import { ideaBankQuery, type Idea } from "@/lib/idea-bank";
+import { ideaBankQuery, ideaUsageQuery, type Idea } from "@/lib/idea-bank";
 
 export function IdeaBank({ onUse, disabled }: { onUse: (idea: Idea) => void; disabled?: boolean }) {
   const [open, setOpen] = useState(false);
   const [area, setArea] = useState<string>("");
   const [q, setQ] = useState("");
   const { data: ideas = [] } = useQuery(ideaBankQuery);
+  const { data: usage = {} } = useQuery(ideaUsageQuery);
   const list = useMemo(
     () =>
       ideas.filter(
@@ -56,6 +57,11 @@ export function IdeaBank({ onUse, disabled }: { onUse: (idea: Idea) => void; dis
                       <Badge key={b} variant="muted">{b}</Badge>
                     ))}
                   </div>
+                  {usage[i.id]?.length ? (
+                    <p className="mb-2 rounded-md bg-accent/20 px-2 py-1 text-xs font-medium">
+                      Já em uso por: {usage[i.id]!.join(", ")}
+                    </p>
+                  ) : null}
                   <p className="font-semibold">{i.theme}</p>
                   <p className="mt-1 text-sm italic">{i.question}</p>
                   <p className="mt-2 text-sm text-muted-foreground">{i.summary}</p>

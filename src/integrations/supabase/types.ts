@@ -1133,6 +1133,7 @@ export type Database = {
           group_id: string
           guiding_question: string | null
           id: string
+          idea_id: string | null
           institution: string | null
           introduction: string | null
           keywords: string | null
@@ -1177,6 +1178,7 @@ export type Database = {
           group_id: string
           guiding_question?: string | null
           id?: string
+          idea_id?: string | null
           institution?: string | null
           introduction?: string | null
           keywords?: string | null
@@ -1221,6 +1223,7 @@ export type Database = {
           group_id?: string
           guiding_question?: string | null
           id?: string
+          idea_id?: string | null
           institution?: string | null
           introduction?: string | null
           keywords?: string | null
@@ -1241,6 +1244,13 @@ export type Database = {
             columns: ["group_id"]
             isOneToOne: true
             referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "idea_bank"
             referencedColumns: ["id"]
           },
         ]
@@ -1784,6 +1794,14 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      idea_usage: {
+        Args: never
+        Returns: {
+          class_name: string
+          group_name: string
+          idea_id: string
+        }[]
       }
       is_class_student: { Args: { _class_id: string }; Returns: boolean }
       is_google_form_url: { Args: { _url: string }; Returns: boolean }
