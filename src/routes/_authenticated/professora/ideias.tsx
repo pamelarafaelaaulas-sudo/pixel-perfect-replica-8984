@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { AREAS, areaLabel } from "@/lib/project-code";
-import { ideaBankQuery, type Idea } from "@/lib/idea-bank";
+import { ideaBankQuery, ideaUsageQuery, type Idea } from "@/lib/idea-bank";
 
 export const Route = createFileRoute("/_authenticated/professora/ideias")({
   head: () => ({
@@ -38,6 +38,7 @@ const EMPTY: Form = { area: "BIO", theme: "", question: "", summary: "", bncc: "
 
 function IdeasPage() {
   const { data: ideas } = useSuspenseQuery(ideaBankQuery);
+  const { data: usage = {} } = useQuery(ideaUsageQuery);
   const qc = useQueryClient();
   const [area, setArea] = useState("");
   const [form, setForm] = useState<Form | null>(null);
@@ -106,6 +107,9 @@ function IdeasPage() {
                   <Badge key={b} variant="muted">{b}</Badge>
                 ))}
               </div>
+              {usage[i.id]?.length ? (
+                <p className="mb-2 rounded-md bg-accent/20 px-2 py-1 text-xs font-medium">Já em uso por: {usage[i.id].join(", ")}</p>
+              ) : null}
               <p className="font-semibold">{i.theme}</p>
               {i.question && <p className="mt-1 text-sm italic">{i.question}</p>}
               {i.summary && <p className="mt-2 text-sm text-muted-foreground">{i.summary}</p>}
