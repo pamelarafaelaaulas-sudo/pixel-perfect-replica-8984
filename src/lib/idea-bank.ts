@@ -24,3 +24,15 @@ export const ideaBankQuery = queryOptions({
     return data ?? [];
   },
 });
+
+/** Groups already using each idea: idea id → list of "Grupo (Turma)". */
+export const ideaUsageQuery = queryOptions({
+  queryKey: ["idea-usage"],
+  queryFn: async (): Promise<Record<string, string[]>> => {
+    const { data, error } = await supabase.rpc("idea_usage");
+    if (error) throw error;
+    const map: Record<string, string[]> = {};
+    for (const r of data ?? []) (map[r.idea_id] ??= []).push(`${r.group_name} (${r.class_name})`);
+    return map;
+  },
+});

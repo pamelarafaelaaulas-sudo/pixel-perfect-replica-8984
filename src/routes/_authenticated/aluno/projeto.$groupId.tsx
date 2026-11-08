@@ -137,6 +137,7 @@ function StudentProjectPage() {
 
   const [selected, setSelected] = useState<number>(project?.current_phase ?? 1);
   const [draft, setDraft] = useState<Draft | null>(project ? toDraft(project) : null);
+  const [pickedIdea, setPickedIdea] = useState<string | null>(null);
   const saved = useMemo(() => (project ? toDraft(project) : null), [project]);
 
   const changedFields = useMemo(() => {
@@ -148,6 +149,12 @@ function StudentProjectPage() {
 
   const saveMutation = useMutation({
     mutationFn: async () => {
+      if (project && pickedIdea) {
+        const r = await supabase.from("projects").update({ idea_id: pickedIdea }).eq("id", project.id);
+        if (r.error) throw r.error;
+        setPickedIdea(null);
+        qc.invalidateQueries({ queryKey: ["idea-usage"] });
+      }
       if (!project || !draft || !saved || changedFields.length === 0) return;
       const patch: Partial<Project> = {};
       for (const k of changedFields) {
@@ -360,7 +367,8 @@ function StudentProjectPage() {
           {selected === 1 && editable && (
             <div className="mb-5">
               <IdeaBank
-                onUse={(i) =>
+                onUse={(i) => {
+                  setPickedIdea(i.id);
                   setDraft((d) =>
                     d ? { ...d, theme: `${i.theme}\n\n${i.summary}`, guiding_question: d.guiding_question?.trim() ? d.guiding_question : i.question } : d,
                   )
