@@ -21,7 +21,6 @@ REGRAS DE RIGOR:
 - Proibido inventar referências, DOIs ou links. Se não achar, marque como "Não localizado".
 - Se não encontrar 6 artigos de alta qualidade dos últimos 5 anos, apresente apenas os válidos e avise.
 - Não faça síntese, conclusões ou a revisão ainda. Apenas selecione e apresente.
-- Selecione apenas fontes científicas em Português (BR).
 
 FORMATO DE SAÍDA (Apenas para os 6 selecionados):
 
