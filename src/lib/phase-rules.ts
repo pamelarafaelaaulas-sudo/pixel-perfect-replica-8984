@@ -7,6 +7,9 @@ import { checkCitations, citedWorks, missingReferences, workKey, type CitedWork 
 import { ethicsExtraProblems, ethicsProblems, type EthicsExtraValues } from "./ethics";
 import { diaryVideoProblems } from "./diary";
 
+/** Minimum sources the group must register to deliver stage 2 (Artigos científicos). */
+export const MIN_ARTICLES = 5;
+
 /** Parts where ABNT in-text citations are mandatory. */
 export const CITATION_FIELDS: Record<string, string> = {
   introduction: "Introdução",
@@ -132,9 +135,11 @@ export function phaseProblems(
   values: Partial<Record<string, unknown>>,
   articleCount: number,
 ): string[] {
+  // MIN_ARTICLES must match SQL phase_rule_problem_base (stage 2).
   const problems: string[] = [];
   if (phase === 2) {
-    if (articleCount === 0) problems.push("Adicione pelo menos um artigo.");
+    if (articleCount < MIN_ARTICLES)
+      problems.push(`Cadastrem pelo menos ${MIN_ARTICLES} fontes (agora: ${articleCount}).`);
     return problems;
   }
   const checkCitationsIn = (key: string) => {
