@@ -28,9 +28,10 @@ FORMATO DE SAÍDA (Apenas para os 6 selecionados):
 - Referência completa: [ABNT ou APA]
 - Ano de publicação: [AAAA]
 - Link: [URL ou DOI direto]
-- Tipo de estudo: [Metodologia]
-- Justificativa de escolha: [Objetiva]
-- Principal contribuição: [Resumo em 1-2 frases]`;
+- Objetivo / pergunta da pesquisa: [Descrição clara do objetivo principal do estudo]
+• Metodologia/amostra: [Tipo de bioensaio, microorganismos/microbiota utilizada, polímeros testados e condições ambientais/compostagem]
+• Principais resultados: [Dados quantitativos ou qualitativos de perda de massa, taxas de degradação ou atividade enzimática/respirométrica]
+• Contribuição para o nosso projeto: [Como este estudo embasa a fundamentação teórica ou metodologia do nosso bioensaio comparativo]`;
 }
 
 export function ResearchPromptCard({ theme }: { theme: string }) {
