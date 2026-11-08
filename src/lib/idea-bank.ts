@@ -9,7 +9,11 @@ export type Idea = {
   question: string;
   summary: string;
   bncc: string[];
+  year: number;
 };
+
+/** Current school year in Cuiabá. */
+export const currentYear = () => Number(new Date().toLocaleString("en-US", { timeZone: "America/Cuiaba", year: "numeric" }));
 
 /** RLS returns the teacher's own ideas, or for students the ideas of their class's teacher. */
 export const ideaBankQuery = queryOptions({
@@ -17,7 +21,7 @@ export const ideaBankQuery = queryOptions({
   queryFn: async (): Promise<Idea[]> => {
     const { data, error } = await supabase
       .from("idea_bank")
-      .select("id, area, theme, question, summary, bncc")
+      .select("id, area, theme, question, summary, bncc, year")
       .order("area")
       .order("theme");
     if (error) throw error;

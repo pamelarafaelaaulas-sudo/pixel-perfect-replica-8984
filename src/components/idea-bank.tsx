@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AREAS, areaLabel } from "@/lib/project-code";
 import { useQuery } from "@tanstack/react-query";
-import { ideaBankQuery, ideaTakenBy, ideaUsageQuery, type Idea } from "@/lib/idea-bank";
+import { currentYear, ideaBankQuery, ideaTakenBy, ideaUsageQuery, type Idea } from "@/lib/idea-bank";
 
 export function IdeaBank({ onUse, disabled, groupId, classId }: { onUse: (idea: Idea) => void; disabled?: boolean; groupId: string; classId: string }) {
   const [open, setOpen] = useState(false);
@@ -18,7 +18,7 @@ export function IdeaBank({ onUse, disabled, groupId, classId }: { onUse: (idea: 
   const list = useMemo(
     () =>
       ideas.filter(
-        (i) => (!area || i.area === area) && (!q || (i.theme + i.question + i.summary).toLowerCase().includes(q.toLowerCase())),
+        (i) => i.year === currentYear() && (!area || i.area === area) && (!q || (i.theme + i.question + i.summary).toLowerCase().includes(q.toLowerCase())),
       ),
     [ideas, area, q],
   );

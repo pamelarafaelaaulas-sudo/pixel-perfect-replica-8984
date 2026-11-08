@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { AREAS, areaLabel } from "@/lib/project-code";
-import { ideaBankQuery, ideaUsageQuery, type Idea } from "@/lib/idea-bank";
+import { currentYear, ideaBankQuery, ideaUsageQuery, type Idea } from "@/lib/idea-bank";
 
 export const Route = createFileRoute("/_authenticated/professora/ideias")({
   head: () => ({
@@ -33,17 +33,31 @@ export const Route = createFileRoute("/_authenticated/professora/ideias")({
   notFoundComponent: () => <div className="card-paper p-5">Página não encontrada.</div>,
 });
 
-type Form = { id?: string; area: string; theme: string; question: string; summary: string; bncc: string };
-const EMPTY: Form = { area: "BIO", theme: "", question: "", summary: "", bncc: "" };
+type Form = { id?: string; area: string; theme: string; question: string; summary: string; bncc: string; year: number };
 
 function IdeasPage() {
   const { data: ideas } = useSuspenseQuery(ideaBankQuery);
   const { data: usage = {} } = useQuery(ideaUsageQuery);
   const qc = useQueryClient();
   const [area, setArea] = useState("");
+  const [year, setYear] = useState(currentYear());
+  const years = useMemo(() => [...new Set([currentYear(), ...ideas.map((i) => i.year)])].sort((a, b) => b - a), [ideas]);
+  const ofYear = useMemo(() => ideas.filter((i) => i.year === year), [ideas, year]);
+  const EMPTY: Form = { area: "BIO", theme: "", question: "", summary: "", bncc: "", year };
+  const copyPrevious = async () => {
+    const prev = ideas.filter((i) => i.year === year - 1);
+    if (!prev.length) { toast.error(`Não há ideias de ${year - 1}.`); return; }
+    const { data: u } = await supabase.auth.getUser();
+    const { error } = await supabase.from("idea_bank").insert(
+      prev.map(({ area, theme, question, summary, bncc }) => ({ area, theme, question, summary, bncc, year, teacher_id: u.user!.id })),
+    );
+    if (error) { toast.error(error.message); return; }
+    toast.success(`${prev.length} ideias de ${year - 1} copiadas para ${year}.`);
+    refresh();
+  };
   const [form, setForm] = useState<Form | null>(null);
   const [saving, setSaving] = useState(false);
-  const list = useMemo(() => ideas.filter((i) => !area || i.area === area), [ideas, area]);
+  const list = useMemo(() => ofYear.filter((i) => !area || i.area === area), [ofYear, area]);
   const refresh = () => qc.invalidateQueries({ queryKey: ideaBankQuery.queryKey });
 
   const save = async () => {
@@ -56,6 +70,7 @@ function IdeasPage() {
       question: form.question.trim(),
       summary: form.summary.trim(),
       bncc: form.bncc.split(",").map((s) => s.trim()).filter(Boolean),
+      year: Number(form.year) || year,
     };
     const { data: u } = await supabase.auth.getUser();
     const { error } = form.id
@@ -80,18 +95,25 @@ function IdeasPage() {
     <div className="space-y-6">
       <PageHeader
         title="Banco de Inspirações"
-        description="Ideias que seus alunos veem na Etapa 1 (Tema) e podem usar com um clique."
+        description="Os alunos veem só as ideias do ano atual. As de anos anteriores ficam guardadas aqui."
         actions={
-          <Button onClick={() => setForm(EMPTY)}>
-            <Plus /> Nova ideia
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <select aria-label="Ano" className="h-9 rounded-md border bg-background px-3 text-sm" value={year} onChange={(e) => setYear(Number(e.target.value))}>
+              {years.map((y) => <option key={y} value={y}>{y}{y === currentYear() ? " (atual)" : ""}</option>)}
+              <option value={currentYear() + 1}>{currentYear() + 1} (próximo)</option>
+            </select>
+            {ofYear.length === 0 && <Button variant="outline" onClick={copyPrevious}>Copiar ideias de {year - 1}</Button>}
+            <Button onClick={() => setForm(EMPTY)}>
+              <Plus /> Nova ideia
+            </Button>
+          </div>
         }
       />
       <div className="flex flex-wrap gap-2">
-        <Button size="sm" variant={area ? "outline" : "default"} onClick={() => setArea("")}>Todas ({ideas.length})</Button>
+        <Button size="sm" variant={area ? "outline" : "default"} onClick={() => setArea("")}>Todas ({ofYear.length})</Button>
         {AREAS.map((a) => (
           <Button key={a.code} size="sm" variant={area === a.code ? "default" : "outline"} onClick={() => setArea(a.code)}>
-            {a.label} ({ideas.filter((i) => i.area === a.code).length})
+            {a.label} ({ofYear.filter((i) => i.area === a.code).length})
           </Button>
         ))}
       </div>
@@ -145,6 +167,10 @@ function IdeasPage() {
                     <option key={a.code} value={a.code}>{a.label}</option>
                   ))}
                 </select>
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="year">Ano</Label>
+                <Input id="year" type="number" value={form.year} onChange={(e) => setForm({ ...form, year: Number(e.target.value) })} />
               </div>
               <div className="space-y-1">
                 <Label htmlFor="theme">Tema</Label>
