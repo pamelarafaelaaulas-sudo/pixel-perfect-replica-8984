@@ -901,6 +901,47 @@ export type Database = {
           },
         ]
       }
+      idea_bank: {
+        Row: {
+          area: string
+          bncc: string[]
+          created_at: string
+          id: string
+          question: string
+          summary: string
+          teacher_id: string
+          theme: string
+        }
+        Insert: {
+          area: string
+          bncc?: string[]
+          created_at?: string
+          id?: string
+          question?: string
+          summary?: string
+          teacher_id: string
+          theme: string
+        }
+        Update: {
+          area?: string
+          bncc?: string[]
+          created_at?: string
+          id?: string
+          question?: string
+          summary?: string
+          teacher_id?: string
+          theme?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "idea_bank_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       peer_evaluations: {
         Row: {
           created_at: string
@@ -1825,6 +1866,7 @@ export type Database = {
         Args: { _approve: boolean; _note?: string; _submission_id: string }
         Returns: undefined
       }
+      seed_teacher_ideas: { Args: { _teacher: string }; Returns: undefined }
       shares_group_with: { Args: { _other: string }; Returns: boolean }
       submit_group_diary: { Args: { _group_id: string }; Returns: string }
       submit_phase: { Args: { _project_id: string }; Returns: number }
