@@ -267,6 +267,13 @@
       "when": 1794181433315,
       "tag": "0037_min_five_articles",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1794181466138,
+      "tag": "0038_restore_phase_rules_with_five_articles",
+      "breakpoints": true
     }
   ]
 }
