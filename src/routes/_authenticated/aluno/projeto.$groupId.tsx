@@ -366,7 +366,7 @@ function StudentProjectPage() {
           <StudentWrittenFeedback reviews={writtenRounds} perDay={Number(cls.late_penalty_per_day)} />
           {selected === 1 && editable && (
             <div className="mb-5">
-              <IdeaBank
+              <IdeaBank groupId={groupId} classId={group!.class_id}
                 onUse={(i) => {
                   setPickedIdea(i.id);
                   setDraft((d) =>

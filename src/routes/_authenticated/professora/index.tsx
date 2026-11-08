@@ -62,6 +62,11 @@ function TeacherHome() {
               </Link>
             </Button>
             <Button variant="outline" asChild>
+              <Link to="/professora/entregas">
+                <ClipboardList /> Entregas por etapa
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
               <Link to="/professora/ideias">
                 <Lightbulb /> Banco de Inspirações
               </Link>

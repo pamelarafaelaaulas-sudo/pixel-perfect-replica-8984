@@ -21,6 +21,7 @@ import { Route as AuthenticatedProfessoraIndexRouteImport } from './routes/_auth
 import { Route as AuthenticatedProfessoraAlunosRouteImport } from './routes/_authenticated/professora/alunos'
 import { Route as AuthenticatedProfessoraBannerRouteImport } from './routes/_authenticated/professora/banner'
 import { Route as AuthenticatedProfessoraBimestresRouteImport } from './routes/_authenticated/professora/bimestres'
+import { Route as AuthenticatedProfessoraEntregasRouteImport } from './routes/_authenticated/professora/entregas'
 import { Route as AuthenticatedProfessoraExportarRouteImport } from './routes/_authenticated/professora/exportar'
 import { Route as AuthenticatedProfessoraFeirasRouteImport } from './routes/_authenticated/professora/feiras'
 import { Route as AuthenticatedProfessoraIdeiasRouteImport } from './routes/_authenticated/professora/ideias'
@@ -102,6 +103,12 @@ const AuthenticatedProfessoraBimestresRoute =
   AuthenticatedProfessoraBimestresRouteImport.update({
     id: '/bimestres',
     path: '/bimestres',
+    getParentRoute: () => AuthenticatedProfessoraRouteRoute,
+  } as any)
+const AuthenticatedProfessoraEntregasRoute =
+  AuthenticatedProfessoraEntregasRouteImport.update({
+    id: '/entregas',
+    path: '/entregas',
     getParentRoute: () => AuthenticatedProfessoraRouteRoute,
   } as any)
 const AuthenticatedProfessoraExportarRoute =
@@ -223,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/professora/alunos': typeof AuthenticatedProfessoraAlunosRoute
   '/professora/banner': typeof AuthenticatedProfessoraBannerRoute
   '/professora/bimestres': typeof AuthenticatedProfessoraBimestresRoute
+  '/professora/entregas': typeof AuthenticatedProfessoraEntregasRoute
   '/professora/exportar': typeof AuthenticatedProfessoraExportarRoute
   '/professora/feiras': typeof AuthenticatedProfessoraFeirasRoute
   '/professora/ideias': typeof AuthenticatedProfessoraIdeiasRoute
@@ -252,6 +260,7 @@ export interface FileRoutesByTo {
   '/professora/alunos': typeof AuthenticatedProfessoraAlunosRoute
   '/professora/banner': typeof AuthenticatedProfessoraBannerRoute
   '/professora/bimestres': typeof AuthenticatedProfessoraBimestresRoute
+  '/professora/entregas': typeof AuthenticatedProfessoraEntregasRoute
   '/professora/exportar': typeof AuthenticatedProfessoraExportarRoute
   '/professora/feiras': typeof AuthenticatedProfessoraFeirasRoute
   '/professora/ideias': typeof AuthenticatedProfessoraIdeiasRoute
@@ -285,6 +294,7 @@ export interface FileRoutesById {
   '/_authenticated/professora/alunos': typeof AuthenticatedProfessoraAlunosRoute
   '/_authenticated/professora/banner': typeof AuthenticatedProfessoraBannerRoute
   '/_authenticated/professora/bimestres': typeof AuthenticatedProfessoraBimestresRoute
+  '/_authenticated/professora/entregas': typeof AuthenticatedProfessoraEntregasRoute
   '/_authenticated/professora/exportar': typeof AuthenticatedProfessoraExportarRoute
   '/_authenticated/professora/feiras': typeof AuthenticatedProfessoraFeirasRoute
   '/_authenticated/professora/ideias': typeof AuthenticatedProfessoraIdeiasRoute
@@ -318,6 +328,7 @@ export interface FileRouteTypes {
     | '/professora/alunos'
     | '/professora/banner'
     | '/professora/bimestres'
+    | '/professora/entregas'
     | '/professora/exportar'
     | '/professora/feiras'
     | '/professora/ideias'
@@ -347,6 +358,7 @@ export interface FileRouteTypes {
     | '/professora/alunos'
     | '/professora/banner'
     | '/professora/bimestres'
+    | '/professora/entregas'
     | '/professora/exportar'
     | '/professora/feiras'
     | '/professora/ideias'
@@ -379,6 +391,7 @@ export interface FileRouteTypes {
     | '/_authenticated/professora/alunos'
     | '/_authenticated/professora/banner'
     | '/_authenticated/professora/bimestres'
+    | '/_authenticated/professora/entregas'
     | '/_authenticated/professora/exportar'
     | '/_authenticated/professora/feiras'
     | '/_authenticated/professora/ideias'
@@ -494,6 +507,13 @@ declare module '@tanstack/react-router' {
       path: '/bimestres'
       fullPath: '/professora/bimestres'
       preLoaderRoute: typeof AuthenticatedProfessoraBimestresRouteImport
+      parentRoute: typeof AuthenticatedProfessoraRouteRoute
+    }
+    '/_authenticated/professora/entregas': {
+      id: '/_authenticated/professora/entregas'
+      path: '/entregas'
+      fullPath: '/professora/entregas'
+      preLoaderRoute: typeof AuthenticatedProfessoraEntregasRouteImport
       parentRoute: typeof AuthenticatedProfessoraRouteRoute
     }
     '/_authenticated/professora/exportar': {
@@ -651,6 +671,7 @@ interface AuthenticatedProfessoraRouteRouteChildren {
   AuthenticatedProfessoraAlunosRoute: typeof AuthenticatedProfessoraAlunosRoute
   AuthenticatedProfessoraBannerRoute: typeof AuthenticatedProfessoraBannerRoute
   AuthenticatedProfessoraBimestresRoute: typeof AuthenticatedProfessoraBimestresRoute
+  AuthenticatedProfessoraEntregasRoute: typeof AuthenticatedProfessoraEntregasRoute
   AuthenticatedProfessoraExportarRoute: typeof AuthenticatedProfessoraExportarRoute
   AuthenticatedProfessoraFeirasRoute: typeof AuthenticatedProfessoraFeirasRoute
   AuthenticatedProfessoraIdeiasRoute: typeof AuthenticatedProfessoraIdeiasRoute
@@ -673,6 +694,7 @@ const AuthenticatedProfessoraRouteRouteChildren: AuthenticatedProfessoraRouteRou
     AuthenticatedProfessoraBannerRoute: AuthenticatedProfessoraBannerRoute,
     AuthenticatedProfessoraBimestresRoute:
       AuthenticatedProfessoraBimestresRoute,
+    AuthenticatedProfessoraEntregasRoute: AuthenticatedProfessoraEntregasRoute,
     AuthenticatedProfessoraExportarRoute: AuthenticatedProfessoraExportarRoute,
     AuthenticatedProfessoraFeirasRoute: AuthenticatedProfessoraFeirasRoute,
     AuthenticatedProfessoraIdeiasRoute: AuthenticatedProfessoraIdeiasRoute,

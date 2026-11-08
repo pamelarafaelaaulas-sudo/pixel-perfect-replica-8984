@@ -9,7 +9,11 @@ export type Idea = {
   question: string;
   summary: string;
   bncc: string[];
+  year: number;
 };
+
+/** Current school year in Cuiabá. */
+export const currentYear = () => Number(new Date().toLocaleString("en-US", { timeZone: "America/Cuiaba", year: "numeric" }));
 
 /** RLS returns the teacher's own ideas, or for students the ideas of their class's teacher. */
 export const ideaBankQuery = queryOptions({
@@ -17,7 +21,7 @@ export const ideaBankQuery = queryOptions({
   queryFn: async (): Promise<Idea[]> => {
     const { data, error } = await supabase
       .from("idea_bank")
-      .select("id, area, theme, question, summary, bncc")
+      .select("id, area, theme, question, summary, bncc, year")
       .order("area")
       .order("theme");
     if (error) throw error;
@@ -25,14 +29,21 @@ export const ideaBankQuery = queryOptions({
   },
 });
 
-/** Groups already using each idea: idea id → list of "Grupo (Turma)". */
+export type IdeaUse = { groupId: string; classId: string; label: string };
+/** Groups already using each idea (idea id → uses). */
 export const ideaUsageQuery = queryOptions({
   queryKey: ["idea-usage"],
-  queryFn: async (): Promise<Record<string, string[]>> => {
+  queryFn: async (): Promise<Record<string, IdeaUse[]>> => {
     const { data, error } = await supabase.rpc("idea_usage");
     if (error) throw error;
-    const map: Record<string, string[]> = {};
-    for (const r of data ?? []) (map[r.idea_id] ??= []).push(`${r.group_name} (${r.class_name})`);
+    const map: Record<string, IdeaUse[]> = {};
+    for (const r of data ?? [])
+      (map[r.idea_id] ??= []).push({ groupId: r.group_id, classId: r.class_id, label: `${r.group_name} (${r.class_name})` });
     return map;
   },
 });
+
+/** An idea is blocked for a group when another group of the same class already uses it. */
+export function ideaTakenBy(uses: IdeaUse[] | undefined, groupId: string, classId: string): IdeaUse | undefined {
+  return uses?.find((u) => u.classId === classId && u.groupId !== groupId);
+}

@@ -1,0 +1,2 @@
+ALTER TABLE public.idea_bank ADD COLUMN year integer NOT NULL DEFAULT EXTRACT(YEAR FROM (now() AT TIME ZONE 'America/Cuiaba'))::int;
+CREATE INDEX idea_bank_year_idx ON public.idea_bank(teacher_id, year);

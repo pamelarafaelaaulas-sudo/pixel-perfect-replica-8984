@@ -246,6 +246,20 @@
       "when": 1794179097199,
       "tag": "0034_idea_usage",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1794179219924,
+      "tag": "0035_idea_class_lock",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1794179291092,
+      "tag": "0036_idea_year",
+      "breakpoints": true
     }
   ]
 }

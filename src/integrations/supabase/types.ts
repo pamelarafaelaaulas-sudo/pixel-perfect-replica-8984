@@ -911,6 +911,7 @@ export type Database = {
           summary: string
           teacher_id: string
           theme: string
+          year: number
         }
         Insert: {
           area: string
@@ -921,6 +922,7 @@ export type Database = {
           summary?: string
           teacher_id: string
           theme: string
+          year?: number
         }
         Update: {
           area?: string
@@ -931,6 +933,7 @@ export type Database = {
           summary?: string
           teacher_id?: string
           theme?: string
+          year?: number
         }
         Relationships: [
           {
@@ -1798,7 +1801,9 @@ export type Database = {
       idea_usage: {
         Args: never
         Returns: {
+          class_id: string
           class_name: string
+          group_id: string
           group_name: string
           idea_id: string
         }[]
