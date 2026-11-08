@@ -7,9 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AREAS, areaLabel } from "@/lib/project-code";
 import { useQuery } from "@tanstack/react-query";
-import { ideaBankQuery, ideaUsageQuery, type Idea } from "@/lib/idea-bank";
+import { ideaBankQuery, ideaTakenBy, ideaUsageQuery, type Idea } from "@/lib/idea-bank";
 
-export function IdeaBank({ onUse, disabled }: { onUse: (idea: Idea) => void; disabled?: boolean }) {
+export function IdeaBank({ onUse, disabled, groupId, classId }: { onUse: (idea: Idea) => void; disabled?: boolean; groupId: string; classId: string }) {
   const [open, setOpen] = useState(false);
   const [area, setArea] = useState<string>("");
   const [q, setQ] = useState("");
@@ -49,7 +49,9 @@ export function IdeaBank({ onUse, disabled }: { onUse: (idea: Idea) => void; dis
             <Input placeholder="Buscar por palavra..." value={q} onChange={(e) => setQ(e.target.value)} />
             <div className="grid gap-3">
               {list.length === 0 && <p className="text-sm text-muted-foreground">Nenhuma ideia encontrada.</p>}
-              {list.map((i) => (
+              {list.map((i) => {
+                const taken = ideaTakenBy(usage[i.id], groupId, classId);
+                return (
                 <div key={i.id} className="rounded-lg border p-4">
                   <div className="mb-2 flex flex-wrap gap-1">
                     <Badge variant="secondary">{areaLabel(i.area)}</Badge>
@@ -59,7 +61,7 @@ export function IdeaBank({ onUse, disabled }: { onUse: (idea: Idea) => void; dis
                   </div>
                   {usage[i.id]?.length ? (
                     <p className="mb-2 rounded-md bg-accent/20 px-2 py-1 text-xs font-medium">
-                      Já em uso por: {usage[i.id]!.join(", ")}
+                      Já em uso por: {usage[i.id]!.map((u) => u.label).join(", ")}
                     </p>
                   ) : null}
                   <p className="font-semibold">{i.theme}</p>
@@ -69,17 +71,23 @@ export function IdeaBank({ onUse, disabled }: { onUse: (idea: Idea) => void; dis
                     className="mt-3"
                     size="sm"
                     type="button"
-                    disabled={disabled}
+                    disabled={disabled || !!taken}
                     onClick={() => {
                       onUse(i);
                       setOpen(false);
                       toast.success("Ideia aplicada! Adapte o tema e salve o rascunho.");
                     }}
                   >
-                    Usar esta ideia
+                    {taken ? "Bloqueada nesta turma" : "Usar esta ideia"}
                   </Button>
+                  {taken && (
+                    <p className="mt-2 text-xs font-medium text-destructive">
+                      Ideia já escolhida pelo grupo {taken.label} da sua turma. Escolha outra.
+                    </p>
+                  )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           </DialogContent>
         </Dialog>

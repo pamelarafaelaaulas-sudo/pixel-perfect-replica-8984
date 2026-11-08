@@ -25,14 +25,21 @@ export const ideaBankQuery = queryOptions({
   },
 });
 
-/** Groups already using each idea: idea id → list of "Grupo (Turma)". */
+export type IdeaUse = { groupId: string; classId: string; label: string };
+/** Groups already using each idea (idea id → uses). */
 export const ideaUsageQuery = queryOptions({
   queryKey: ["idea-usage"],
-  queryFn: async (): Promise<Record<string, string[]>> => {
+  queryFn: async (): Promise<Record<string, IdeaUse[]>> => {
     const { data, error } = await supabase.rpc("idea_usage");
     if (error) throw error;
-    const map: Record<string, string[]> = {};
-    for (const r of data ?? []) (map[r.idea_id] ??= []).push(`${r.group_name} (${r.class_name})`);
+    const map: Record<string, IdeaUse[]> = {};
+    for (const r of data ?? [])
+      (map[r.idea_id] ??= []).push({ groupId: r.group_id, classId: r.class_id, label: `${r.group_name} (${r.class_name})` });
     return map;
   },
 });
+
+/** An idea is blocked for a group when another group of the same class already uses it. */
+export function ideaTakenBy(uses: IdeaUse[] | undefined, groupId: string, classId: string): IdeaUse | undefined {
+  return uses?.find((u) => u.classId === classId && u.groupId !== groupId);
+}
