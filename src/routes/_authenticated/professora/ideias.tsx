@@ -47,7 +47,7 @@ function IdeasPage() {
 
   const save = async () => {
     if (!form) return;
-    if (!form.theme.trim()) return toast.error("Escreva o tema.");
+    if (!form.theme.trim()) { toast.error("Escreva o tema."); return; }
     setSaving(true);
     const row = {
       area: form.area,
@@ -61,7 +61,7 @@ function IdeasPage() {
       ? await supabase.from("idea_bank").update(row).eq("id", form.id)
       : await supabase.from("idea_bank").insert({ ...row, teacher_id: u.user!.id });
     setSaving(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(form.id ? "Ideia atualizada." : "Ideia cadastrada.");
     setForm(null);
     refresh();
@@ -70,7 +70,7 @@ function IdeasPage() {
   const remove = async (i: Idea) => {
     if (!confirm(`Remover a ideia "${i.theme}"?`)) return;
     const { error } = await supabase.from("idea_bank").delete().eq("id", i.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Ideia removida.");
     refresh();
   };
