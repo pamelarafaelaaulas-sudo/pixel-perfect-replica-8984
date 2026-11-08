@@ -7,6 +7,9 @@ import { checkCitations, citedWorks, missingReferences, workKey, type CitedWork 
 import { ethicsExtraProblems, ethicsProblems, type EthicsExtraValues } from "./ethics";
 import { diaryVideoProblems } from "./diary";
 
+/** Minimum sources the group must register to deliver stage 2 (Artigos científicos). */
+export const MIN_ARTICLES = 5;
+
 /** Parts where ABNT in-text citations are mandatory. */
 export const CITATION_FIELDS: Record<string, string> = {
   introduction: "Introdução",

@@ -260,6 +260,13 @@
       "when": 1794179291092,
       "tag": "0036_idea_year",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1794181433315,
+      "tag": "0037_min_five_articles",
+      "breakpoints": true
     }
   ]
 }
