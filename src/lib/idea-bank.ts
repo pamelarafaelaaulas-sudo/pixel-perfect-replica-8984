@@ -1,0 +1,27 @@
+/** Pre-registered project ideas for groups without a theme (Etapa 1). */
+export type Idea = {
+  area: string; // AREAS code
+  theme: string;
+  question: string;
+  summary: string;
+  bncc: string[];
+};
+
+export const IDEAS: Idea[] = [
+  { area: "BIO", theme: "Bioindicadores da qualidade da água em córregos urbanos de Cuiabá", question: "A presença de macroinvertebrados indica a qualidade da água dos córregos próximos à escola?", summary: "Coletar amostras em pontos diferentes de um córrego, identificar organismos com chave simplificada e comparar com medições simples de pH e turbidez.", bncc: ["Ciências da Natureza", "Sustentabilidade"] },
+  { area: "BIO", theme: "Germinação de sementes do Cerrado após exposição ao fogo", question: "O calor simulado de queimadas acelera ou impede a germinação de sementes nativas do Cerrado?", summary: "Expor sementes a temperaturas controladas e acompanhar a germinação em comparação com um grupo controle.", bncc: ["Ciências da Natureza", "Meio ambiente"] },
+  { area: "BIO", theme: "Plantas medicinais do Pantanal e seu efeito antimicrobiano", question: "Extratos de plantas usadas pela comunidade inibem o crescimento de bactérias comuns?", summary: "Preparar extratos simples e testar halos de inibição em meio de cultura caseiro, com orientação de biossegurança.", bncc: ["Ciências da Natureza", "Saberes tradicionais"] },
+  { area: "SAU", theme: "Hidratação e rendimento escolar em dias de calor extremo", question: "Os estudantes que bebem mais água durante o período de aula apresentam melhor atenção em dias acima de 35 °C?", summary: "Aplicar questionário e teste rápido de atenção, cruzando com o consumo de água registrado pelos voluntários (com TCLE).", bncc: ["Saúde", "Clima"] },
+  { area: "SAU", theme: "Consumo de ultraprocessados na cantina escolar", question: "Qual a proporção de alimentos ultraprocessados consumidos pelos estudantes no intervalo e como reduzi-la?", summary: "Levantamento de rótulos e entrevistas, propondo um cardápio alternativo de baixo custo.", bncc: ["Saúde", "Educação alimentar"] },
+  { area: "SAU", theme: "Uso de telas antes de dormir e qualidade do sono", question: "O tempo de tela à noite influencia as horas de sono e o cansaço relatado pelos estudantes?", summary: "Diário de sono durante duas semanas e questionário validado, com proposta de campanha na escola.", bncc: ["Saúde mental", "Tecnologia"] },
+  { area: "EXA", theme: "Telhados verdes e redução da temperatura em salas de aula", question: "Uma cobertura vegetal sobre maquetes reduz a temperatura interna em comparação com telhas comuns?", summary: "Construir maquetes com sensores de temperatura e medir durante vários dias ensolarados.", bncc: ["Física", "Sustentabilidade"] },
+  { area: "EXA", theme: "Filtro de água com materiais de baixo custo", question: "Um filtro feito com carvão, areia e casca de banana reduz a turbidez da água?", summary: "Montar filtros com camadas diferentes e comparar a turbidez antes e depois da filtragem.", bncc: ["Química", "Saneamento"] },
+  { area: "EXA", theme: "Estatística da evasão escolar no bairro", question: "Quais fatores mais se relacionam com a evasão escolar na comunidade?", summary: "Análise de dados públicos e da secretaria com gráficos e modelagem matemática simples.", bncc: ["Matemática", "Sociedade"] },
+  { area: "ENG", theme: "Sensor de umidade com Arduino para hortas escolares", question: "Um sistema automático de irrigação economiza água em relação à rega manual?", summary: "Programar um sensor de umidade do solo que aciona irrigação e medir o volume de água gasto.", bncc: ["Tecnologia", "Itinerário de Exatas"] },
+  { area: "ENG", theme: "Tijolo ecológico com resíduos da construção", question: "Tijolos com resíduos reciclados têm resistência semelhante aos tijolos comuns?", summary: "Produzir corpos de prova com diferentes proporções e testar resistência com pesos.", bncc: ["Engenharia", "Economia circular"] },
+  { area: "AGR", theme: "Compostagem dos resíduos orgânicos da merenda", question: "A compostagem dos restos da merenda gera adubo eficiente para a horta escolar?", summary: "Montar composteiras, acompanhar temperatura e usar o composto em canteiros comparativos.", bncc: ["Agricultura", "Sustentabilidade"] },
+  { area: "AGR", theme: "Biofertilizante para o cultivo de hortaliças", question: "O biofertilizante caseiro aumenta o crescimento de alfaces em comparação com o adubo comum?", summary: "Experimento com grupos de plantas e medições semanais de altura e número de folhas.", bncc: ["Agricultura", "Ciências da Natureza"] },
+  { area: "HUM", theme: "Memória dos bairros históricos de Cuiabá", question: "Como os moradores mais antigos percebem as transformações do centro histórico?", summary: "Entrevistas de história oral, mapa afetivo e exposição com fotos antigas e atuais.", bncc: ["História", "Patrimônio cultural"] },
+  { area: "SOC", theme: "Educação financeira entre estudantes do ensino médio", question: "Os estudantes que controlam gastos pessoais têm menos dívidas e mais metas financeiras?", summary: "Questionário, oficina de planejamento e comparação antes/depois.", bncc: ["Educação financeira", "Projeto de vida"] },
+  { area: "LIN", theme: "Linguagem cuiabana e identidade dos jovens", question: "Os jovens ainda usam expressões do falar cuiabano e como isso se relaciona à identidade local?", summary: "Coleta de expressões, questionário e glossário ilustrado produzido pela turma.", bncc: ["Linguagens", "Cultura regional"] },
+];

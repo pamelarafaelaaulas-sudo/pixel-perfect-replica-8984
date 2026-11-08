@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { ArrowLeft, CheckCircle2, Lock, MessageCircle, Plus, Save, Send, Star, Trash2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { ResearchPromptCard } from "@/components/research-prompt";
+import { IdeaBank } from "@/components/idea-bank";
 import { PageHeader } from "@/components/page-header";
 import { GroupResponsibilities } from "@/components/group-responsibilities";
 import { PhaseTimeline } from "@/components/phase-timeline";
@@ -356,6 +357,17 @@ function StudentProjectPage() {
             />
           )}
           <StudentWrittenFeedback reviews={writtenRounds} perDay={Number(cls.late_penalty_per_day)} />
+          {selected === 1 && editable && (
+            <div className="mb-5">
+              <IdeaBank
+                onUse={(i) =>
+                  setDraft((d) =>
+                    d ? { ...d, theme: `${i.theme}\n\n${i.summary}`, guiding_question: d.guiding_question?.trim() ? d.guiding_question : i.question } : d,
+                  )
+                }
+              />
+            </div>
+          )}
           <fieldset disabled={!editable} className="space-y-5">
             {isBanner ? null : selected === 2 ? (
               <div className="space-y-5">
