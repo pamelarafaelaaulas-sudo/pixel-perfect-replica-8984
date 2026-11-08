@@ -8,5 +8,5 @@
 - [x] Add owning-teacher approve/return actions; test submission prerequisites and verify pending → approved end-to-end.
 - [x] Automatically approve dated diary submissions and provide Gemini tips without blocking on teacher review.
 - [x] Test date validation, safe AI fallback and the saved student-facing approval flow (temporary isolated group; mobile checked).- [ ] Bloquear ideia usada por outro grupo da mesma turma
-- [ ] Aba da mentora: entregas por etapa + tema, filtro por turma
-- [ ] Ano nas ideias do Banco de Inspirações (filtro/troca por ano)
+- [x] Aba da mentora: entregas por etapa + tema, filtro por turma
+- [x] Ano nas ideias do Banco de Inspirações (filtro/troca por ano)
