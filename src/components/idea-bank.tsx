@@ -59,7 +59,7 @@ export function IdeaBank({ onUse, disabled }: { onUse: (idea: Idea) => void; dis
                   </div>
                   {usage[i.id]?.length ? (
                     <p className="mb-2 rounded-md bg-accent/20 px-2 py-1 text-xs font-medium">
-                      Já em uso por: {usage[i.id].join(", ")}
+                      Já em uso por: {usage[i.id]!.join(", ")}
                     </p>
                   ) : null}
                   <p className="font-semibold">{i.theme}</p>

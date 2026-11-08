@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Lightbulb, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -108,7 +108,7 @@ function IdeasPage() {
                 ))}
               </div>
               {usage[i.id]?.length ? (
-                <p className="mb-2 rounded-md bg-accent/20 px-2 py-1 text-xs font-medium">Já em uso por: {usage[i.id].join(", ")}</p>
+                <p className="mb-2 rounded-md bg-accent/20 px-2 py-1 text-xs font-medium">Já em uso por: {usage[i.id]!.join(", ")}</p>
               ) : null}
               <p className="font-semibold">{i.theme}</p>
               {i.question && <p className="mt-1 text-sm italic">{i.question}</p>}
