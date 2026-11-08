@@ -371,8 +371,8 @@ function StudentProjectPage() {
                   setPickedIdea(i.id);
                   setDraft((d) =>
                     d ? { ...d, theme: `${i.theme}\n\n${i.summary}`, guiding_question: d.guiding_question?.trim() ? d.guiding_question : i.question } : d,
-                  )
-                }
+                  );
+                }}
               />
             </div>
           )}
