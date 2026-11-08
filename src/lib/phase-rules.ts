@@ -132,9 +132,11 @@ export function phaseProblems(
   values: Partial<Record<string, unknown>>,
   articleCount: number,
 ): string[] {
+  // MIN_ARTICLES must match SQL phase_rule_problem_base (stage 2).
   const problems: string[] = [];
   if (phase === 2) {
-    if (articleCount === 0) problems.push("Adicione pelo menos um artigo.");
+    if (articleCount < MIN_ARTICLES)
+      problems.push(`Cadastrem pelo menos ${MIN_ARTICLES} fontes (agora: ${articleCount}).`);
     return problems;
   }
   const checkCitationsIn = (key: string) => {

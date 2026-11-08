@@ -116,3 +116,10 @@ describe("minimum citations and references", () => {
     expect(phaseProblems(11, { references_list: four + "\nROCHA, E. 2022." }, 0).some((p) => p.includes("mínimo é 5"))).toBe(false);
   });
 });
+
+describe("articles stage", () => {
+  it("blocks delivery with fewer than 5 sources", () => {
+    expect(phaseProblems(2, {}, 4)).toHaveLength(1);
+    expect(phaseProblems(2, {}, 5)).toEqual([]);
+  });
+});
