@@ -729,6 +729,12 @@ function ArticlesEditor({
   const update = (i: number, patch: Partial<Article>) => onChange(value.map((a, j) => (j === i ? { ...a, ...patch } : a)));
   return (
     <div className="space-y-4">
+      <p
+        className={`rounded-md px-3 py-2 text-sm font-medium ${value.length >= 5 ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"}`}
+      >
+        Fontes cadastradas: {value.length} de no mínimo 5
+        {value.length < 5 && " — a entrega fica bloqueada até completar."}
+      </p>
       {value.length === 0 && <p className="text-sm italic text-muted-foreground">Nenhum artigo adicionado ainda.</p>}
       {value.map((a, i) => (
         <div key={i} className="space-y-3 rounded-lg border border-border p-4">
