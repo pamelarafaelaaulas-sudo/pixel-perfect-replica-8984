@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Lightbulb, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -95,7 +95,7 @@ function IdeasPage() {
         ))}
       </div>
       {list.length === 0 ? (
-        <EmptyState title="Nenhuma ideia nesta área" description="Clique em “Nova ideia” para cadastrar." />
+        <EmptyState icon={<Lightbulb />} title="Nenhuma ideia nesta área" text="Clique em “Nova ideia” para cadastrar." />
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
           {list.map((i) => (
