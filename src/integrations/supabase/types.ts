@@ -911,6 +911,7 @@ export type Database = {
           summary: string
           teacher_id: string
           theme: string
+          year: number
         }
         Insert: {
           area: string
@@ -921,6 +922,7 @@ export type Database = {
           summary?: string
           teacher_id: string
           theme: string
+          year?: number
         }
         Update: {
           area?: string
@@ -931,6 +933,7 @@ export type Database = {
           summary?: string
           teacher_id?: string
           theme?: string
+          year?: number
         }
         Relationships: [
           {
