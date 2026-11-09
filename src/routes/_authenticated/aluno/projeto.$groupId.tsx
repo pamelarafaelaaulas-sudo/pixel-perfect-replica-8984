@@ -163,7 +163,7 @@ function StudentProjectPage() {
       for (const k of changedFields) {
         if (k === "scientific_articles") patch.scientific_articles = draft.scientific_articles;
         else if (TABLE_COLUMN_LIST.includes(k as TableColumn)) (patch as Record<string, unknown>)[k] = draft[k as TableColumn];
-        else patch[k] = draft[k].trim() === "" ? null : draft[k];
+        else { const t = k as TextFieldKey; patch[t] = draft[t].trim() === "" ? null : draft[t]; }
       }
       const { error } = await supabase.from("projects").update(patch).eq("id", project.id);
       if (error) throw error;
