@@ -1144,6 +1144,7 @@ export type Database = {
           project_seq: number | null
           references_list: string | null
           results_discussion: string | null
+          results_tables: Json
           scientific_articles: Json
           social_application: string | null
           specific_objectives: string | null
@@ -1189,6 +1190,7 @@ export type Database = {
           project_seq?: number | null
           references_list?: string | null
           results_discussion?: string | null
+          results_tables?: Json
           scientific_articles?: Json
           social_application?: string | null
           specific_objectives?: string | null
@@ -1234,6 +1236,7 @@ export type Database = {
           project_seq?: number | null
           references_list?: string | null
           results_discussion?: string | null
+          results_tables?: Json
           scientific_articles?: Json
           social_application?: string | null
           specific_objectives?: string | null
