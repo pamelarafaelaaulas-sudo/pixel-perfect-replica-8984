@@ -35,7 +35,7 @@ import { cn } from "@/lib/utils";
 import type { Database } from "@/integrations/supabase/types";
 import { aiSuggestionsForGroupQuery, diaryGradesQuery, groupDetailQuery, meQuery } from "@/lib/queries";
 import { latestPerPhase } from "@/lib/ai-score";
-import { parseTables, tableProblems, type ResultTable } from "@/lib/result-tables";
+import { parseTables, tableProblems, tableColumnOf, TABLE_COLUMN_LIST, type ResultTable, type TableColumn } from "@/lib/result-tables";
 import { ResultTablesEditor } from "@/components/result-tables";
 import {
   PHASE_COUNT,
@@ -99,13 +99,13 @@ export const Route = createFileRoute("/_authenticated/aluno/projeto/$groupId")({
 });
 
 type Project = Database["public"]["Tables"]["projects"]["Row"];
-type Draft = Record<TextFieldKey, string> & { scientific_articles: Article[]; results_tables: ResultTable[] };
+type Draft = Record<TextFieldKey, string> & { scientific_articles: Article[] } & Record<TableColumn, ResultTable[]>;
 
 function toDraft(p: Project): Draft {
   return {
     ...(Object.fromEntries(TEXT_FIELDS.map((k) => [k, p[k] ?? ""])) as Record<TextFieldKey, string>),
     scientific_articles: parseArticles(p.scientific_articles),
-    results_tables: parseTables(p.results_tables),
+    ...(Object.fromEntries(TABLE_COLUMN_LIST.map((c) => [c, parseTables(p[c])])) as Record<TableColumn, ResultTable[]>),
   };
 }
 
@@ -162,7 +162,7 @@ function StudentProjectPage() {
       const patch: Partial<Project> = {};
       for (const k of changedFields) {
         if (k === "scientific_articles") patch.scientific_articles = draft.scientific_articles;
-        else if (k === "results_tables") patch.results_tables = draft.results_tables as unknown as Project["results_tables"];
+        else if (TABLE_COLUMN_LIST.includes(k as TableColumn)) (patch as Record<string, unknown>)[k] = draft[k as TableColumn];
         else patch[k] = draft[k].trim() === "" ? null : draft[k];
       }
       const { error } = await supabase.from("projects").update(patch).eq("id", project.id);
@@ -235,7 +235,7 @@ function StudentProjectPage() {
   const openReview = isSubmitted ? (writtenRounds.find((r) => !r.resubmitted_at) ?? null) : null;
   const editable = (!isSubmitted && selected <= project.current_phase && info.state !== "skipped") || !!openReview;
   const phaseDirty = changedFields.some((f) => phaseFields(selected).includes(f));
-  const problems = [...(selected === 9 ? tableProblems(draft.results_tables) : []), ...phaseProblems(
+  const problems = [...phaseFields(selected).flatMap((f) => (TABLE_COLUMN_LIST.includes(f as TableColumn) ? tableProblems(draft[f as TableColumn]) : [])), ...phaseProblems(
     selected,
     isBanner
       ? { banner_canva_url: project.banner_canva_url, banner_file_path: project.banner_file_path, banner_template_url: cls.banner_template_url }
@@ -412,9 +412,9 @@ function StudentProjectPage() {
                       onChange={(e) => set(f.key, e.target.value)}
                     />
                   )}
-                  {f.key === "results_discussion" && (
+                  {tableColumnOf(f.key) && (
                     <div className="mt-3">
-                      <ResultTablesEditor value={draft.results_tables} onChange={(v) => set("results_tables", v)} editable={editable} />
+                      <ResultTablesEditor value={draft[tableColumnOf(f.key)!]} onChange={(v) => set(tableColumnOf(f.key)!, v)} editable={editable} />
                     </div>
                   )}
                 </Field>

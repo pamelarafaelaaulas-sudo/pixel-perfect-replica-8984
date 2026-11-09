@@ -1,6 +1,17 @@
 /** ABNT tables in "Resultados e discussão". First row is the header. Not counted in word limits. */
 export type ResultTable = { title: string; source: string; rows: string[][] };
 
+/** Text field → column holding its tables, in document order. */
+export const TABLE_COLUMNS = {
+  introduction: "introduction_tables",
+  methodology: "methodology_tables",
+  results_discussion: "results_tables",
+} as const;
+export type TableField = keyof typeof TABLE_COLUMNS;
+export type TableColumn = (typeof TABLE_COLUMNS)[TableField];
+export const TABLE_COLUMN_LIST = Object.values(TABLE_COLUMNS) as TableColumn[];
+export const tableColumnOf = (field: string): TableColumn | null => (TABLE_COLUMNS as Record<string, TableColumn>)[field] ?? null;
+
 export const MAX_TABLE_ROWS = 30;
 export const MAX_TABLE_COLS = 8;
 

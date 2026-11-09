@@ -31,15 +31,15 @@ export function ResultTableView({ table, index }: { table: ResultTable; index: n
   );
 }
 
-export function ResultTablesEditor({ value, onChange, editable }: { value: ResultTable[]; onChange: (v: ResultTable[]) => void; editable: boolean }) {
+export function ResultTablesEditor({ value, onChange, editable, label = "Tabelas" }: { value: ResultTable[]; onChange: (v: ResultTable[]) => void; editable: boolean; label?: string }) {
   const update = (i: number, t: ResultTable) => onChange(value.map((x, k) => (k === i ? t : x)));
   return (
     <div className="space-y-4 rounded-lg border border-dashed p-4">
       <div className="flex items-center justify-between gap-2">
         <div>
-          <p className="flex items-center gap-2 font-medium"><Table2 className="h-4 w-4 text-primary" /> Tabelas dos resultados</p>
+          <p className="flex items-center gap-2 font-medium"><Table2 className="h-4 w-4 text-primary" /> {label}</p>
           <p className="text-xs text-muted-foreground">
-            Opcional. A 1ª linha é o cabeçalho. Você pode colar uma tabela do Excel ou Google Planilhas na primeira célula.
+            Opcional, para organizar dados. A 1ª linha é o cabeçalho. Você pode colar uma tabela do Excel ou Google Planilhas na primeira célula.
             O texto das tabelas não conta nas palavras.
           </p>
         </div>

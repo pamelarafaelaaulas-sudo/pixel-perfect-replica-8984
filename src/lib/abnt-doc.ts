@@ -39,6 +39,8 @@ export type AbntInput = {
   introduction: string | null;
   results_discussion: string | null;
   results_tables?: unknown;
+  methodology_tables?: unknown;
+  introduction_tables?: unknown;
   conclusion: string | null;
   references_list: string | null;
   authors: string[];
@@ -99,6 +101,10 @@ export function sortReferences(text: string | null | undefined) {
 export const alinea = (i: number) => `${String.fromCharCode(97 + (i % 26))})`;
 
 export function buildAbntModel(p: AbntInput): AbntModel {
+  // ABNT numbers tables continuously through the document (Introdução → Metodologia → Resultados).
+  let n = 0;
+  const docTables = (v: unknown): AbntTable[] =>
+    parseTables(v).map((t) => ({ caption: tableCaption(n++, t.title), source: tableSource(t.source), rows: t.rows }));
   const missing: string[] = [];
   const need = (label: string, value: string | null | undefined) => {
     if (!(value ?? "").trim()) missing.push(label);
@@ -135,7 +141,7 @@ export function buildAbntModel(p: AbntInput): AbntModel {
     titlePage: { authors: authors.map((a) => a.toUpperCase()), title: title.toUpperCase(), nature, place: place.toUpperCase(), year },
     abstract: { paragraphs: paragraphsOf(p.abstract), keywords: splitKeywords(p.keywords) },
     sections: [
-      { number: "1", title: "INTRODUÇÃO", level: 1, paragraphs: paragraphsOf(p.introduction) },
+      { number: "1", title: "INTRODUÇÃO", level: 1, paragraphs: paragraphsOf(p.introduction), tables: docTables(p.introduction_tables) },
       { number: "2", title: "OBJETIVOS", level: 1, paragraphs: [] },
       { number: "2.1", title: "OBJETIVO GERAL", level: 2, paragraphs: paragraphsOf(p.general_objective) },
       {
@@ -145,9 +151,9 @@ export function buildAbntModel(p: AbntInput): AbntModel {
         paragraphs: [],
         items: objectiveLines(p.specific_objectives).map(stripMarker).filter(Boolean),
       },
-      { number: "3", title: "METODOLOGIA", level: 1, paragraphs: paragraphsOf(p.methodology) },
+      { number: "3", title: "METODOLOGIA", level: 1, paragraphs: paragraphsOf(p.methodology), tables: docTables(p.methodology_tables) },
       { number: "4", title: "RESULTADOS E DISCUSSÃO", level: 1, paragraphs: paragraphsOf(p.results_discussion),
-        tables: parseTables(p.results_tables).map((t, i) => ({ caption: tableCaption(i, t.title), source: tableSource(t.source), rows: t.rows })) },
+        tables: docTables(p.results_tables) },
       { number: "5", title: "CONCLUSÃO", level: 1, paragraphs: paragraphsOf(p.conclusion) },
     ],
     references: sortReferences(p.references_list),
