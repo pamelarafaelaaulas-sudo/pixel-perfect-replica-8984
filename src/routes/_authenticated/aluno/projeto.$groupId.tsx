@@ -127,10 +127,6 @@ function size(v: string | Article[] | ResultTable[]) {
   if (v.length && "rows" in v[0]!) return (v as ResultTable[]).reduce((s, t) => s + t.rows.flat().join("").length, 0);
   return (v as Article[]).reduce((s, a) => s + a.title.length + a.url.length + a.abnt_citation.length, 0);
 }
-function _unusedSize(v: Article[]) {
-  return v.reduce((s, a) => s + a.title.length + a.url.length + a.abnt_citation.length, 0);
-}
-
 function StudentProjectPage() {
   const { groupId } = Route.useParams();
   const { data: me } = useSuspenseQuery(meQuery);
