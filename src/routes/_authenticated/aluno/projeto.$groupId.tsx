@@ -414,7 +414,7 @@ function StudentProjectPage() {
                   )}
                   {tableColumnOf(f.key) && (
                     <div className="mt-3">
-                      <ResultTablesEditor value={draft[tableColumnOf(f.key)!]} onChange={(v) => set(tableColumnOf(f.key)!, v)} editable={editable} />
+                      <ResultTablesEditor value={draft[tableColumnOf(f.key)!]} onChange={(v) => set(tableColumnOf(f.key)!, v)} editable={editable} label={`Tabelas – ${f.label}`} />
                     </div>
                   )}
                 </Field>
