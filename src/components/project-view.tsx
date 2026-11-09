@@ -73,10 +73,13 @@ export function ProjectView({ project, groupId }: { project: Project; groupId?: 
               </p>
             )}
           </Part>
-          <Part title="Introdução" value={project.introduction} />
+          <Part title="Introdução" value={project.introduction}>
+            {parseTables(project.introduction_tables).map((t, i) => <ResultTableView key={i} table={t} index={i} />)}
+          </Part>
           <Part title="Objetivo geral" value={project.general_objective} />
           <Part title="Objetivos específicos" value={project.specific_objectives} />
           <Part title="Metodologia" value={project.methodology}>
+            {parseTables(project.methodology_tables).map((t, i) => <ResultTableView key={i} table={t} index={i} />)}
             <div className="mt-3 rounded-lg bg-muted p-3">
               <EthicsSummary project={project} groupId={groupId} />
             </div>

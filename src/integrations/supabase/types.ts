@@ -1139,8 +1139,10 @@ export type Database = {
           idea_id: string | null
           institution: string | null
           introduction: string | null
+          introduction_tables: Json
           keywords: string | null
           methodology: string | null
+          methodology_tables: Json
           project_seq: number | null
           references_list: string | null
           results_discussion: string | null
@@ -1185,8 +1187,10 @@ export type Database = {
           idea_id?: string | null
           institution?: string | null
           introduction?: string | null
+          introduction_tables?: Json
           keywords?: string | null
           methodology?: string | null
+          methodology_tables?: Json
           project_seq?: number | null
           references_list?: string | null
           results_discussion?: string | null
@@ -1231,8 +1235,10 @@ export type Database = {
           idea_id?: string | null
           institution?: string | null
           introduction?: string | null
+          introduction_tables?: Json
           keywords?: string | null
           methodology?: string | null
+          methodology_tables?: Json
           project_seq?: number | null
           references_list?: string | null
           results_discussion?: string | null

@@ -162,6 +162,8 @@ export const PHASE_FORM: Record<number, FormField[]> = {
 export function phaseFields(n: number): string[] {
   if (n === 2) return ["scientific_articles"];
   if (n === BANNER_PHASE) return ["banner_canva_url", "banner_file_path"];
+  if (n === 7) return ["methodology", "methodology_tables"];
+  if (n === 8) return ["introduction", "introduction_tables"];
   if (n === 9) return ["results_discussion", "results_tables"];
   return (PHASE_FORM[n] ?? []).map((f) => f.key);
 }
@@ -171,6 +173,8 @@ export const SECTION_LABELS: Record<string, string> = {
   banner_canva_url: "Banner (link do Canva)",
   banner_file_path: "Banner (arquivo)",
   results_tables: "Tabelas dos resultados",
+  methodology_tables: "Tabelas da metodologia",
+  introduction_tables: "Tabelas da introdução",
   ...Object.fromEntries(Object.values(PHASE_FORM).flat().map((f) => [f.key, f.label.replace(/ \(.*\)$/, "")])),
 };
 

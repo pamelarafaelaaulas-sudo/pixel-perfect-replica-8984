@@ -9,3 +9,4 @@
 - Student home alerts (`alerts.ts`) and the teacher fair indicators/CSV (`indicators.ts`) are pure and tested; the PDF report is the browser print of `/professora/indicadores`.
 - Banco de Inspirações: per-teacher rows in `idea_bank` (teacher writes own; students read their class teacher's via RLS), seeded with 16 defaults by `seed_teacher_ideas` when a teacher role is created; read through `ideaBankQuery` in `idea-bank.ts`.
 - Idea usage: `projects.idea_id` (set when a group saves after "Usar esta ideia"); trigger `guard_idea_per_class` blocks one idea per class, mirrored in UI by `ideaTakenBy`; read through security-definer `idea_usage`. Ideas carry a `year`; students see only the current year's.
+- Stage tables (Introdução, Metodologia, Resultados): jsonb columns mapped by `TABLE_COLUMNS` in `result-tables.ts` (tested); not counted in word limits, numbered continuously in the Word export.
