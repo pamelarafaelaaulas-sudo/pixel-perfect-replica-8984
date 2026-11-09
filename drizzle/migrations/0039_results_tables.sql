@@ -1,0 +1,2 @@
+ALTER TABLE public.projects ADD COLUMN results_tables jsonb NOT NULL DEFAULT '[]'::jsonb;
+COMMENT ON COLUMN public.projects.results_tables IS 'ABNT tables of Resultados e discussão: [{title, source, rows: string[][]}], first row = header. Not counted in word limits.';
