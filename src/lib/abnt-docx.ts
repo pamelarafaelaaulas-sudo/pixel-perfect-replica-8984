@@ -152,11 +152,6 @@ export async function buildProjectDocx(model: AbntModel): Promise<Blob> {
       );
       text.push(new Paragraph({ spacing: { ...single, before: 60, after: 240 }, children: [new TextRun({ text: t.source, font: ABNT.font, size: ABNT.smallPt * 2 })] }));
     });
-    if (false) {
-      // unreachable: keeps the original else chain shape
-    } else if (false if (s.title !== "OBJETIVOS") {
-      text.push(placeholder());
-    }
   });
 
   text.push(
