@@ -3,6 +3,8 @@ import type { Database } from "@/integrations/supabase/types";
 import { PHASES, parseArticles } from "@/lib/phases";
 import { BannerView } from "@/components/banner-stage";
 import { EthicsSummary } from "@/components/ethics-screening";
+import { ResultTableView } from "@/components/result-tables";
+import { parseTables } from "@/lib/result-tables";
 
 type Project = Database["public"]["Tables"]["projects"]["Row"];
 
@@ -79,7 +81,9 @@ export function ProjectView({ project, groupId }: { project: Project; groupId?: 
               <EthicsSummary project={project} groupId={groupId} />
             </div>
           </Part>
-          <Part title="Resultados e discussão" value={project.results_discussion} />
+          <Part title="Resultados e discussão" value={project.results_discussion}>
+            {parseTables(project.results_tables).map((t, i) => <ResultTableView key={i} table={t} index={i} />)}
+          </Part>
           <Part title="Conclusão" value={project.conclusion} />
           <Part title="Referências" value={project.references_list} />
         </div>

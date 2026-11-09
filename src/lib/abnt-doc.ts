@@ -1,5 +1,8 @@
 import { objectiveLines, splitKeywords } from "./phase-rules";
 import { parseArticles } from "./phases";
+import { parseTables, tableCaption, tableSource } from "./result-tables";
+
+export type AbntTable = { caption: string; source: string; rows: string[][] };
 
 /**
  * ABNT (NBR 14724) layout for the written project. Pure values so the rules are testable;
@@ -35,6 +38,7 @@ export type AbntInput = {
   methodology: string | null;
   introduction: string | null;
   results_discussion: string | null;
+  results_tables?: unknown;
   conclusion: string | null;
   references_list: string | null;
   authors: string[];
@@ -52,6 +56,8 @@ export type AbntSection = {
   paragraphs: string[];
   /** Alíneas (a), b)…) — used for the specific objectives. */
   items?: string[];
+  /** ABNT tables after the paragraphs. */
+  tables?: AbntTable[];
 };
 
 export type AbntModel = {
@@ -140,7 +146,8 @@ export function buildAbntModel(p: AbntInput): AbntModel {
         items: objectiveLines(p.specific_objectives).map(stripMarker).filter(Boolean),
       },
       { number: "3", title: "METODOLOGIA", level: 1, paragraphs: paragraphsOf(p.methodology) },
-      { number: "4", title: "RESULTADOS E DISCUSSÃO", level: 1, paragraphs: paragraphsOf(p.results_discussion) },
+      { number: "4", title: "RESULTADOS E DISCUSSÃO", level: 1, paragraphs: paragraphsOf(p.results_discussion),
+        tables: parseTables(p.results_tables).map((t, i) => ({ caption: tableCaption(i, t.title), source: tableSource(t.source), rows: t.rows })) },
       { number: "5", title: "CONCLUSÃO", level: 1, paragraphs: paragraphsOf(p.conclusion) },
     ],
     references: sortReferences(p.references_list),

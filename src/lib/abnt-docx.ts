@@ -4,7 +4,7 @@ const PLACEHOLDER = "[Parte ainda não escrita]";
 
 /** Builds the ABNT-formatted .docx in the browser (docx loaded on demand). */
 export async function buildProjectDocx(model: AbntModel): Promise<Blob> {
-  const { AlignmentType, Document, Header, LineRuleType, Packer, PageNumber, Paragraph, TextRun } = await import("docx");
+  const { AlignmentType, BorderStyle, Document, Header, LineRuleType, Packer, PageNumber, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } = await import("docx");
 
   const size = ABNT.bodyPt * 2;
   const single = { line: 240, lineRule: LineRuleType.AUTO };
@@ -96,7 +96,7 @@ export async function buildProjectDocx(model: AbntModel): Promise<Blob> {
   ];
 
   /* ---------- Textual part (page number top-right) ---------- */
-  const text: InstanceType<typeof Paragraph>[] = [];
+  const text: (InstanceType<typeof Paragraph> | InstanceType<typeof Table>)[] = [];
   model.sections.forEach((s, i) => {
     text.push(
       new Paragraph({
@@ -120,7 +120,41 @@ export async function buildProjectDocx(model: AbntModel): Promise<Blob> {
       );
     } else if (s.paragraphs.length) {
       s.paragraphs.forEach((p) => text.push(body(p)));
-    } else if (s.title !== "OBJETIVOS") {
+    } else if (!s.tables?.length && s.title !== "OBJETIVOS") {
+      text.push(placeholder());
+    }
+    s.tables?.forEach((t) => {
+      const small = (v: string, bold = false) =>
+        new Paragraph({ spacing: single, children: [new TextRun({ text: v, font: ABNT.font, size: ABNT.smallPt * 2, bold })] });
+      const line = { style: BorderStyle.SINGLE, size: 8, color: "000000" };
+      const none = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
+      text.push(new Paragraph({ spacing: { ...single, before: 240, after: 60 }, keepNext: true, children: [run(t.caption)] }));
+      text.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: t.rows.map((r, ri) =>
+            new TableRow({
+              tableHeader: ri === 0,
+              children: r.map((c) =>
+                new TableCell({
+                  borders: {
+                    top: ri <= 1 ? line : none,
+                    bottom: ri === 0 || ri === t.rows.length - 1 ? line : none,
+                    left: none,
+                    right: none,
+                  },
+                  children: [small(c, ri === 0)],
+                }),
+              ),
+            }),
+          ),
+        }),
+      );
+      text.push(new Paragraph({ spacing: { ...single, before: 60, after: 240 }, children: [new TextRun({ text: t.source, font: ABNT.font, size: ABNT.smallPt * 2 })] }));
+    });
+    if (false) {
+      // unreachable: keeps the original else chain shape
+    } else if (false if (s.title !== "OBJETIVOS") {
       text.push(placeholder());
     }
   });
