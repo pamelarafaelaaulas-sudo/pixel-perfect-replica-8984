@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { meQuery, teacherClassesQuery } from "@/lib/queries";
 import { plural } from "@/lib/format";
 import { TeacherInvitesDialog } from "@/components/teacher-invites";
+import { isOwnerEmail } from "@/lib/owner";
 import { normalizeClassLabel } from "@/lib/project-code";
 import { FairCountdown } from "@/components/fair-countdown";
 import { EthicsFormTemplateDialog } from "@/components/ethics-form-template";
@@ -127,7 +128,7 @@ function TeacherHome() {
             </Button>
             {me && <EthicsFormTemplateDialog teacherId={me.id} classes={classes} />}
             {me && <TrailSettingsDialog teacherId={me.id} classes={classes} />}
-            <TeacherInvitesDialog />
+            {isOwnerEmail(me?.email) && <TeacherInvitesDialog />}
             <NewClassDialog />
           </div>
         }
