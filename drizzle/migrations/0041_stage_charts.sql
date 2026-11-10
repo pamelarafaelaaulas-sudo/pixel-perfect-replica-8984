@@ -1,0 +1,4 @@
+ALTER TABLE public.projects ADD COLUMN introduction_charts jsonb NOT NULL DEFAULT '[]'::jsonb, ADD COLUMN methodology_charts jsonb NOT NULL DEFAULT '[]'::jsonb, ADD COLUMN results_charts jsonb NOT NULL DEFAULT '[]'::jsonb;
+COMMENT ON COLUMN public.projects.introduction_charts IS 'Structured charts for Introduction; optional, excluded from word counts.';
+COMMENT ON COLUMN public.projects.methodology_charts IS 'Structured charts for Methodology; optional, excluded from word counts.';
+COMMENT ON COLUMN public.projects.results_charts IS 'Structured charts for Results and Discussion; optional, excluded from word counts.';

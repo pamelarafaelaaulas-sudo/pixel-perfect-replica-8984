@@ -1139,12 +1139,15 @@ export type Database = {
           idea_id: string | null
           institution: string | null
           introduction: string | null
+          introduction_charts: Json
           introduction_tables: Json
           keywords: string | null
           methodology: string | null
+          methodology_charts: Json
           methodology_tables: Json
           project_seq: number | null
           references_list: string | null
+          results_charts: Json
           results_discussion: string | null
           results_tables: Json
           scientific_articles: Json
@@ -1187,12 +1190,15 @@ export type Database = {
           idea_id?: string | null
           institution?: string | null
           introduction?: string | null
+          introduction_charts?: Json
           introduction_tables?: Json
           keywords?: string | null
           methodology?: string | null
+          methodology_charts?: Json
           methodology_tables?: Json
           project_seq?: number | null
           references_list?: string | null
+          results_charts?: Json
           results_discussion?: string | null
           results_tables?: Json
           scientific_articles?: Json
@@ -1235,12 +1241,15 @@ export type Database = {
           idea_id?: string | null
           institution?: string | null
           introduction?: string | null
+          introduction_charts?: Json
           introduction_tables?: Json
           keywords?: string | null
           methodology?: string | null
+          methodology_charts?: Json
           methodology_tables?: Json
           project_seq?: number | null
           references_list?: string | null
+          results_charts?: Json
           results_discussion?: string | null
           results_tables?: Json
           scientific_articles?: Json
