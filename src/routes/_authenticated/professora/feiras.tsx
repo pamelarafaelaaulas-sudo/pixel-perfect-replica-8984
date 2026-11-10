@@ -12,6 +12,9 @@ import { ETHICS_STATUS_LABEL, externalFairRows, type EthicsStatus } from "@/lib/
 import { downloadBlob } from "@/lib/export-xlsx";
 import { supabase } from "@/integrations/supabase/client";
 import { SHIRT_SIZES, formatCpf } from "@/lib/fair-attendees";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { FAIR_STATUS_LABEL } from "@/lib/fair-docs";
 import { FairBannerModelsManager, FairTemplatesManager } from "@/components/fair-accreditation";
 
 export const Route = createFileRoute("/_authenticated/professora/feiras")({
@@ -44,6 +47,27 @@ function FairsPage() {
   const { data } = useSuspenseQuery(teacherExternalFairsQuery);
   const all = useMemo(() => externalFairRows(data), [data]);
   const [fair, setFair] = useState<string>("all");
+  const qc = useQueryClient();
+  const ids = all.map((r) => r.groupId);
+  const { data: approvals = [] } = useQuery({
+    queryKey: ["fair-approvals", ids],
+    enabled: ids.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("fair_approvals").select("group_id, status").in("group_id", ids);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  async function decide(groupId: string, status: string) {
+    const { data: u } = await supabase.auth.getUser();
+    const { error } = status === "pendente"
+      ? await supabase.from("fair_approvals").delete().eq("group_id", groupId)
+      : await supabase.from("fair_approvals").upsert({ group_id: groupId, status, teacher_id: u.user?.id ?? null, decided_at: new Date().toISOString() }, { onConflict: "group_id" });
+    if (error) { toast.error("Não foi possível salvar a decisão."); return; }
+    toast.success(status === "aprovado" ? "Aprovado: o grupo já pode baixar o modelo oficial." : "Decisão salva.");
+    qc.invalidateQueries({ queryKey: ["fair-approvals"] });
+    qc.invalidateQueries({ queryKey: ["fair-accreditation", groupId] });
+  }
   const rows = fair === "all" ? all : all.filter((r) => r.fairs.includes(fair as (typeof EXTERNAL_FAIRS)[number]));
 
   async function exportSheet() {
@@ -160,6 +184,7 @@ function FairsPage() {
                 <th className="p-3">Feiras</th>
                 <th className="p-3">Etapa</th>
                 <th className="p-3">Triagem de ética</th>
+                <th className="p-3">Aprovação na feira</th>
               </tr>
             </thead>
             <tbody>
@@ -186,6 +211,15 @@ function FairsPage() {
                         Abrir Forms
                       </a>
                     )}
+                  </td>
+                  <td className="p-3">
+                    <Select value={approvals.find((a) => a.group_id === r.groupId)?.status ?? "pendente"} onValueChange={(v) => decide(r.groupId, v)}>
+                      <SelectTrigger className="w-48" aria-label={`Aprovação de ${r.groupName}`}><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pendente">Pendente</SelectItem>
+                        {Object.entries(FAIR_STATUS_LABEL).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
                   </td>
                 </tr>
               ))}
