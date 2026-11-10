@@ -21,10 +21,10 @@ export function parseCharts(value: unknown): StageChart[] {
   return value.filter((c) => c && typeof c === "object").map((c) => {
     const o = c as Record<string, unknown>;
     return {
-      title: String(o.title ?? ""), source: String(o.source ?? ""),
-      type: o.type === "line" || o.type === "pie" ? o.type : "bar",
-      xLabel: String(o.xLabel ?? ""), yLabel: String(o.yLabel ?? ""),
-      points: Array.isArray(o.points) ? o.points.map((p) => ({ label: String(p?.label ?? ""), value: String(p?.value ?? "") })) : [],
+      title: String(o["title"] ?? ""), source: String(o["source"] ?? ""),
+      type: o["type"] === "line" || o["type"] === "pie" ? o["type"] : "bar",
+      xLabel: String(o["xLabel"] ?? ""), yLabel: String(o["yLabel"] ?? ""),
+      points: Array.isArray(o["points"]) ? o["points"].map((p) => ({ label: String(p?.label ?? ""), value: String(p?.value ?? "") })) : [],
     };
   });
 }
