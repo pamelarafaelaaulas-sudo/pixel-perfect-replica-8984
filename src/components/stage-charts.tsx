@@ -25,7 +25,7 @@ export function StageChartView({ chart, index }: { chart: StageChart; index: num
   }, [chart]);
   return <figure className="my-4 min-w-0">
     <figcaption className="mb-2 text-sm font-medium">{figureCaption(index, chart.title)}</figcaption>
-    <canvas ref={canvas} width={800} height={450} className="h-auto w-full max-w-full" role="img" aria-label={figureCaption(index, chart.title)} />
+    <div className="overflow-x-auto"><div className="min-w-[600px]"><canvas ref={canvas} width={800} height={450} className="h-auto w-full max-w-full" role="img" aria-label={figureCaption(index, chart.title)} /></div></div>
     {error && <p className="text-sm text-destructive">Não foi possível desenhar o gráfico.</p>}
     <p className="mt-2 text-xs text-muted-foreground">{tableSource(chart.source)}</p>
     <table className="sr-only"><caption>{chart.title}</caption><thead><tr><th>Categoria</th><th>Valor</th></tr></thead><tbody>{chart.points.map((p, i) => <tr key={i}><td>{p.label}</td><td>{p.value}</td></tr>)}</tbody></table>
