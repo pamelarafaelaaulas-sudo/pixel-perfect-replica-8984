@@ -1829,6 +1829,7 @@ export type Database = {
       is_class_student: { Args: { _class_id: string }; Returns: boolean }
       is_google_form_url: { Args: { _url: string }; Returns: boolean }
       is_group_member: { Args: { _group_id: string }; Returns: boolean }
+      is_invite_admin: { Args: never; Returns: boolean }
       is_teacher: { Args: never; Returns: boolean }
       join_group: {
         Args: { _group_id: string; _whatsapp: string }
