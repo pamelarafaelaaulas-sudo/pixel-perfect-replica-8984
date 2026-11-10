@@ -10,5 +10,5 @@
 - [x] Test date validation, safe AI fallback and the saved student-facing approval flow (temporary isolated group; mobile checked).- [ ] Bloquear ideia usada por outro grupo da mesma turma
 - [x] Aba da mentora: entregas por etapa + tema, filtro por turma
 - [x] Ano nas ideias do Banco de Inspirações (filtro/troca por ano)
-- [ ] Add editable charts in Introduction, Methodology and Results, with teacher display and Word figures.
-- [ ] Test chart data and verify saved charts and Word export in the browser.
+- [x] Add editable charts in Introduction, Methodology and Results, with teacher display and Word figures.
+- [x] Test chart data and editor desktop/mobile; verify saved charts and Word export as teacher, restoring original chart data. Full student-authenticated saving remains unverified.
