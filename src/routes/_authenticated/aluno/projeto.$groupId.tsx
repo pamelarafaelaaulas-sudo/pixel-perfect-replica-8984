@@ -37,6 +37,8 @@ import { aiSuggestionsForGroupQuery, diaryGradesQuery, groupDetailQuery, meQuery
 import { latestPerPhase } from "@/lib/ai-score";
 import { parseTables, tableProblems, tableColumnOf, TABLE_COLUMN_LIST, type ResultTable, type TableColumn } from "@/lib/result-tables";
 import { ResultTablesEditor } from "@/components/result-tables";
+import { CHART_COLUMN_LIST, chartColumnOf, parseCharts, type ChartColumn, type StageChart } from "@/lib/stage-charts";
+import { StageChartsEditor } from "@/components/stage-charts";
 import {
   PHASE_COUNT,
   PHASE_FORM,
@@ -99,13 +101,14 @@ export const Route = createFileRoute("/_authenticated/aluno/projeto/$groupId")({
 });
 
 type Project = Database["public"]["Tables"]["projects"]["Row"];
-type Draft = Record<TextFieldKey, string> & { scientific_articles: Article[] } & Record<TableColumn, ResultTable[]>;
+type Draft = Record<TextFieldKey, string> & { scientific_articles: Article[] } & Record<TableColumn, ResultTable[]> & Record<ChartColumn, StageChart[]>;
 
 function toDraft(p: Project): Draft {
   return {
     ...(Object.fromEntries(TEXT_FIELDS.map((k) => [k, p[k] ?? ""])) as Record<TextFieldKey, string>),
     scientific_articles: parseArticles(p.scientific_articles),
     ...(Object.fromEntries(TABLE_COLUMN_LIST.map((c) => [c, parseTables(p[c])])) as Record<TableColumn, ResultTable[]>),
+    ...(Object.fromEntries(CHART_COLUMN_LIST.map((c) => [c, parseCharts(p[c])])) as Record<ChartColumn, StageChart[]>),
   };
 }
 
@@ -122,9 +125,11 @@ function phaseText(d: Draft, phase: number) {
   return parts.join("\n\n");
 }
 
-function size(v: string | Article[] | ResultTable[]) {
+function size(v: string | Article[] | ResultTable[] | StageChart[]) {
   if (typeof v === "string") return v.length;
-  if (v.length && "rows" in v[0]!) return (v as ResultTable[]).reduce((s, t) => s + t.rows.flat().join("").length, 0);
+  const first = v[0];
+  if (first && "points" in first) return JSON.stringify(v).length;
+  if (first && "rows" in first) return (v as ResultTable[]).reduce((s, t) => s + t.rows.flat().join("").length, 0);
   return (v as Article[]).reduce((s, a) => s + a.title.length + a.url.length + a.abnt_citation.length, 0);
 }
 function StudentProjectPage() {
@@ -163,6 +168,7 @@ function StudentProjectPage() {
       for (const k of changedFields) {
         if (k === "scientific_articles") patch.scientific_articles = draft.scientific_articles;
         else if (TABLE_COLUMN_LIST.includes(k as TableColumn)) (patch as Record<string, unknown>)[k] = draft[k as TableColumn];
+        else if (CHART_COLUMN_LIST.includes(k as ChartColumn)) (patch as Record<string, unknown>)[k] = draft[k as ChartColumn];
         else { const t = k as TextFieldKey; patch[t] = draft[t].trim() === "" ? null : draft[t]; }
       }
       const { error } = await supabase.from("projects").update(patch).eq("id", project.id);
@@ -412,11 +418,12 @@ function StudentProjectPage() {
                       onChange={(e) => set(f.key, e.target.value)}
                     />
                   )}
-                  {tableColumnOf(f.key) && (
+                  {(() => { const column = tableColumnOf(f.key); return column ? (
                     <div className="mt-3">
-                      <ResultTablesEditor value={draft[tableColumnOf(f.key)!]} onChange={(v) => set(tableColumnOf(f.key)!, v)} editable={editable} label={`Tabelas – ${f.label}`} />
+                      <ResultTablesEditor value={draft[column]} onChange={(v) => set(column, v)} editable={editable} label={`Tabelas – ${f.label}`} />
                     </div>
-                  )}
+                  ) : null; })()}
+                  {(() => { const column = chartColumnOf(f.key); return column ? <StageChartsEditor value={draft[column]} onChange={(v) => set(column, v)} editable={editable} /> : null; })()}
                 </Field>
               ))
             )}
