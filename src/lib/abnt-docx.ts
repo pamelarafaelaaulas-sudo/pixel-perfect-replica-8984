@@ -1,10 +1,11 @@
 import { ABNT, alinea, cmToTwip, type AbntModel } from "./abnt-doc";
+import { ImageRun } from "docx";
 
 const PLACEHOLDER = "[Parte ainda não escrita]";
 
 /** Builds the ABNT-formatted .docx in the browser (docx loaded on demand). */
 export async function buildProjectDocx(model: AbntModel): Promise<Blob> {
-  const { AlignmentType, BorderStyle, Document, Header, ImageRun, LineRuleType, Packer, PageNumber, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } = await import("docx");
+  const { AlignmentType, BorderStyle, Document, Header, LineRuleType, Packer, PageNumber, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } = await import("docx");
   const images = new Map<object, Uint8Array>();
   if (model.sections.some((s) => s.figures?.length)) {
     const { chartPng } = await import("./chart-render");
