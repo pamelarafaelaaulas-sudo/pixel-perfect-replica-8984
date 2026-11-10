@@ -1,6 +1,8 @@
 import { objectiveLines, splitKeywords } from "./phase-rules";
 import { parseArticles } from "./phases";
 import { parseTables, tableCaption, tableSource } from "./result-tables";
+import { parseCharts, figureCaption, type StageChart } from "./stage-charts";
+export type AbntFigure = { caption: string; source: string; chart: StageChart };
 
 export type AbntTable = { caption: string; source: string; rows: string[][] };
 
@@ -41,6 +43,9 @@ export type AbntInput = {
   results_tables?: unknown;
   methodology_tables?: unknown;
   introduction_tables?: unknown;
+  introduction_charts?: unknown;
+  methodology_charts?: unknown;
+  results_charts?: unknown;
   conclusion: string | null;
   references_list: string | null;
   authors: string[];
@@ -60,6 +65,7 @@ export type AbntSection = {
   items?: string[];
   /** ABNT tables after the paragraphs. */
   tables?: AbntTable[];
+  figures?: AbntFigure[];
 };
 
 export type AbntModel = {
@@ -103,6 +109,8 @@ export const alinea = (i: number) => `${String.fromCharCode(97 + (i % 26))})`;
 export function buildAbntModel(p: AbntInput): AbntModel {
   // ABNT numbers tables continuously through the document (Introdução → Metodologia → Resultados).
   let n = 0;
+  let figureIndex = 0;
+  const docFigures = (value: unknown): AbntFigure[] => parseCharts(value).map((chart) => ({ caption: figureCaption(figureIndex++, chart.title), source: tableSource(chart.source), chart }));
   const docTables = (v: unknown): AbntTable[] =>
     parseTables(v).map((t) => ({ caption: tableCaption(n++, t.title), source: tableSource(t.source), rows: t.rows }));
   const missing: string[] = [];
@@ -141,7 +149,7 @@ export function buildAbntModel(p: AbntInput): AbntModel {
     titlePage: { authors: authors.map((a) => a.toUpperCase()), title: title.toUpperCase(), nature, place: place.toUpperCase(), year },
     abstract: { paragraphs: paragraphsOf(p.abstract), keywords: splitKeywords(p.keywords) },
     sections: [
-      { number: "1", title: "INTRODUÇÃO", level: 1, paragraphs: paragraphsOf(p.introduction), tables: docTables(p.introduction_tables) },
+      { number: "1", title: "INTRODUÇÃO", level: 1, paragraphs: paragraphsOf(p.introduction), tables: docTables(p.introduction_tables), figures: docFigures(p.introduction_charts) },
       { number: "2", title: "OBJETIVOS", level: 1, paragraphs: [] },
       { number: "2.1", title: "OBJETIVO GERAL", level: 2, paragraphs: paragraphsOf(p.general_objective) },
       {
@@ -151,9 +159,9 @@ export function buildAbntModel(p: AbntInput): AbntModel {
         paragraphs: [],
         items: objectiveLines(p.specific_objectives).map(stripMarker).filter(Boolean),
       },
-      { number: "3", title: "METODOLOGIA", level: 1, paragraphs: paragraphsOf(p.methodology), tables: docTables(p.methodology_tables) },
+      { number: "3", title: "METODOLOGIA", level: 1, paragraphs: paragraphsOf(p.methodology), tables: docTables(p.methodology_tables), figures: docFigures(p.methodology_charts) },
       { number: "4", title: "RESULTADOS E DISCUSSÃO", level: 1, paragraphs: paragraphsOf(p.results_discussion),
-        tables: docTables(p.results_tables) },
+        tables: docTables(p.results_tables), figures: docFigures(p.results_charts) },
       { number: "5", title: "CONCLUSÃO", level: 1, paragraphs: paragraphsOf(p.conclusion) },
     ],
     references: sortReferences(p.references_list),
@@ -172,6 +180,7 @@ function natureNote(kind: string, institution: string | null, area: string | nul
 }
 
 export type PlanInput = {
+  methodology_charts?: unknown;
   theme: string | null;
   guiding_question: string | null;
   social_application: string | null;
@@ -240,7 +249,7 @@ export function buildPlanModel(p: PlanInput): AbntModel {
         paragraphs: [],
         items: objectiveLines(p.specific_objectives).map(stripMarker).filter(Boolean),
       },
-      { number: "5", title: "METODOLOGIA", level: 1, paragraphs: paragraphsOf(p.methodology) },
+      { number: "5", title: "METODOLOGIA", level: 1, paragraphs: paragraphsOf(p.methodology), figures: parseCharts(p.methodology_charts).map((chart, i) => ({ caption: figureCaption(i, chart.title), source: tableSource(chart.source), chart })) },
     ],
     references,
     breakSections: false,

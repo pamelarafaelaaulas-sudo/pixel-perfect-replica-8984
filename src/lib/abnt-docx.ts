@@ -4,7 +4,12 @@ const PLACEHOLDER = "[Parte ainda não escrita]";
 
 /** Builds the ABNT-formatted .docx in the browser (docx loaded on demand). */
 export async function buildProjectDocx(model: AbntModel): Promise<Blob> {
-  const { AlignmentType, BorderStyle, Document, Header, LineRuleType, Packer, PageNumber, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } = await import("docx");
+  const { AlignmentType, BorderStyle, Document, Header, ImageRun, LineRuleType, Packer, PageNumber, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } = await import("docx");
+  const images = new Map<object, Uint8Array>();
+  if (model.sections.some((s) => s.figures?.length)) {
+    const { chartPng } = await import("./chart-render");
+    for (const s of model.sections) for (const f of s.figures ?? []) images.set(f, await chartPng(f.chart));
+  }
 
   const size = ABNT.bodyPt * 2;
   const single = { line: 240, lineRule: LineRuleType.AUTO };
@@ -120,7 +125,7 @@ export async function buildProjectDocx(model: AbntModel): Promise<Blob> {
       );
     } else if (s.paragraphs.length) {
       s.paragraphs.forEach((p) => text.push(body(p)));
-    } else if (!s.tables?.length && s.title !== "OBJETIVOS") {
+    } else if (!s.tables?.length && !s.figures?.length && s.title !== "OBJETIVOS") {
       text.push(placeholder());
     }
     s.tables?.forEach((t) => {
@@ -152,6 +157,13 @@ export async function buildProjectDocx(model: AbntModel): Promise<Blob> {
       );
       text.push(new Paragraph({ spacing: { ...single, before: 60, after: 240 }, children: [new TextRun({ text: t.source, font: ABNT.font, size: ABNT.smallPt * 2 })] }));
     });
+    for (const f of s.figures ?? []) {
+      const data = images.get(f);
+      if (!data) continue;
+      text.push(new Paragraph({ spacing: { ...single, before: 240, after: 60 }, keepNext: true, children: [run(f.caption)] }));
+      text.push(new Paragraph({ alignment: AlignmentType.CENTER, keepNext: true, children: [new ImageRun({ type: "png", data, transformation: { width: 600, height: 337.5 }, altText: { title: f.caption, description: f.chart.points.map((p) => `${p.label}: ${p.value}`).join("; "), name: f.caption } })] }));
+      text.push(new Paragraph({ spacing: { ...single, before: 60, after: 240 }, children: [new TextRun({ text: f.source, font: ABNT.font, size: ABNT.smallPt * 2 })] }));
+    }
   });
 
   text.push(
