@@ -1,0 +1,1 @@
+- Group names come from trigger `refresh_group_name` (members' first names, sorted); students never type them.

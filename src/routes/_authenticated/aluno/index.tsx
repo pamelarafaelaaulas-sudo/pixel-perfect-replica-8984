@@ -134,7 +134,6 @@ function JoinClass({ defaultWhatsapp }: { defaultWhatsapp: string }) {
   const [found, setFound] = useState<FoundClass | null>(null);
   const [groups, setGroups] = useState<ClassGroup[]>([]);
   const [whatsapp, setWhatsapp] = useState(defaultWhatsapp);
-  const [newName, setNewName] = useState("");
   const [area, setArea] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -182,7 +181,7 @@ function JoinClass({ defaultWhatsapp }: { defaultWhatsapp: string }) {
     mutationFn: async () => {
       const { data, error } = await supabase.rpc("create_group", {
         _code: code,
-        _group_name: newName,
+        _group_name: "Grupo",
         _whatsapp: whatsapp,
         _area: area,
       });
@@ -268,7 +267,7 @@ function JoinClass({ defaultWhatsapp }: { defaultWhatsapp: string }) {
             className="space-y-2"
           >
             <Label htmlFor="gname">Ou crie um grupo novo</Label>
-            <Input id="gname" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Nome do grupo" required />
+            <p id="gname" className="text-xs text-muted-foreground">O nome do grupo será o primeiro nome dos integrantes, em ordem alfabética.</p>
             <div className="flex gap-2">
               <AreaSelect value={area} onChange={setArea} className="flex-1" />
               <Button variant="highlight" disabled={!whatsapp.trim() || !area || create.isPending}>
