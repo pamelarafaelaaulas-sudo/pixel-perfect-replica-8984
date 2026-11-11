@@ -267,7 +267,7 @@ function JoinClass({ defaultWhatsapp }: { defaultWhatsapp: string }) {
             className="space-y-2"
           >
             <Label htmlFor="gname">Ou crie um grupo novo</Label>
-            <p id="gname" className="text-xs text-muted-foreground">O nome do grupo será o primeiro nome dos integrantes, em ordem alfabética.</p>
+            <p id="gname" className="text-xs text-muted-foreground">O nome do grupo será o nome e sobrenome dos integrantes, em ordem alfabética.</p>
             <div className="flex gap-2">
               <AreaSelect value={area} onChange={setArea} className="flex-1" />
               <Button variant="highlight" disabled={!whatsapp.trim() || !area || create.isPending}>
