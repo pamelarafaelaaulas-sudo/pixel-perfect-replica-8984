@@ -387,6 +387,11 @@ function StudentProjectPage() {
               />
             </div>
           )}
+          {selected === 2 && (
+            <div className="mb-5">
+              <ResearchTutorial theme={draft.theme ?? ""} />
+            </div>
+          )}
           <fieldset disabled={!editable} className="space-y-5">
             {isBanner ? null : selected === 2 ? (
               <div className="space-y-5">
