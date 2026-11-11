@@ -330,6 +330,13 @@
       "when": 1794420699961,
       "tag": "0046_validate_whatsapp_numbers",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1794432140945,
+      "tag": "0047_scope_fair_templates_read",
+      "breakpoints": true
     }
   ]
 }
