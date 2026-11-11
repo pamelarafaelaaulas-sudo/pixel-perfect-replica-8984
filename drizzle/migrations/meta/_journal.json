@@ -323,6 +323,13 @@
       "when": 1794412129939,
       "tag": "0045_group_names_first_last",
       "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1794420699961,
+      "tag": "0046_validate_whatsapp_numbers",
+      "breakpoints": true
     }
   ]
 }

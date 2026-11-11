@@ -1,3 +1,4 @@
+import { brMobileProblem, maskBrPhone } from "@/lib/phone";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
@@ -136,6 +137,7 @@ function JoinClass({ defaultWhatsapp }: { defaultWhatsapp: string }) {
   const [whatsapp, setWhatsapp] = useState(defaultWhatsapp);
   const [area, setArea] = useState("");
   const [busy, setBusy] = useState(false);
+  const phoneProblem = brMobileProblem(whatsapp);
 
   async function lookup(e: FormEvent) {
     e.preventDefault();
@@ -226,10 +228,12 @@ function JoinClass({ defaultWhatsapp }: { defaultWhatsapp: string }) {
             <Input
               id="wa"
               value={whatsapp}
-              onChange={(e) => setWhatsapp(e.target.value)}
+              onChange={(e) => setWhatsapp(maskBrPhone(e.target.value))}
               placeholder="(65) 99999-9999"
               inputMode="tel"
+              aria-invalid={!!whatsapp && !!phoneProblem}
             />
+            {whatsapp && phoneProblem && <p className="text-xs text-destructive">{phoneProblem}</p>}
           </div>
 
           {groups.length > 0 && (
@@ -247,7 +251,7 @@ function JoinClass({ defaultWhatsapp }: { defaultWhatsapp: string }) {
                       <Button
                         size="sm"
                         variant="outline"
-                        disabled={full || !whatsapp.trim() || join.isPending}
+                        disabled={full || !!phoneProblem || join.isPending}
                         onClick={() => join.mutate(g.group_id)}
                       >
                         {full ? "Completo" : "Entrar"}
@@ -270,13 +274,13 @@ function JoinClass({ defaultWhatsapp }: { defaultWhatsapp: string }) {
             <p id="gname" className="text-xs text-muted-foreground">O nome do grupo será o nome e sobrenome dos integrantes, em ordem alfabética.</p>
             <div className="flex gap-2">
               <AreaSelect value={area} onChange={setArea} className="flex-1" />
-              <Button variant="highlight" disabled={!whatsapp.trim() || !area || create.isPending}>
+              <Button variant="highlight" disabled={!!phoneProblem || !area || create.isPending}>
                 <Plus /> Criar
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              {!whatsapp.trim()
-                ? "Preencha seu WhatsApp para continuar."
+              {phoneProblem
+                ? phoneProblem
                 : !area
                   ? "Escolha a área do projeto: ela forma o código do projeto."
                   : "A área não pode ser trocada depois (só a professora muda)."}
