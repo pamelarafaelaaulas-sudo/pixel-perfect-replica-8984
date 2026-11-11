@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { ArrowLeft, CheckCircle2, Lock, MessageCircle, Plus, Save, Send, Star, Trash2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { ResearchPromptCard } from "@/components/research-prompt";
+import { ResearchTutorial } from "@/components/research-tutorial";
 import { IdeaBank } from "@/components/idea-bank";
 import { PageHeader } from "@/components/page-header";
 import { GroupResponsibilities } from "@/components/group-responsibilities";
