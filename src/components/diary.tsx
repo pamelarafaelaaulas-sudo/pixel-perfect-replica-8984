@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { BookOpen, CalendarDays, Loader2, NotebookPen, Plus, Save } from "lucide-react";
+import { BookOpen, Camera, CalendarDays, Loader2, NotebookPen, Plus, Save } from "lucide-react";
 import { toast } from "sonner";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -26,7 +26,20 @@ import {
 import { formatPoints } from "@/lib/penalty";
 import { fmtDateTime } from "@/lib/format";
 
-type Entry = { id: string; student_id: string; entry_date: string; kind: string; content: string; created_at: string };
+type Entry = { id: string; student_id: string; entry_date: string; kind: string; content: string; created_at: string; photo_path?: string | null };
+
+const PHOTO_BUCKET = "diary-photos";
+
+/** Thumbnail of a physical diary page; opens the full photo in a new tab. */
+function DiaryPhoto({ path }: { path: string }) {
+  const url = useQuery({ queryKey: ["diary", "photo", path], staleTime: 8 * 60000, queryFn: async () => {
+    const { data, error } = await supabase.storage.from(PHOTO_BUCKET).createSignedUrl(path, 600);
+    if (error) throw error;
+    return data.signedUrl;
+  } });
+  if (!url.data) return <div className="h-40 w-full animate-pulse rounded-md bg-muted" />;
+  return <a href={url.data} target="_blank" rel="noreferrer"><img src={url.data} alt="Foto da página do diário físico" className="max-h-80 w-full rounded-md border border-border object-contain" loading="lazy" /></a>;
+}
 
 const fmtDay = (d: string) => format(parseISO(d), "dd/MM/yyyy (EEE)", { locale: ptBR });
 
@@ -86,7 +99,8 @@ export function DiaryTimeline({ entries, nameOf }: { entries: Entry[]; nameOf?: 
                     {nameOf && <span className="text-xs font-medium text-foreground">{nameOf(e.student_id)}</span>}
                     <span className="text-xs text-muted-foreground">escrito em {fmtDateTime(e.created_at)}</span>
                   </div>
-                  <p className="whitespace-pre-wrap text-foreground">{e.content}</p>
+                  {e.photo_path && <DiaryPhoto path={e.photo_path} />}
+                  {e.content && <p className="mt-2 whitespace-pre-wrap text-foreground">{e.content}</p>}
                 </li>
               ))}
           </ul>
@@ -96,26 +110,33 @@ export function DiaryTimeline({ entries, nameOf }: { entries: Entry[]; nameOf?: 
   );
 }
 
-/** Student: new diary entry (dated, append-only). */
+/** Student: upload a photo of a physical diary page (dated, append-only). Typing is not offered. */
 export function DiaryEntryForm({ groupId, studentId }: { groupId: string; studentId: string }) {
   const qc = useQueryClient();
   const today = diaryToday();
   const minDate = format(new Date(parseISO(today).getTime() - DIARY_MAX_BACKDATE_DAYS * 86400000), "yyyy-MM-dd");
   const [date, setDate] = useState(today);
-  const [kind, setKind] = useState<DiaryKind>("registro");
-  const [content, setContent] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [inputKey, setInputKey] = useState(0);
 
   const add = useMutation({
     mutationFn: async () => {
+      if (!file) throw new Error("Escolha a foto da página do diário.");
+      if (!/^image\/(jpeg|png|webp|heic|heif)$/.test(file.type)) throw new Error("Envie uma foto (JPG, PNG ou WEBP).");
+      if (file.size > 10 * 1024 * 1024) throw new Error("A foto pode ter no máximo 10 MB.");
+      const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+      const path = `${groupId}/${Date.now()}-${studentId.slice(0, 8)}.${ext}`;
+      const up = await supabase.storage.from(PHOTO_BUCKET).upload(path, file, { contentType: file.type });
+      if (up.error) throw up.error;
       const { error } = await supabase
         .from("diary_entries")
-        .insert({ group_id: groupId, student_id: studentId, entry_date: date, kind, content: content.trim() });
+        .insert({ group_id: groupId, student_id: studentId, entry_date: date, kind: "registro", content: "Foto do diário físico", photo_path: path });
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Registro salvo no diário");
-      setContent("");
-      setKind("registro");
+      toast.success("Foto do diário enviada");
+      setFile(null);
+      setInputKey((k) => k + 1);
       setDate(diaryToday());
       qc.invalidateQueries({ queryKey: ["diary", "entries", groupId] });
     },
@@ -123,55 +144,23 @@ export function DiaryEntryForm({ groupId, studentId }: { groupId: string; studen
   });
 
   return (
-    <form
-      className="card-paper space-y-4 p-5"
-      onSubmit={(e) => {
-        e.preventDefault();
-        add.mutate();
-      }}
-    >
+    <form className="card-paper space-y-4 p-5" onSubmit={(e) => { e.preventDefault(); add.mutate(); }}>
       <h2 className="flex items-center gap-2 text-lg font-semibold">
-        <NotebookPen className="size-5 text-primary" /> Novo registro
+        <Camera className="size-5 text-primary" /> Foto do diário físico
       </h2>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="space-y-1.5">
-          <Label htmlFor="diary-date">Data da atividade</Label>
-          <Input id="diary-date" type="date" value={date} min={minDate} max={today} onChange={(e) => setDate(e.target.value)} required />
-        </div>
-        <div className="space-y-1.5">
-          <Label>Tipo</Label>
-          <Select value={kind} onValueChange={(v) => setKind(v as DiaryKind)}>
-            <SelectTrigger aria-label="Tipo do registro">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {DIARY_KINDS.map((k) => (
-                <SelectItem key={k.key} value={k.key}>
-                  {k.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <div className="space-y-1.5">
+        <Label htmlFor="diary-date">Data da página</Label>
+        <Input id="diary-date" type="date" value={date} min={minDate} max={today} onChange={(e) => setDate(e.target.value)} required />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="diary-content">O que aconteceu?</Label>
-        <Textarea
-          id="diary-content"
-          rows={5}
-          maxLength={5000}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Ex.: Medimos o pH das 3 amostras. A amostra 2 deu errado porque a fita molhou antes; vamos repetir amanhã."
-          required
-        />
+        <Label htmlFor="diary-photo">Foto da página</Label>
+        <Input key={inputKey} id="diary-photo" type="file" accept="image/*" capture="environment" onChange={(e) => setFile(e.target.files?.[0] ?? null)} required />
       </div>
       <p className="text-xs text-muted-foreground">
-        Registre também os erros e as mudanças de rota. Os registros não podem ser apagados nem editados; para corrigir, faça um novo
-        registro. Dá para datar até {DIARY_MAX_BACKDATE_DAYS} dias para trás.
+        Fotografe a página do caderno com boa luz e letra legível. As fotos não podem ser apagadas. Dá para datar até {DIARY_MAX_BACKDATE_DAYS} dias para trás.
       </p>
-      <Button disabled={add.isPending || content.trim().length < 3}>
-        {add.isPending ? <Loader2 className="animate-spin" /> : <Plus />} Salvar registro
+      <Button disabled={add.isPending || !file}>
+        {add.isPending ? <Loader2 className="animate-spin" /> : <Plus />} Enviar foto
       </Button>
     </form>
   );

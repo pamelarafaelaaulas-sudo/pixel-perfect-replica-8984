@@ -18,7 +18,7 @@ export const DIARY_MAX_BACKDATE_DAYS = 7;
 export function diarySubmissionProblems(v: { leaderId?: string | null; diaryId?: string | null; entryCount: number; pending: boolean }): string[] {
   const problems: string[] = [];
   if (!v.leaderId || !v.diaryId) problems.push("Escolham o líder e o responsável pelo diário antes de enviar.");
-  if (v.entryCount < 1) problems.push("Salvem pelo menos um registro no diário antes de enviar.");
+  if (v.entryCount < 1) problems.push("Enviem pelo menos uma foto do diário físico antes de enviar.");
   if (v.pending) problems.push("O diário já está aguardando aprovação.");
   return problems;
 }
