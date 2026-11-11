@@ -202,7 +202,7 @@ export const diaryEntriesQuery = (groupId: string) =>
     queryFn: async () => {
       const { data, error } = await supabase
         .from("diary_entries")
-        .select("id, student_id, entry_date, kind, content, created_at")
+        .select("id, student_id, entry_date, kind, content, created_at, photo_path")
         .eq("group_id", groupId)
         .order("entry_date", { ascending: true })
         .order("created_at", { ascending: true });

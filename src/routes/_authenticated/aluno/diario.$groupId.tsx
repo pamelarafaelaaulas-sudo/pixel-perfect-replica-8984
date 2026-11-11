@@ -61,7 +61,7 @@ function DiaryPage() {
       <PageHeader
         eyebrow="Diário de bordo"
         title="Diário de bordo"
-        description="Anote com frequência, com data e com honestidade: o que deu certo, o que deu errado e o que mudou. A professora avalia o diário no 3º bimestre."
+        description="Escrevam no diário físico (caderno) e enviem a foto de cada página, com a data, para validação. A professora avalia o diário no 3º bimestre."
       />
 
       <GroupResponsibilities groupId={groupId} members={members} editable />
