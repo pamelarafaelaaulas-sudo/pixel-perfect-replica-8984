@@ -302,6 +302,13 @@
       "when": 1794351795990,
       "tag": "0042_restrict_teacher_invites_owner",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1794411534846,
+      "tag": "0043_diary_photos",
+      "breakpoints": true
     }
   ]
 }

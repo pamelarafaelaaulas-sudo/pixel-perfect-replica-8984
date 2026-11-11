@@ -416,6 +416,7 @@ export type Database = {
           group_id: string
           id: string
           kind: string
+          photo_path: string | null
           student_id: string
         }
         Insert: {
@@ -425,6 +426,7 @@ export type Database = {
           group_id: string
           id?: string
           kind?: string
+          photo_path?: string | null
           student_id: string
         }
         Update: {
@@ -434,6 +436,7 @@ export type Database = {
           group_id?: string
           id?: string
           kind?: string
+          photo_path?: string | null
           student_id?: string
         }
         Relationships: [
