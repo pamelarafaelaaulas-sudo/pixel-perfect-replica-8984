@@ -134,7 +134,6 @@ function JoinClass({ defaultWhatsapp }: { defaultWhatsapp: string }) {
   const [found, setFound] = useState<FoundClass | null>(null);
   const [groups, setGroups] = useState<ClassGroup[]>([]);
   const [whatsapp, setWhatsapp] = useState(defaultWhatsapp);
-  const [newName, setNewName] = useState("");
   const [area, setArea] = useState("");
   const [busy, setBusy] = useState(false);
 
