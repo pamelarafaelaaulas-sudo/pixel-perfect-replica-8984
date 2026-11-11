@@ -3,7 +3,7 @@ import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Brand } from "@/components/brand";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -54,11 +54,12 @@ function ResetPassword() {
           <h1 className="text-2xl font-semibold">Defina sua nova senha</h1>
           <div className="space-y-2">
             <Label htmlFor="password">Nova senha</Label>
-            <Input id="password" name="password" type="password" minLength={6} required />
+            <PasswordInput id="password" name="password" minLength={6} autoComplete="new-password" required />
+            <p className="text-xs text-muted-foreground">Use pelo menos 6 caracteres, sem obrigação de símbolos.</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="confirm">Repita a senha</Label>
-            <Input id="confirm" name="confirm" type="password" minLength={6} required />
+            <PasswordInput id="confirm" name="confirm" minLength={6} autoComplete="new-password" required />
           </div>
           <Button className="w-full" disabled={busy}>
             Salvar senha

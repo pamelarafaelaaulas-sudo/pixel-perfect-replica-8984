@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Brand } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -166,7 +167,7 @@ function AuthPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="password">Senha</Label>
-                    <Input id="password" name="password" type="password" autoComplete="current-password" required />
+                    <PasswordInput id="password" name="password" autoComplete="current-password" required />
                   </div>
                   <Button className="w-full" disabled={busy}>
                     Entrar
@@ -193,14 +194,14 @@ function AuthPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="spassword">Senha</Label>
-                    <Input
+                    <PasswordInput
                       id="spassword"
                       name="password"
-                      type="password"
                       minLength={6}
                       autoComplete="new-password"
                       required
                     />
+                    <p className="text-xs text-muted-foreground">Mínimo de 6 caracteres, sem obrigação de símbolos.</p>
                   </div>
                   <label className="flex cursor-pointer items-center gap-2 text-sm">
                     <Checkbox checked={isTeacher} onCheckedChange={(v) => setIsTeacher(v === true)} />
