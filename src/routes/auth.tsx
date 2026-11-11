@@ -194,14 +194,14 @@ function AuthPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="spassword">Senha</Label>
-                    <Input
+                    <PasswordInput
                       id="spassword"
                       name="password"
-                      type="password"
                       minLength={6}
                       autoComplete="new-password"
                       required
                     />
+                    <p className="text-xs text-muted-foreground">Mínimo de 6 caracteres, sem obrigação de símbolos.</p>
                   </div>
                   <label className="flex cursor-pointer items-center gap-2 text-sm">
                     <Checkbox checked={isTeacher} onCheckedChange={(v) => setIsTeacher(v === true)} />
