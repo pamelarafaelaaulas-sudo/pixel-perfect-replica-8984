@@ -167,7 +167,7 @@ function AuthPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="password">Senha</Label>
-                    <Input id="password" name="password" type="password" autoComplete="current-password" required />
+                    <PasswordInput id="password" name="password" autoComplete="current-password" required />
                   </div>
                   <Button className="w-full" disabled={busy}>
                     Entrar
