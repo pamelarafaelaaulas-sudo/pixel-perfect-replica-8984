@@ -1877,6 +1877,7 @@ export type Database = {
         Args: { _authors: string; _lines: string[]; _year: string }
         Returns: boolean
       }
+      refresh_group_name: { Args: { _group_id: string }; Returns: undefined }
       renumber_projects:
         | { Args: { _class_ids: string[] }; Returns: number }
         | {
