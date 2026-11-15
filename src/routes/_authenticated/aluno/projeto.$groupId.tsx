@@ -65,6 +65,7 @@ import {
   splitKeywords,
 } from "@/lib/phase-rules";
 import { CITATION_EXAMPLES, checkCitations } from "@/lib/citations";
+import { citationHint, citationsWithoutArticle, importArticleReferences, uncitedReferences } from "@/lib/article-links";
 import { fmtDateTime, whatsappLink } from "@/lib/format";
 import { bimesterBase, bimesterPenalties, formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
 import { BannerStage } from "@/components/banner-stage";
@@ -240,7 +241,9 @@ function StudentProjectPage() {
   // A delivered written stage reopens while the teacher's feedback round awaits the new version.
   const writtenRounds = isWrittenPart(selected) ? stageReviews(project.written_reviews, selected) : [];
   const openReview = isSubmitted ? (writtenRounds.find((r) => !r.resubmitted_at) ?? null) : null;
-  const editable = (!isSubmitted && selected <= project.current_phase && info.state !== "skipped") || !!openReview;
+  // Articles stay editable after delivery so students can fix or add sources while writing.
+  const articlesOpen = selected === 2 && isSubmitted && !isBannerDelivered(project);
+  const editable = (!isSubmitted && selected <= project.current_phase && info.state !== "skipped") || !!openReview || articlesOpen;
   const phaseDirty = changedFields.some((f) => phaseFields(selected).includes(f));
   const problems = [...phaseFields(selected).flatMap((f) => (TABLE_COLUMN_LIST.includes(f as TableColumn) ? tableProblems(draft[f as TableColumn]) : [])), ...phaseProblems(
     selected,
@@ -407,9 +410,15 @@ function StudentProjectPage() {
                   meter={<FieldMeter field={f.key} value={draft[f.key]} />}
                   before={
                     CITATION_FIELDS[f.key] ? (
-                      <CitationGuide />
+                      <>
+                        <CitationGuide />
+                        {f.key === "introduction" && <ArticleCitationPanel articles={draft.scientific_articles} text={draft.introduction} />}
+                      </>
                     ) : f.key === "references_list" ? (
-                      <ReferenceChecklist values={draft} />
+                      <>
+                        <ReferenceImport articles={draft.scientific_articles} value={draft.references_list} editable={editable} onChange={(v) => set("references_list", v)} />
+                        <ReferenceChecklist values={draft} />
+                      </>
                     ) : null
                   }
                 >
@@ -646,6 +655,8 @@ function Field({
 function ReferenceChecklist({ values }: { values: Partial<Record<string, unknown>> }) {
   const items = referenceCheck(values);
   const missing = items.filter((i) => !i.found).length;
+  const str = (k: string) => (typeof values[k] === "string" ? (values[k] as string) : "");
+  const uncited = uncitedReferences(str("references_list"), [str("introduction"), str("results_discussion")]);
   return (
     <div className="mb-3 rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm">
       <p className="font-semibold text-foreground">Conferência das citações</p>
@@ -677,6 +688,83 @@ function ReferenceChecklist({ values }: { values: Partial<Record<string, unknown
           </ul>
         </>
       )}
+      {uncited.length > 0 && (
+        <div className="mt-3 rounded-md border border-warning/40 bg-warning/10 p-2.5 text-xs">
+          <p className="font-medium text-foreground">Referências listadas que não foram citadas no texto ({uncited.length}):</p>
+          <ul className="mt-1 list-disc pl-4 text-muted-foreground">{uncited.map((u) => <li key={u}>{u}</li>)}</ul>
+          <p className="mt-1 text-muted-foreground">Cite-as na Introdução ou em Resultados, ou remova-as da lista.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Stage-2 articles beside the Introdução: how to cite each and how to use its notes, never ready text. */
+function isBannerDelivered(p: { current_phase: number }) {
+  return p.current_phase > 13;
+}
+
+function ArticleCitationPanel({ articles, text }: { articles: Article[]; text: string }) {
+  const list = articles.filter((a) => a.abnt_citation.trim() || a.title.trim());
+  const unknown = citationsWithoutArticle(text, list);
+  const cited = new Set(uncitedReferences(list.map((a) => a.abnt_citation).join("\n"), [text]));
+  return (
+    <div className="mb-3 rounded-lg border border-secondary/40 bg-secondary/5 p-4 text-sm">
+      <p className="font-semibold text-foreground">Seus artigos cadastrados (Etapa 2)</p>
+      <p className="mt-1 text-muted-foreground">
+        Use o fichamento para escrever com suas palavras. Modelo de frase: “[ideia do artigo, reescrita por você] + citação”.
+        Ex. de estrutura: “Segundo [Autor] ([ano]), [o que o estudo encontrou]. Isso se relaciona ao nosso projeto porque [sua explicação].”
+      </p>
+      {list.length === 0 ? (
+        <p className="mt-3 text-muted-foreground">Nenhum artigo cadastrado na etapa Artigos científicos.</p>
+      ) : (
+        <ul className="mt-3 grid gap-2">
+          {list.map((a, i) => {
+            const h = citationHint(a.abnt_citation);
+            const used = a.abnt_citation.trim() !== "" && !cited.has(a.abnt_citation.trim());
+            return (
+              <li key={i} className="rounded-md bg-background p-2.5">
+                <div className="flex items-start gap-2">
+                  {used ? <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-success" aria-label="Já citado" /> : <XCircle className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-label="Ainda não citado" />}
+                  <span className="font-medium text-foreground">{a.title || a.abnt_citation}</span>
+                </div>
+                {h ? (
+                  <p className="mt-1 font-mono text-xs text-foreground">Cite assim: {h.parenthetical} ou {h.narrative}</p>
+                ) : (
+                  <p className="mt-1 text-xs text-destructive">Não consegui ler autor e ano da referência ABNT deste artigo. Revise-a na Etapa 2.</p>
+                )}
+                {(a.findings || a.contribution) && (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Ideia para usar (reescreva com suas palavras): {a.findings || a.contribution}
+                  </p>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {unknown.length > 0 && (
+        <p className="mt-3 text-xs font-medium text-destructive">
+          Atenção: {unknown.map((w) => `${w.authors}, ${w.year}`).join("; ")} não corresponde(m) a nenhum artigo cadastrado.
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** Fills the reference list from the stage-2 articles and warns about listed-but-uncited works. */
+function ReferenceImport({ articles, value, editable, onChange }: { articles: Article[]; value: string; editable: boolean; onChange: (v: string) => void }) {
+  const pending = importArticleReferences(articles, value).added;
+  return (
+    <div className="mb-3 rounded-lg border border-secondary/40 bg-secondary/5 p-4 text-sm">
+      <p className="font-semibold text-foreground">Importar dos artigos cadastrados</p>
+      <p className="mt-1 text-muted-foreground">
+        Traz as referências que você digitou na Etapa 2. Revise, ajuste detalhes e adicione outras obras, uma por linha.
+      </p>
+      <Button type="button" size="sm" variant="secondary" className="mt-3" disabled={!editable || pending === 0}
+        onClick={() => { const r = importArticleReferences(articles, value); onChange(r.text); toast.success(`${r.added} referência(s) importada(s)`); }}>
+        {pending ? `Importar ${pending} referência(s)` : "Todas já importadas"}
+      </Button>
     </div>
   );
 }
