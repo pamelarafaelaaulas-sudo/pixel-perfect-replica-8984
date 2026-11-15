@@ -65,7 +65,7 @@ import {
   splitKeywords,
 } from "@/lib/phase-rules";
 import { CITATION_EXAMPLES, checkCitations } from "@/lib/citations";
-import { citationHint, citationsWithoutArticle, importArticleReferences, uncitedReferences } from "@/lib/article-links";
+import { articleCitationHint, buildAbntReference, citationsWithoutArticle, importArticleReferences, uncitedReferences } from "@/lib/article-links";
 import { fmtDateTime, whatsappLink } from "@/lib/format";
 import { bimesterBase, bimesterPenalties, formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
 import { BannerStage } from "@/components/banner-stage";
@@ -720,7 +720,7 @@ function ArticleCitationPanel({ articles, text }: { articles: Article[]; text: s
       ) : (
         <ul className="mt-3 grid gap-2">
           {list.map((a, i) => {
-            const h = citationHint(a.abnt_citation);
+            const h = articleCitationHint(a);
             const used = a.abnt_citation.trim() !== "" && !cited.has(a.abnt_citation.trim());
             return (
               <li key={i} className="rounded-md bg-background p-2.5">
@@ -731,7 +731,7 @@ function ArticleCitationPanel({ articles, text }: { articles: Article[]; text: s
                 {h ? (
                   <p className="mt-1 font-mono text-xs text-foreground">Cite assim: {h.parenthetical} ou {h.narrative}</p>
                 ) : (
-                  <p className="mt-1 text-xs text-destructive">Não consegui ler autor e ano da referência ABNT deste artigo. Revise-a na Etapa 2.</p>
+                  <p className="mt-1 text-xs text-destructive">Falta o autor ou o ano desta fonte. Volte na Etapa 2 e preencha “Autores” e “Ano”.</p>
                 )}
                 {(a.findings || a.contribution) && (
                   <p className="mt-1 text-xs text-muted-foreground">
@@ -836,7 +836,16 @@ function ArticlesEditor({
   onChange: (v: Article[]) => void;
   editable: boolean;
 }) {
-  const update = (i: number, patch: Partial<Article>) => onChange(value.map((a, j) => (j === i ? { ...a, ...patch } : a)));
+  const update = (i: number, patch: Partial<Article>) =>
+    onChange(
+      value.map((a, j) => {
+        if (j !== i) return a;
+        const n = { ...a, ...patch };
+        const simple = "authors" in patch || "year" in patch || "journal" in patch || "title" in patch || "url" in patch;
+        if (simple && (n.authors?.trim() || n.year?.trim())) n.abnt_citation = buildAbntReference(n);
+        return n;
+      }),
+    );
   return (
     <div className="space-y-4">
       <p
@@ -872,13 +881,33 @@ function ArticlesEditor({
             </Select>
           </div>
           <Input placeholder="Link (https://...)" value={a.url} onChange={(e) => update(i, { url: e.target.value })} aria-label="Link" />
-          <Textarea
-            rows={2}
-            placeholder="Citação ABNT. Ex.: SOBRENOME, Nome. Título. Revista, v. 1, n. 2, p. 10-20, 2024."
-            value={a.abnt_citation}
-            onChange={(e) => update(i, { abnt_citation: e.target.value })}
-            aria-label="Citação ABNT"
-          />
+          <div className="grid gap-3 sm:grid-cols-[1fr_110px]">
+            <Input placeholder="Autores (ex.: Mariana Silva e Carlos Souza)" value={a.authors ?? ""} onChange={(e) => update(i, { authors: e.target.value })} aria-label="Autores" />
+            <Input inputMode="numeric" maxLength={4} placeholder="Ano" value={a.year ?? ""} onChange={(e) => update(i, { year: e.target.value.replace(/\D/g, "") })} aria-label="Ano" />
+          </div>
+          <Input placeholder="Revista ou site onde foi publicado (opcional)" value={a.journal ?? ""} onChange={(e) => update(i, { journal: e.target.value })} aria-label="Revista ou site" />
+          {(() => {
+            const h = articleCitationHint(a);
+            return h ? (
+              <div className="rounded-md bg-success/10 p-2.5 text-sm">
+                <p className="font-medium text-foreground">✅ Como citar no seu texto: <span className="font-mono">{h.parenthetical}</span> ou <span className="font-mono">{h.narrative}</span></p>
+                {a.abnt_citation && <p className="mt-1 text-xs text-muted-foreground">Referência ABNT montada: {a.abnt_citation}</p>}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">Preencha autores e ano: o app monta a ABNT para você.</p>
+            );
+          })()}
+          <details className="text-sm">
+            <summary className="cursor-pointer text-muted-foreground">Já tenho a referência pronta (colar do Google Acadêmico)</summary>
+            <Textarea
+              rows={2}
+              className="mt-2"
+              placeholder="Cole aqui a referência. Pode ser com letras maiúsculas ou minúsculas."
+              value={a.abnt_citation}
+              onChange={(e) => update(i, { abnt_citation: e.target.value })}
+              aria-label="Citação ABNT"
+            />
+          </details>
           <div className="grid gap-3 sm:grid-cols-2">
             {FICHAMENTO.map(([k, label]) => (
               <Textarea
@@ -897,7 +926,7 @@ function ArticlesEditor({
         <Button
           type="button"
           variant="outline"
-          onClick={() => onChange([...value, { title: "", url: "", source_type: SOURCE_TYPES[0], abnt_citation: "" }])}
+          onClick={() => onChange([...value, { title: "", url: "", source_type: SOURCE_TYPES[0], abnt_citation: "", authors: "", year: "", journal: "" }])}
         >
           <Plus /> Adicionar fonte
         </Button>
