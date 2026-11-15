@@ -241,7 +241,9 @@ function StudentProjectPage() {
   // A delivered written stage reopens while the teacher's feedback round awaits the new version.
   const writtenRounds = isWrittenPart(selected) ? stageReviews(project.written_reviews, selected) : [];
   const openReview = isSubmitted ? (writtenRounds.find((r) => !r.resubmitted_at) ?? null) : null;
-  const editable = (!isSubmitted && selected <= project.current_phase && info.state !== "skipped") || !!openReview;
+  // Articles stay editable after delivery so students can fix or add sources while writing.
+  const articlesOpen = selected === 2 && isSubmitted && !isBannerDelivered(project);
+  const editable = (!isSubmitted && selected <= project.current_phase && info.state !== "skipped") || !!openReview || articlesOpen;
   const phaseDirty = changedFields.some((f) => phaseFields(selected).includes(f));
   const problems = [...phaseFields(selected).flatMap((f) => (TABLE_COLUMN_LIST.includes(f as TableColumn) ? tableProblems(draft[f as TableColumn]) : [])), ...phaseProblems(
     selected,
@@ -698,6 +700,10 @@ function ReferenceChecklist({ values }: { values: Partial<Record<string, unknown
 }
 
 /** Stage-2 articles beside the Introdução: how to cite each and how to use its notes, never ready text. */
+function isBannerDelivered(p: { current_phase: number }) {
+  return p.current_phase > 13;
+}
+
 function ArticleCitationPanel({ articles, text }: { articles: Article[]; text: string }) {
   const list = articles.filter((a) => a.abnt_citation.trim() || a.title.trim());
   const unknown = citationsWithoutArticle(text, list);
