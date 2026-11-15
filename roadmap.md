@@ -13,3 +13,6 @@
 - [x] Add editable charts in Introduction, Methodology and Results, with teacher display and Word figures.
 - [x] Test chart data and editor desktop/mobile; verify saved charts and Word export as teacher, restoring original chart data. Full student-authenticated saving remains unverified.
 - [x] Alunos podem editar/adicionar artigos depois da Etapa 2
+- [ ] Add teacher-owned gold-standard diary snapshots and private AI preliminary scores.
+- [ ] Analyze submitted diary photos, validate readable dated pages and show student-only formative feedback.
+- [ ] Test diary evaluation rules, access controls and the authenticated teacher flow.
