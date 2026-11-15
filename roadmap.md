@@ -12,3 +12,4 @@
 - [x] Ano nas ideias do Banco de Inspirações (filtro/troca por ano)
 - [x] Add editable charts in Introduction, Methodology and Results, with teacher display and Word figures.
 - [x] Test chart data and editor desktop/mobile; verify saved charts and Word export as teacher, restoring original chart data. Full student-authenticated saving remains unverified.
+- [ ] Alunos podem editar/adicionar artigos depois da Etapa 2
