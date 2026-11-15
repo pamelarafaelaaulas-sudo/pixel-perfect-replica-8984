@@ -42,7 +42,7 @@ export function TeacherDiaryAI({ groupId }: { groupId: string }) {
   return <section className="space-y-4 border-b border-border pb-6" aria-label="Avaliação por IA e diário padrão ouro">
     <h2 className="flex items-center gap-2 text-xl font-semibold"><Award className="size-5 text-primary" /> Diário padrão ouro</h2>
     <p className="text-sm text-muted-foreground">{reference.data ? `Referência nota 10: ${reference.data.groups?.group_name ?? "Diário selecionado"}.` : "Nenhum diário de referência selecionado."}</p>
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 [&_button]:h-auto [&_button]:min-h-9 [&_button]:max-w-full [&_button]:whitespace-normal [&_button]:py-2 [&_svg]:shrink-0">
       <Button variant="outline" disabled={!latest || action.isPending || (!!latest && reference.data?.submission_id === latest.id)} onClick={() => action.mutate("gold")}><Award /> {latest && reference.data?.submission_id === latest.id ? "Este envio é o padrão ouro" : reference.data ? "Substituir padrão ouro por este diário" : "Eleger este diário como referência nota 10"}</Button>
       {reference.data && <Button variant="ghost" size="icon" aria-label="Remover padrão ouro" title="Remover padrão ouro" disabled={action.isPending} onClick={() => action.mutate("remove")}><X /></Button>}
       <Button disabled={!latest || action.isPending || !!evaluation} onClick={() => action.mutate("assess")}>{action.isPending ? <Loader2 className="animate-spin" /> : <Sparkles />} {evaluation ? "Envio avaliado" : "Analisar fotos e gerar nota prévia"}</Button>
