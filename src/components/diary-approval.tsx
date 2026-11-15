@@ -12,6 +12,7 @@ import { diarySubmissionProblems } from "@/lib/diary";
 import { fmtDateTime } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
 import { submitDiaryAutomatically } from "@/lib/diary-auto.functions";
+import { assessDiary } from "@/lib/diary-evaluation.functions";
 
 type Entry = { id: string; student_id: string; entry_date: string; kind: string; content: string; created_at: string };
 function snapshotEntries(raw: unknown): Entry[] {
@@ -25,13 +26,17 @@ export function DiaryApproval({ groupId, teacher = false, nameOf }: { groupId: s
   const { data: roles } = useSuspenseQuery(groupResponsibilitiesQuery(groupId));
   const [note, setNote] = useState("");
   const submitAutomatically = useServerFn(submitDiaryAutomatically);
+  const assess = useServerFn(assessDiary);
   const qc = useQueryClient();
   const latest = submissions[0];
   const pending = latest?.status === "pending";
   const problems = diarySubmissionProblems({ leaderId: roles?.leader_student_id ?? null, diaryId: roles?.diary_student_id ?? null, entryCount: entries.length, pending });
   const action = useMutation({
-    mutationFn: async (decision: "submit" | "auto" | "approve" | "return") => {
-      if (decision === "submit" || decision === "auto") {
+    mutationFn: async (decision: "submit" | "auto" | "approve" | "return" | "retry") => {
+      if (decision === "retry") {
+        if (!latest) throw new Error("Nenhum diário enviado.");
+        await assess({ data: { groupId, submissionId: latest.id } });
+      } else if (decision === "submit" || decision === "auto") {
         await submitAutomatically({ data: { groupId, pendingId: decision === "auto" ? latest?.id : undefined } });
       } else {
         if (!latest) throw new Error("Nenhum diário enviado.");
@@ -62,11 +67,12 @@ export function DiaryApproval({ groupId, teacher = false, nameOf }: { groupId: s
       {latest.reviewed_at && <p className="text-muted-foreground">Revisado em {fmtDateTime(latest.reviewed_at)}</p>}
       {latest.teacher_note && <p className="whitespace-pre-wrap break-words rounded-md bg-muted p-3">{latest.teacher_note}</p>}
       {latest.ai_feedback && <div className="space-y-2 border-l-4 border-primary pl-3"><h3 className="flex items-center gap-2 font-semibold"><Sparkles className="size-4 text-primary" /> Dicas da IA</h3><p className="whitespace-pre-wrap break-words">{latest.ai_feedback}</p></div>}
-      {latest.ai_status === "unavailable" && <p className="text-muted-foreground">Dicas da IA indisponíveis neste envio. A aprovação por datas foi mantida.</p>}
+      <p className="text-muted-foreground">{latest.photo_validation === "validated" ? "Fotos e datas validadas pela IA." : latest.photo_validation === "changes_requested" ? "Validação das fotos: ajustes solicitados." : "Validação visual das fotos pendente; a aprovação automática anterior confere apenas as datas informadas."}</p>
+      {(latest.ai_status === "unavailable" || latest.photo_validation === "not_checked") && <Button variant="outline" disabled={action.isPending} onClick={() => action.mutate("retry")}><Sparkles /> Validar fotos com IA</Button>}
     </div>}
     {!teacher && <>
       <Button className="h-auto min-h-9 max-w-full whitespace-normal py-2 text-left [&_svg]:shrink-0" disabled={action.isPending || (!pending && problems.length > 0)} onClick={() => action.mutate(pending ? "auto" : "submit")}>
-        {action.isPending ? <Loader2 className="animate-spin" /> : <Send />} {action.isPending ? "Conferindo diário e preparando dicas…" : pending ? "Aprovar automaticamente este envio" : latest ? "Enviar atualização com aprovação automática" : "Enviar diário com aprovação automática"}
+        {action.isPending ? <Loader2 className="animate-spin" /> : <Send />} {action.isPending ? "Analisando fotos e conferindo datas…" : pending ? "Validar este envio com IA" : latest ? "Enviar atualização para validação da IA" : "Enviar diário para validação da IA"}
       </Button>
       {!pending && problems.length > 0 && <ul className="list-inside list-disc text-sm text-muted-foreground">{problems.map((p) => <li key={p}>{p}</li>)}</ul>}
     </>}

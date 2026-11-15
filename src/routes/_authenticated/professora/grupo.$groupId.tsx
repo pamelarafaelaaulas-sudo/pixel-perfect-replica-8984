@@ -44,6 +44,7 @@ import { ProjectAreaPicker, ProjectCodeTag } from "@/components/project-code";
 import { ProjectDocxButton } from "@/components/project-docx";
 import { SocialApplicationCard } from "@/components/social-application";
 import { RenameGroupButton } from "@/components/rename-group";
+import { TeacherDiaryAI } from "@/components/diary-ai";
 
 export const Route = createFileRoute("/_authenticated/professora/grupo/$groupId")({
   head: () => ({
@@ -337,6 +338,7 @@ function TeacherGroupPage() {
           </p>
         )}
           <TabsContent value="diario" className="p-0">
+            <TeacherDiaryAI groupId={groupId} />
             <DiaryApproval groupId={groupId} teacher nameOf={nameOf} />
             {diaryOpen && <>
             <p className="mb-6 text-sm text-muted-foreground">
