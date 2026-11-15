@@ -408,6 +408,64 @@ export type Database = {
           },
         ]
       }
+      diary_ai_evaluations: {
+        Row: {
+          axes: Json
+          comparison: string
+          created_at: string
+          group_id: string
+          id: string
+          reference_submission_id: string | null
+          score: number | null
+          submission_id: string
+          validated: boolean
+        }
+        Insert: {
+          axes: Json
+          comparison: string
+          created_at?: string
+          group_id: string
+          id?: string
+          reference_submission_id?: string | null
+          score?: number | null
+          submission_id: string
+          validated: boolean
+        }
+        Update: {
+          axes?: Json
+          comparison?: string
+          created_at?: string
+          group_id?: string
+          id?: string
+          reference_submission_id?: string | null
+          score?: number | null
+          submission_id?: string
+          validated?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diary_ai_evaluations_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diary_ai_evaluations_reference_submission_id_fkey"
+            columns: ["reference_submission_id"]
+            isOneToOne: false
+            referencedRelation: "diary_submissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diary_ai_evaluations_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: true
+            referencedRelation: "diary_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       diary_entries: {
         Row: {
           content: string
@@ -451,6 +509,52 @@ export type Database = {
             foreignKeyName: "diary_entries_student_id_fkey"
             columns: ["student_id"]
             isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diary_gold_standards: {
+        Row: {
+          entries_snapshot: Json
+          group_id: string
+          selected_at: string
+          submission_id: string
+          teacher_id: string
+        }
+        Insert: {
+          entries_snapshot: Json
+          group_id: string
+          selected_at?: string
+          submission_id: string
+          teacher_id: string
+        }
+        Update: {
+          entries_snapshot?: Json
+          group_id?: string
+          selected_at?: string
+          submission_id?: string
+          teacher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diary_gold_standards_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diary_gold_standards_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "diary_submissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diary_gold_standards_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -508,6 +612,7 @@ export type Database = {
           group_id: string
           id: string
           leader_student_id: string
+          photo_validation: string
           reviewed_at: string | null
           reviewed_by: string | null
           status: string
@@ -524,6 +629,7 @@ export type Database = {
           group_id: string
           id?: string
           leader_student_id: string
+          photo_validation?: string
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
@@ -540,6 +646,7 @@ export type Database = {
           group_id?: string
           id?: string
           leader_student_id?: string
+          photo_validation?: string
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
@@ -1914,6 +2021,10 @@ export type Database = {
         Returns: undefined
       }
       seed_teacher_ideas: { Args: { _teacher: string }; Returns: undefined }
+      set_diary_gold_standard: {
+        Args: { _submission_id: string }
+        Returns: undefined
+      }
       shares_group_with: { Args: { _other: string }; Returns: boolean }
       submit_group_diary: { Args: { _group_id: string }; Returns: string }
       submit_phase: { Args: { _project_id: string }; Returns: number }
