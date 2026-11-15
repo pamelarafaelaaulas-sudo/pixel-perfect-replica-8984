@@ -18,6 +18,7 @@ import { normalizeClassLabel } from "@/lib/project-code";
 import { FairCountdown } from "@/components/fair-countdown";
 import { EthicsFormTemplateDialog } from "@/components/ethics-form-template";
 import { TrailSettingsDialog } from "@/components/trail-settings";
+import { RecentDeliveries } from "@/components/recent-deliveries";
 
 export const Route = createFileRoute("/_authenticated/professora/")({
   head: () => ({
@@ -133,6 +134,7 @@ function TeacherHome() {
           </div>
         }
       />
+      <RecentDeliveries />
       {me && <FairCountdown classes={classes} teacherId={me.id} />}
       {classes.length === 0 ? (
         <EmptyState
