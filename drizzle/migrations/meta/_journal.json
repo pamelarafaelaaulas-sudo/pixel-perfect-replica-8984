@@ -337,6 +337,13 @@
       "when": 1794432140945,
       "tag": "0047_scope_fair_templates_read",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1794765773723,
+      "tag": "0048_diary_gold_standard_ai_scores",
+      "breakpoints": true
     }
   ]
 }
