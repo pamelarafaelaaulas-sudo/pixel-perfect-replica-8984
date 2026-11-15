@@ -24,3 +24,16 @@ describe("article links", () => {
     expect(uncitedReferences(`${silva}\n${duo}`, ["Como diz Silva (2020)."])).toEqual([duo]);
   });
 });
+
+import { articleCitationHint as ach, buildAbntReference as bar, citationHint as ch } from "./article-links";
+import { describe as d2, expect as e2, it as i2 } from "vitest";
+d2("teen-friendly ABNT", () => {
+  i2("reads lowercase / natural names", () => {
+    e2(ch("Silva, Mariana; Souza, Carlos. Plástico. Revista X, 2023.")?.parenthetical).toBe("(Silva; Souza, 2023)");
+    e2(ach({ authors: "Mariana Silva e Carlos Souza", year: "2023", abnt_citation: "" })?.narrative).toBe("Silva e Souza (2023)");
+  });
+  i2("builds ABNT from simple fields", () => {
+    e2(bar({ authors: "Mariana Silva e Carlos Souza", year: "2023", title: "Plástico", journal: "Revista X", url: "" }))
+      .toBe("SILVA, Mariana; SOUZA, Carlos. Plástico. Revista X, 2023.");
+  });
+});

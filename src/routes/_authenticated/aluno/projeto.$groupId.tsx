@@ -65,7 +65,7 @@ import {
   splitKeywords,
 } from "@/lib/phase-rules";
 import { CITATION_EXAMPLES, checkCitations } from "@/lib/citations";
-import { citationHint, citationsWithoutArticle, importArticleReferences, uncitedReferences } from "@/lib/article-links";
+import { articleCitationHint, buildAbntReference, citationsWithoutArticle, importArticleReferences, uncitedReferences } from "@/lib/article-links";
 import { fmtDateTime, whatsappLink } from "@/lib/format";
 import { bimesterBase, bimesterPenalties, formatPoints, gradeAfterPenalty, projectLateness } from "@/lib/penalty";
 import { BannerStage } from "@/components/banner-stage";
