@@ -16,7 +16,7 @@ export function TeacherDiaryAI({ groupId }: { groupId: string }) {
   const submissions = useQuery(diarySubmissionsQuery(groupId));
   const latest = submissions.data?.[0];
   const reference = useQuery({ queryKey: ["diary", "gold"], queryFn: async () => {
-    const r = await supabase.from("diary_gold_standards").select("*, groups(name)").maybeSingle();
+    const r = await supabase.from("diary_gold_standards").select("*, groups(group_name)").maybeSingle();
     if (r.error) throw r.error;
     return r.data;
   } });
@@ -41,7 +41,7 @@ export function TeacherDiaryAI({ groupId }: { groupId: string }) {
   }, onSuccess: () => { qc.invalidateQueries({ queryKey: ["diary"] }); toast.success("Avaliação do diário atualizada"); }, onError: (e: Error) => { qc.invalidateQueries({ queryKey: ["diary"] }); toast.error(e.message); } });
   return <section className="space-y-4 border-b border-border pb-6" aria-label="Avaliação por IA e diário padrão ouro">
     <h2 className="flex items-center gap-2 text-xl font-semibold"><Award className="size-5 text-primary" /> Diário padrão ouro</h2>
-    <p className="text-sm text-muted-foreground">{reference.data ? `Referência nota 10: ${reference.data.groups?.name ?? "Diário selecionado"}.` : "Nenhum diário de referência selecionado."}</p>
+    <p className="text-sm text-muted-foreground">{reference.data ? `Referência nota 10: ${reference.data.groups?.group_name ?? "Diário selecionado"}.` : "Nenhum diário de referência selecionado."}</p>
     <div className="flex flex-wrap gap-2">
       <Button variant="outline" disabled={!latest || action.isPending || reference.data?.submission_id === latest?.id} onClick={() => action.mutate("gold")}><Award /> {reference.data?.submission_id === latest?.id ? "Este envio é o padrão ouro" : reference.data ? "Substituir padrão ouro por este diário" : "Eleger este diário como referência nota 10"}</Button>
       {reference.data && <Button variant="ghost" size="icon" aria-label="Remover padrão ouro" title="Remover padrão ouro" disabled={action.isPending} onClick={() => action.mutate("remove")}><X /></Button>}
