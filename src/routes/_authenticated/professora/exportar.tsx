@@ -14,6 +14,7 @@ import { BIMESTERS } from "@/lib/phases";
 import { formatPoints } from "@/lib/penalty";
 
 export const Route = createFileRoute("/_authenticated/professora/exportar")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Exportar notas — FECITI Flow" },

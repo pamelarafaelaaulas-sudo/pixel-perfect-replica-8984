@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/painel")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Painel — FECITI Flow" },

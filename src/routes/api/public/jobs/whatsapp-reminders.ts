@@ -3,6 +3,7 @@ import { authenticateCronRequest } from "@/integrations/supabase/cron-auth";
 
 /** Daily check: sends the stage-deadline reminders for teachers whose automatic interval has elapsed. */
 export const Route = createFileRoute("/api/public/jobs/whatsapp-reminders")({
+  staticData: { sitemap: false },
   server: {
     handlers: {
       POST: async ({ request }) => {

@@ -14,6 +14,7 @@ import { plural } from "@/lib/format";
 import { StudentGradesSheetButton } from "@/components/sheet-downloads";
 
 export const Route = createFileRoute("/_authenticated/professora/alunos")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Alunos — FECITI Flow" },

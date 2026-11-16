@@ -23,6 +23,7 @@ import { studentSummary } from "@/lib/student-review";
 import { AdjustmentEditor } from "@/components/grade-adjustment";
 
 export const Route = createFileRoute("/_authenticated/professora/aluno/$studentId")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Revisão do aluno — FECITI Flow" },

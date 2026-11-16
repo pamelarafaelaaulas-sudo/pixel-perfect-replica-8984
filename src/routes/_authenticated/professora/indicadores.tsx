@@ -7,6 +7,7 @@ import { teacherIndicatorsQuery } from "@/lib/queries";
 import { fairIndicators, indicatorsCsv, type IndicatorProject } from "@/lib/indicators";
 
 export const Route = createFileRoute("/_authenticated/professora/indicadores")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Indicadores da feira — FECITI Flow" },

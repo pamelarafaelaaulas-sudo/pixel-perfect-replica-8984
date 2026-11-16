@@ -21,6 +21,7 @@ import { isCanvaUrl } from "@/lib/phase-rules";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/professora/banner")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Modelo do banner — FECITI Flow" },

@@ -82,6 +82,7 @@ import { StudentWrittenFeedback, StudentWrittenResubmit, stageReviews, useWritte
 import { writtenPhaseText } from "@/lib/written-review";
 
 export const Route = createFileRoute("/_authenticated/aluno/projeto/$groupId")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Projeto do grupo — FECITI Flow" },

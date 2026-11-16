@@ -18,6 +18,7 @@ import { endOfDayFromInput, fmtDate, fmtDateTime, plural, toDateInput } from "@/
 import { classLateness, daysLate, formatPoints, phasePenalty, phaseTotals, type PhaseInfo, type PhaseTotals } from "@/lib/penalty";
 
 export const Route = createFileRoute("/_authenticated/professora/turma/$classId_/prazos")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Prazos e atrasos — FECITI Flow" },

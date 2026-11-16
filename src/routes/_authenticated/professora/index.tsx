@@ -21,6 +21,7 @@ import { TrailSettingsDialog } from "@/components/trail-settings";
 import { RecentDeliveries } from "@/components/recent-deliveries";
 
 export const Route = createFileRoute("/_authenticated/professora/")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Minhas turmas — FECITI Flow" },

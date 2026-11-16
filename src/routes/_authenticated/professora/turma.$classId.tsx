@@ -30,6 +30,7 @@ import { ProjectCodeTag } from "@/components/project-code";
 import { ExternalFairsTag } from "@/components/external-fairs";
 
 export const Route = createFileRoute("/_authenticated/professora/turma/$classId")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Turma — FECITI Flow" },

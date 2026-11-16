@@ -20,6 +20,7 @@ const deliveriesQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/_authenticated/professora/entregas")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Entregas por etapa — FECITI Flow" },

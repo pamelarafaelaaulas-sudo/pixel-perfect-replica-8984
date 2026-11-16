@@ -13,6 +13,7 @@ import { formatPoints } from "@/lib/penalty";
 import { fmtDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/aluno/diario/$groupId")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Diário de bordo — FECITI Flow" },

@@ -11,6 +11,7 @@ import { PHASE_COUNT } from "@/lib/phases";
 import { fmtDate, fmtDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/professora/planejamento")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Planejamento — FECITI Flow" },
