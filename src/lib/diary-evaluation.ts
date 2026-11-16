@@ -18,8 +18,9 @@ export function diaryStudentFeedback(text: string) {
   return text.split(/\n|(?<=[.!?])\s+/).filter(line => !/\b(nota|pontua[çc][aã]o|score|pontos?|padr[aã]o ouro|refer[eê]ncia nota)\b/i.test(line)).join("\n").trim() || "Confira as orientações de validação das fotos do diário.";
 }
 
-export const DIARY_PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
-export const DIARY_BATCH_BYTES = 20 * 1024 * 1024;
+export const DIARY_PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"] as const;
+// Leave room for base64 expansion and prompts below Gemini's inline request limit.
+export const DIARY_BATCH_BYTES = 12 * 1024 * 1024;
 export type DiaryEvaluation = z.infer<typeof diaryEvaluationSchema>;
 export type DiaryPhotoEntry = z.infer<typeof diaryPhotoEntries>[number];
 export type DiaryImage = { entry: DiaryPhotoEntry; image: Uint8Array; mediaType: string };
@@ -49,7 +50,7 @@ export async function analyzeDiaryBatches(
     if (!DIARY_PHOTO_TYPES.some(type => type === photo.mediaType) || photo.image.byteLength > DIARY_BATCH_BYTES) {
       await flush();
       // Keep incompatible historical pages visible, without poisoning later batches.
-      results.push({ axes: { continuidade: 0, organizacao: 0, conteudo: 0, reflexao: 0 }, comparison: "Página não avaliada por incompatibilidade da foto.", feedback: "Envie novamente a página em JPG, PNG ou WEBP.", pages: [{ id: entry.id, readable: false, dated: false, date_matches: false, reason: `Página de ${entry.entry_date}: envie uma nova foto em JPG, PNG ou WEBP.` }] });
+      results.push({ axes: { continuidade: 0, organizacao: 0, conteudo: 0, reflexao: 0 }, comparison: "Página não avaliada por incompatibilidade da foto.", feedback: "Envie novamente a página em formato compatível, com até 10 MB.", pages: [{ id: entry.id, readable: false, dated: false, date_matches: false, reason: `Página de ${entry.entry_date}: envie uma nova foto em formato compatível, com até 10 MB.` }] });
       continue;
     }
     if (batch.length && (bytes + photo.image.byteLength > DIARY_BATCH_BYTES || batch.length >= 4)) await flush();

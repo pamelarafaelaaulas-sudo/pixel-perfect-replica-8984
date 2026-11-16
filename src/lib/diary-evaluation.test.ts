@@ -23,19 +23,22 @@ describe("diary preliminary assessment", () => {
       batchSizes.push(images.reduce((sum, photo) => sum + photo.image.byteLength, 0));
       return evaluate(images);
     }));
-    expect(batchSizes).toEqual([DIARY_BATCH_BYTES, DIARY_BATCH_BYTES, DIARY_BATCH_BYTES, DIARY_BATCH_BYTES]);
+    expect(batchSizes).toEqual(Array(8).fill(10 * 1024 * 1024));
+    expect(batchSizes.every(bytes => bytes <= DIARY_BATCH_BYTES)).toBe(true);
     expect(diaryPhotosValidated(entries.map(e => e.id), out.pages)).toBe(true);
     expect(diaryPreliminaryScore(out.axes)).toBe(8);
   });
-  it("keeps analyzing later pages after an old HEIC photo", async () => {
-    const out = combineDiaryBatches(await analyzeDiaryBatches(entries.slice(0, 3), async entry => ({ image: new Uint8Array(1024), mediaType: entry.id === entries[0]?.id ? "image/heic" : "image/jpeg" }), evaluate));
+  it("keeps analyzing later pages after an unsupported historical photo", async () => {
+    const out = combineDiaryBatches(await analyzeDiaryBatches(entries.slice(0, 3), async entry => ({ image: new Uint8Array(1024), mediaType: entry.id === entries[0]?.id ? "image/tiff" : "image/jpeg" }), evaluate));
     expect(out.pages).toHaveLength(3);
     expect(out.pages[0]?.readable).toBe(false);
     expect(out.pages.slice(1).every(page => page.readable)).toBe(true);
     expect(diaryPhotosValidated(entries.slice(0, 3).map(e => e.id), out.pages)).toBe(false);
   });
-  it("rejects HEIC and HEIF for new uploads while retaining supported formats", () => {
-    expect([...DIARY_PHOTO_TYPES]).toEqual(["image/jpeg", "image/png", "image/webp"]);
+  it("accepts HEIC and HEIF for existing and new iPhone photos", async () => {
+    expect([...DIARY_PHOTO_TYPES]).toEqual(["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"]);
+    const out = combineDiaryBatches(await analyzeDiaryBatches(entries.slice(0, 2), async entry => ({ image: new Uint8Array(1024), mediaType: entry.id === entries[0]?.id ? "image/heic" : "image/heif" }), evaluate));
+    expect(diaryPhotosValidated(entries.slice(0, 2).map(e => e.id), out.pages)).toBe(true);
   });
   it("does not mark a batch complete when the AI omits a page", async () => {
     await expect(analyzeDiaryBatches(entries.slice(0, 2), async () => ({ image: new Uint8Array(1), mediaType: "image/png" }), async images => evaluate(images.slice(0, 1)))).rejects.toThrow("todas as páginas");

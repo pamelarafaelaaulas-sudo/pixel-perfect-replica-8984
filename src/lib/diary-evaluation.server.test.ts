@@ -32,9 +32,9 @@ beforeEach(() => { state.updates.length = 0; state.evaluations.length = 0; state
 it("saves validation and a private grade for 40 MB current plus 40 MB gold photos", async () => {
   const { evaluateDiaryPhotos } = await import("./diary-evaluation.server");
   await expect(evaluateDiaryPhotos("submission", groupId, "teacher")).resolves.toEqual({ validated: true });
-  expect(state.calls).toHaveLength(4);
-  expect(state.calls.every(call => call.bytes <= 20 * 1024 * 1024)).toBe(true);
-  expect(state.calls[2]?.context).toContain("Resumo observado de TODOS os lotes");
+  expect(state.calls).toHaveLength(8);
+  expect(state.calls.every(call => call.bytes <= 12 * 1024 * 1024)).toBe(true);
+  expect(state.calls[4]?.context).toContain("Resumo observado de TODOS os lotes");
   expect(state.evaluations[0]).toMatchObject({ score: 8, validated: true, reference_submission_id: "reference" });
   expect(state.updates.at(-1)).toMatchObject({ ai_status: "complete", photo_validation: "validated", status: "approved" });
 });
