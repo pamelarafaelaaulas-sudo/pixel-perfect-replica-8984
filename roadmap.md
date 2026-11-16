@@ -21,5 +21,6 @@
 - [x] Add Google verification file and router-derived public sitemap; two tests and preview endpoints pass; publication requested.
 - [ ] Confirm new sitemap and verification file on the published site once deployment completes.
 - [x] Fix growing diary photo payloads and support Gemini HEIC/HEIF; 24 tests pass including 80 MB current/reference evaluation, bounded batches, validation and private grade saving. Teacher session verified; no unevaluated photo submission available for a real Gemini retry.
-- [ ] Rank medals by quality with relative-deadline tie breaks and private scores.
-- [ ] Show internal and interclass scoreboards; test rules and verify live screens.
+- [x] Rank medals by quality with relative-deadline tie breaks and private scores; 12 tests passed.
+- [x] Show internal and interclass scoreboards; teacher's 64 saved scoreboard rows verified on desktop/mobile, with no scores returned and no runtime errors.
+- [ ] Verify student scoreboards using a student's session; teacher session only available in this check.
