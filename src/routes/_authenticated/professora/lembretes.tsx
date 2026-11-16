@@ -31,6 +31,7 @@ import { fmtDateTime, plural } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/professora/lembretes")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Lembretes no WhatsApp — FECITI Flow" },

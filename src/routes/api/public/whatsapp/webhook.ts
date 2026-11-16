@@ -3,6 +3,7 @@ import { verifyWebhookRequest } from "@lovable.dev/webhooks-js";
 
 /** Receives WhatsApp callbacks (delivery statuses, incoming messages) forwarded by Lovable. */
 export const Route = createFileRoute("/api/public/whatsapp/webhook")({
+  staticData: { sitemap: false },
   server: {
     handlers: {
       POST: async ({ request }) => {

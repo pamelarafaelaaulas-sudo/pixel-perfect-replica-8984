@@ -17,6 +17,7 @@ import { MedalCounts, MedalRules } from "@/components/medals";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/professora/medalhas")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Medalhas e ranking — FECITI Flow" },

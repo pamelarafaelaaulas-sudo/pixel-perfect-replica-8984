@@ -15,6 +15,7 @@ import { AREAS, areaLabel } from "@/lib/project-code";
 import { currentYear, ideaBankQuery, ideaUsageQuery, type Idea } from "@/lib/idea-bank";
 
 export const Route = createFileRoute("/_authenticated/professora/ideias")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Banco de Inspirações — FECITI Flow" },

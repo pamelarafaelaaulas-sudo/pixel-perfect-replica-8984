@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/professora")({
+  staticData: { sitemap: false },
   beforeLoad: ({ context }) => {
     if (context.me.role !== "teacher") throw redirect({ to: "/aluno", replace: true });
   },

@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { meQuery } from "@/lib/queries";
 
 export const Route = createFileRoute("/_authenticated")({
+  staticData: { sitemap: "exclude-subtree" },
   ssr: false,
   beforeLoad: async ({ context }) => {
     const { data } = await supabase.auth.getUser();

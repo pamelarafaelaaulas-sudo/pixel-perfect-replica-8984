@@ -13,6 +13,7 @@ import { fmtDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/professora/progresso")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Progresso dos grupos — FECITI Flow" },

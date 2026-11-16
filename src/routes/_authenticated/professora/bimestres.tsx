@@ -12,6 +12,7 @@ import { formatPoints } from "@/lib/penalty";
 import { plural } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/professora/bimestres")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Notas do bimestre — FECITI Flow" },

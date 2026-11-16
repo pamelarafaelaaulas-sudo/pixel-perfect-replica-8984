@@ -18,6 +18,7 @@ import { FAIR_STATUS_LABEL } from "@/lib/fair-docs";
 import { FairBannerModelsManager, FairTemplatesManager } from "@/components/fair-accreditation";
 
 export const Route = createFileRoute("/_authenticated/professora/feiras")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Feiras externas — FECITI Flow" },

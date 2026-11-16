@@ -11,3 +11,5 @@
 - Idea usage: `projects.idea_id` (set when a group saves after "Usar esta ideia"); trigger `guard_idea_per_class` blocks one idea per class, mirrored in UI by `ideaTakenBy`; read through security-definer `idea_usage`. Ideas carry a `year`; students see only the current year's.
 - Stage tables (Introdução, Metodologia, Resultados): jsonb columns mapped by `TABLE_COLUMNS` in `result-tables.ts` (tested); not counted in word limits, numbered continuously in the Word export.
 - Stage charts use structured JSON mapped by `CHART_COLUMNS`; browser-only Chart.js renders both previews and PNG figures embedded in Word, independently numbered across document sections. Chart text is excluded from word counts.
+
+- The sitemap derives static public URLs from required route decisions; the authenticated subtree is excluded and lastmod is omitted without authoritative page timestamps.

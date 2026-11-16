@@ -17,3 +17,5 @@
 - [x] Analyze submitted diary photos, validate readable dated pages and show student-only formative feedback.
 - [x] Test diary evaluation rules and verify teacher controls on desktop/mobile; 18 tests pass and teacher-only policies confirmed.
 - [ ] Verify real-photo AI scoring and gold-standard selection end-to-end: blocked until a group submits diary photos (no photos or submissions currently available).
+
+- [ ] Add Google verification file and router-derived public sitemap; publish and verify live endpoints.

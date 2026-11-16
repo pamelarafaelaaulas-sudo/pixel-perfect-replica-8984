@@ -13,6 +13,7 @@ import { BIMESTER_NUMBERS } from "@/lib/phases";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/aluno/avaliacao/$groupId")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Avaliar colegas — FECITI Flow" },

@@ -8,8 +8,10 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/reset-password")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
+      { name: "robots", content: "noindex" },
       { title: "Nova senha — FECITI Flow" },
       { name: "description", content: "Defina uma nova senha para sua conta." },
       { property: "og:title", content: "Nova senha — FECITI Flow" },

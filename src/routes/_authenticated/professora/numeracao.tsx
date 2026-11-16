@@ -14,6 +14,7 @@ import { plural } from "@/lib/format";
 import { NumberingSheetButton } from "@/components/sheet-downloads";
 
 export const Route = createFileRoute("/_authenticated/professora/numeracao")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Numeração dos trabalhos — FECITI Flow" },

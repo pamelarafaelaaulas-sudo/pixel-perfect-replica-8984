@@ -19,6 +19,7 @@ import { StudentMedals } from "@/components/medals";
 import { StudentAlerts } from "@/components/student-alerts";
 
 export const Route = createFileRoute("/_authenticated/aluno/")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Meus projetos — FECITI Flow" },
