@@ -1,18 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { groupMedalRanking, poolMedals, stageMedals, studentMedalRanking, tallyMedals } from "./medals";
+import { groupMedalRanking, scoreboardRankings, poolMedals, stageMedals, studentMedalRanking, tallyMedals } from "./medals";
 
 const due = "2026-03-10T23:59:00-04:00";
 const schedules = [{ phase_number: 1, due_date: due }];
 const at = (day: number, hour = 10) => `2026-03-${String(day).padStart(2, "0")}T${String(hour).padStart(2, "0")}:00:00-04:00`;
 
 describe("stage medals", () => {
-  it("gives gold, silver and bronze to the first three on-time groups and Honra ao Mérito to the rest", () => {
+  it("gives podium medals to evaluated on-time groups and honor to the rest", () => {
     const medals = stageMedals(schedules, [
-      { group_id: "d", phase_number: 1, submitted_at: at(9) },
-      { group_id: "a", phase_number: 1, submitted_at: at(1) },
-      { group_id: "c", phase_number: 1, submitted_at: at(5) },
-      { group_id: "b", phase_number: 1, submitted_at: at(3) },
-      { group_id: "e", phase_number: 1, submitted_at: at(10, 20) },
+      { group_id: "d", phase_number: 1, quality_score: 8, submitted_at: at(9) },
+      { group_id: "a", phase_number: 1, quality_score: 8, submitted_at: at(1) },
+      { group_id: "c", phase_number: 1, quality_score: 8, submitted_at: at(5) },
+      { group_id: "b", phase_number: 1, quality_score: 8, submitted_at: at(3) },
+      { group_id: "e", phase_number: 1, quality_score: 8, submitted_at: at(10, 20) },
     ]);
     expect(medals.map((m) => [m.groupId, m.kind])).toEqual([
       ["a", "ouro"],
@@ -25,14 +25,14 @@ describe("stage medals", () => {
 
   it("gives no medal to a late delivery, even if it was among the first three", () => {
     const medals = stageMedals(schedules, [
-      { group_id: "late", phase_number: 1, submitted_at: at(11) },
-      { group_id: "ok", phase_number: 1, submitted_at: at(10) },
+      { group_id: "late", phase_number: 1, quality_score: 8, submitted_at: at(11) },
+      { group_id: "ok", phase_number: 1, quality_score: 8, submitted_at: at(10) },
     ]);
     expect(medals).toEqual([{ groupId: "ok", phase: 1, kind: "ouro", at: at(10) }]);
   });
 
   it("gives no medal on a stage without a deadline", () => {
-    expect(stageMedals([], [{ group_id: "a", phase_number: 1, submitted_at: at(1) }])).toEqual([]);
+    expect(stageMedals([], [{ group_id: "a", phase_number: 1, quality_score: 8, submitted_at: at(1) }])).toEqual([]);
   });
 });
 
@@ -42,7 +42,7 @@ describe("competing classes", () => {
     name: id,
     medal_pool: pool,
     schedules,
-    groups: [{ id: `g-${id}`, name: id, members: [], submissions: [{ phase_number: 1, submitted_at: at(day) }] }],
+    groups: [{ id: `g-${id}`, name: id, members: [], submissions: [{ phase_number: 1, quality_score: 8, submitted_at: at(day) }] }],
   });
   it("classes with the same pool share one podium", () => {
     const m = poolMedals([cls("A", "Manhã", 2), cls("B", "manhã", 1)]);
@@ -92,7 +92,7 @@ describe("medal points and ranking", () => {
         name: "1A",
         schedules,
         groups: [
-          { id: "g", name: "G", members: [{ id: "s1", name: "Ana" }, { id: "s2", name: "Bia" }], submissions: [{ phase_number: 1, submitted_at: at(1) }] },
+          { id: "g", name: "G", members: [{ id: "s1", name: "Ana" }, { id: "s2", name: "Bia" }], submissions: [{ phase_number: 1, quality_score: 8, submitted_at: at(1) }] },
         ],
       },
     ]);
@@ -100,5 +100,36 @@ describe("medal points and ranking", () => {
       ["Ana", 1, 1],
       ["Bia", 1, 1],
     ]);
+  });
+});
+
+
+describe("quality competition", () => {
+  it("prioritizes quality over absolute submission time", () => {
+    const medals = stageMedals(schedules, [
+      { group_id: "early", phase_number: 1, submitted_at: at(1), quality_score: 7 },
+      { group_id: "best", phase_number: 1, submitted_at: at(9), quality_score: 10 },
+    ]);
+    expect(medals.map((m) => [m.groupId, m.kind])).toEqual([["best", "ouro"], ["early", "prata"]]);
+  });
+  it("breaks equal grades by own-deadline advance, not the day of class", () => {
+    const medals = stageMedals([], [
+      { group_id: "monday", phase_number: 1, submitted_at: "2026-03-02T10:00:00Z", due_date: "2026-03-03T10:00:00Z", quality_score: 9 },
+      { group_id: "friday", phase_number: 1, submitted_at: "2026-03-06T10:00:00Z", due_date: "2026-03-09T10:00:00Z", quality_score: 9 },
+    ]);
+    expect(medals.map((m) => m.groupId)).toEqual(["friday", "monday"]);
+  });
+  it("leaves unevaluated deliveries pending instead of scoring them zero", () => {
+    expect(stageMedals(schedules, [{ group_id: "pending", phase_number: 1, submitted_at: at(1) }])).toEqual([]);
+    expect(stageMedals(schedules, [{ group_id: "zero", phase_number: 1, submitted_at: at(1), quality_score: 0 }])[0]?.kind).toBe("ouro");
+  });
+  it("counts each group's points once and preserves medals when filtering a class", () => {
+    const rows = [
+      { group_id: "g-a", group_name: "Ana, Bia", class_id: "a", class_name: "A", pool_key: "shared", phase_number: 1, kind: "ouro", submitted_at: at(1) },
+      { group_id: "g-b", group_name: "Carlos", class_id: "b", class_name: "B", pool_key: "shared", phase_number: 1, kind: "prata", submitted_at: at(2) },
+    ];
+    const filtered = scoreboardRankings(rows, "b");
+    expect(filtered.groups.map((g) => [g.id, g.tally.points])).toEqual([["g-b", 2]]);
+    expect(filtered.classes.map((c) => [c.id, c.tally.points, c.position])).toEqual([["a", 3, 1], ["b", 2, 2]]);
   });
 });
