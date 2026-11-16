@@ -25,6 +25,7 @@ import {
 } from "@/lib/diary";
 import { formatPoints } from "@/lib/penalty";
 import { fmtDateTime } from "@/lib/format";
+import { DIARY_PHOTO_TYPES } from "@/lib/diary-evaluation";
 
 type Entry = { id: string; student_id: string; entry_date: string; kind: string; content: string; created_at: string; photo_path?: string | null };
 
@@ -122,7 +123,7 @@ export function DiaryEntryForm({ groupId, studentId }: { groupId: string; studen
   const add = useMutation({
     mutationFn: async () => {
       if (!file) throw new Error("Escolha a foto da página do diário.");
-      if (!/^image\/(jpeg|png|webp|heic|heif)$/.test(file.type)) throw new Error("Envie uma foto (JPG, PNG ou WEBP).");
+      if (!DIARY_PHOTO_TYPES.some(type => type === file.type)) throw new Error("Envie uma foto em JPG, PNG, WEBP, HEIC ou HEIF.");
       if (file.size > 10 * 1024 * 1024) throw new Error("A foto pode ter no máximo 10 MB.");
       const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
       const path = `${groupId}/${Date.now()}-${studentId.slice(0, 8)}.${ext}`;
@@ -154,7 +155,7 @@ export function DiaryEntryForm({ groupId, studentId }: { groupId: string; studen
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="diary-photo">Foto da página</Label>
-        <Input key={inputKey} id="diary-photo" type="file" accept="image/*" capture="environment" onChange={(e) => setFile(e.target.files?.[0] ?? null)} required />
+        <Input key={inputKey} id="diary-photo" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" capture="environment" onChange={(e) => setFile(e.target.files?.[0] ?? null)} required />
       </div>
       <p className="text-xs text-muted-foreground">
         Fotografe a página do caderno com boa luz e letra legível. As fotos não podem ser apagadas. Dá para datar até {DIARY_MAX_BACKDATE_DAYS} dias para trás.
