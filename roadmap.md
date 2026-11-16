@@ -18,4 +18,5 @@
 - [x] Test diary evaluation rules and verify teacher controls on desktop/mobile; 18 tests pass and teacher-only policies confirmed.
 - [ ] Verify real-photo AI scoring and gold-standard selection end-to-end: blocked until a group submits diary photos (no photos or submissions currently available).
 
-- [ ] Add Google verification file and router-derived public sitemap; publish and verify live endpoints.
+- [x] Add Google verification file and router-derived public sitemap; two tests and preview endpoints pass; publication requested.
+- [ ] Confirm new sitemap and verification file on the published site once deployment completes.
