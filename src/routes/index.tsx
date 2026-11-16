@@ -115,7 +115,7 @@ function Index() {
           {[
             { icon: Users, title: "Equipes de até 3", text: "Entre na turma pelo código e forme seu grupo.", cls: "bg-primary/15 text-primary" },
             { icon: Sparkles, title: "Dicas da IA", text: "Sugestões para melhorar a escrita e as citações.", cls: "bg-info/15 text-info" },
-            { icon: Medal, title: "Medalhas digitais", text: "Ganhe ouro, prata e bronze entregando no prazo.", cls: "bg-highlight/40 text-highlight-foreground" },
+            { icon: Medal, title: "Medalhas digitais", text: "Ganhe ouro, prata e bronze entregando no prazo e com qualidade.", cls: "bg-highlight/40 text-highlight-foreground" },
             { icon: BookOpenText, title: "Prazos sempre à vista", text: "Avisos coloridos e contagem regressiva da feira.", cls: "bg-primary/15 text-primary" },
           ].map(({ icon: Icon, title, text, cls }) => (
             <div key={title} className="card-paper p-6 transition-transform hover:-translate-y-1">
