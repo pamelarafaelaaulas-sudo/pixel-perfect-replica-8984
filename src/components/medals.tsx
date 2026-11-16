@@ -86,7 +86,7 @@ export function StudentMedals({ classId, groupId, groupName }: { classId: string
   );
 }
 
-export function MedalScoreboards({ rows, classId, groupId }: { rows: ScoreboardRow[]; classId?: string; groupId?: string }) {
+export function MedalScoreboards({ rows, classId, groupId }: { rows: ScoreboardRow[]; classId?: string | undefined; groupId?: string | undefined }) {
   const rankings = scoreboardRankings(rows, classId);
   const pools = [...new Set(rankings.classes.map((c) => c.poolKey))];
   return <div className="space-y-6">
