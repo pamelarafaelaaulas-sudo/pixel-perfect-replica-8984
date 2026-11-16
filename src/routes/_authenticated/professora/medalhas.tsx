@@ -11,9 +11,10 @@ import { Award, Gift } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { teacherRosterQuery } from "@/lib/queries";
-import { studentMedalRanking } from "@/lib/medals";
+import { medalScoreboardQuery } from "@/lib/queries";
+import { rankByMedals, scoreboardRankings } from "@/lib/medals";
 import { formatPoints } from "@/lib/penalty";
-import { MedalCounts, MedalRules } from "@/components/medals";
+import { MedalCounts, MedalRules, MedalScoreboards } from "@/components/medals";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/professora/medalhas")({
@@ -21,14 +22,14 @@ export const Route = createFileRoute("/_authenticated/professora/medalhas")({
   head: () => ({
     meta: [
       { title: "Medalhas e ranking — FECITI Flow" },
-      { name: "description", content: "Medalhas de ouro, prata, bronze e Honra ao Mérito por entregas no prazo, e o ranking do ano." },
+      { name: "description", content: "Medalhas por qualidade, placar interno dos grupos e Liga das Turmas, com desempate pelo prazo de cada turma." },
       { property: "og:title", content: "Medalhas e ranking — FECITI Flow" },
-      { property: "og:description", content: "Medalhas de ouro, prata, bronze e Honra ao Mérito por entregas no prazo, e o ranking do ano." },
+      { property: "og:description", content: "Medalhas por qualidade, placar interno dos grupos e Liga das Turmas, com desempate pelo prazo de cada turma." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(teacherRosterQuery),
+  loader: ({ context }) => Promise.all([context.queryClient.ensureQueryData(teacherRosterQuery), context.queryClient.ensureQueryData(medalScoreboardQuery())]),
   component: MedalsPage,
   errorComponent: ({ error }) => (
     <div role="alert" className="card-paper p-5 text-destructive">
@@ -40,6 +41,7 @@ export const Route = createFileRoute("/_authenticated/professora/medalhas")({
 
 function MedalsPage() {
   const { data: classes } = useSuspenseQuery(teacherRosterQuery);
+  const { data: scoreboard } = useSuspenseQuery(medalScoreboardQuery());
   const [classId, setClassId] = useState<string>("all");
   const all = useMemo(
     () =>
@@ -57,7 +59,13 @@ function MedalsPage() {
       })),
     [classes],
   );
-  const rows = useMemo(() => studentMedalRanking(classId === "all" ? all : all.filter((c) => c.id === classId)), [all, classId]);
+  const rows = useMemo(() => {
+    const groups = scoreboardRankings(scoreboard).groups;
+    return rankByMedals(all.filter((c) => classId === "all" || c.id === classId).flatMap((c) => c.groups.flatMap((g) => {
+      const ranked = groups.find((r) => r.id === g.id);
+      return ranked ? g.members.map((m) => ({ studentId: m.id, name: m.name, groupName: g.name, classId: c.id, className: c.name, tally: ranked.tally })) : [];
+    })), (r) => r.name);
+  }, [all, classId, scoreboard]);
   const leaders = rows.filter((r) => r.position === 1 && r.tally.total > 0);
 
   return (
@@ -71,9 +79,10 @@ function MedalsPage() {
         <MedalRules />
         <div className="flex flex-wrap gap-2">
           {[{ id: "all", name: "Todas as turmas" }, ...all].map((c) => (
-            <button
+            <Button
               key={c.id}
               type="button"
+              variant={classId === c.id ? "default" : "outline"}
               onClick={() => setClassId(c.id)}
               className={cn(
                 "rounded-full border px-3 py-1.5 text-sm transition-colors",
@@ -81,18 +90,19 @@ function MedalsPage() {
               )}
             >
               {c.name}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
 
       <MedalPools classes={classes.map((c) => ({ id: c.id, name: c.name, medal_pool: c.medal_pool }))} />
+      <div className="mb-6"><MedalScoreboards rows={scoreboard} classId={classId === "all" ? undefined : classId} /></div>
 
       {leaders.length > 0 && (
         <div className="mb-6 flex flex-wrap items-center gap-2 rounded-lg border border-highlight bg-highlight/20 p-4">
           <Gift className="size-5 text-foreground" />
           <span className="text-sm font-medium text-foreground">
-            Na frente agora: {leaders.map((l) => l.name).join(", ")} ({formatPoints(leaders[0]!.tally.points)} pontos)
+            Na frente agora: {leaders.map((l) => l.name).join(", ")} ({formatPoints(leaders[0]?.tally.points ?? 0)} pontos)
           </span>
         </div>
       )}

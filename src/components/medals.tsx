@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Award } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { classMedalsQuery } from "@/lib/queries";
-import { MEDAL_EMOJI, MEDAL_KINDS, MEDAL_LABEL, MEDAL_POINTS, groupMedalRanking, stageMedals, type MedalKind, type MedalTally } from "@/lib/medals";
+import { MEDAL_EMOJI, MEDAL_KINDS, MEDAL_LABEL, MEDAL_POINTS, scoreboardRankings, type ScoreboardRow, type MedalKind, type MedalTally } from "@/lib/medals";
 import { phaseMeta } from "@/lib/phases";
 import { formatPoints } from "@/lib/penalty";
 
@@ -40,8 +40,8 @@ export function MedalCounts({ tally }: { tally: MedalTally }) {
 export function MedalRules() {
   return (
     <p className="text-sm text-muted-foreground">
-      Em cada etapa, os 3 primeiros grupos (da turma ou das turmas que disputam juntas) que entregam dentro do prazo ganham {MEDAL_EMOJI.ouro} ouro, {MEDAL_EMOJI.prata} prata e{" "}
-      {MEDAL_EMOJI.bronze} bronze. Quem entrega no prazo depois deles ganha {MEDAL_EMOJI.honra} Honra ao Mérito. Pontos: ouro{" "}
+      Em cada etapa, as 3 melhores avaliações entre entregas no prazo ganham {MEDAL_EMOJI.ouro} ouro, {MEDAL_EMOJI.prata} prata e{" "}
+      {MEDAL_EMOJI.bronze} bronze. No empate, vale a maior antecedência em relação ao prazo da própria turma. As demais entregas avaliadas no prazo ganham {MEDAL_EMOJI.honra} Honra ao Mérito. O placar é provisório enquanto novas avaliações chegam; entregas sem avaliação aguardam classificação. Pontos: ouro{" "}
       {MEDAL_POINTS.ouro}, prata {MEDAL_POINTS.prata}, bronze {MEDAL_POINTS.bronze}, Honra ao Mérito {formatPoints(MEDAL_POINTS.honra)}. Quem
       somar mais pontos no fim do ano ganha um presente da professora!
     </p>
@@ -51,13 +51,9 @@ export function MedalRules() {
 /** Student: the group's medals and its position in the class. */
 export function StudentMedals({ classId, groupId, groupName }: { classId: string; groupId: string; groupName: string }) {
   const q = useQuery(classMedalsQuery(classId));
+  if (q.isError) return <p role="alert" className="text-destructive">Não foi possível carregar as medalhas.</p>;
   if (!q.data) return null;
-  const medals = stageMedals(q.data.schedules, q.data.deliveries);
-  const groupIds = [...new Set([...q.data.deliveries.map((d) => d.group_id), groupId])];
-  const ranking = groupMedalRanking(
-    groupIds.map((id) => ({ id, name: id })),
-    medals,
-  );
+  const ranking = scoreboardRankings(q.data.rows, classId).groups;
   const mine = ranking.find((r) => r.id === groupId);
   if (!mine) return null;
   return (
@@ -85,6 +81,37 @@ export function StudentMedals({ classId, groupId, groupName }: { classId: string
         </ul>
       )}
       <MedalRules />
+      <MedalScoreboards rows={q.data.rows} classId={classId} groupId={groupId} />
     </aside>
   );
+}
+
+export function MedalScoreboards({ rows, classId, groupId }: { rows: ScoreboardRow[]; classId?: string | undefined; groupId?: string | undefined }) {
+  const rankings = scoreboardRankings(rows, classId);
+  const pools = [...new Set(rankings.classes.map((c) => c.poolKey))];
+  return <div className="space-y-6">
+    <section className="space-y-3">
+      <h2 className="text-lg font-semibold">Placar interno · grupos{classId ? " da turma" : " por turma"}</h2>
+      {(classId ? [classId] : [...new Set(rows.map((r) => r.class_id))]).map((id) => {
+        const groups = scoreboardRankings(rows, id).groups;
+        return <div key={id} className="space-y-2">
+          {!classId && <h3 className="text-sm font-medium text-muted-foreground">{groups[0]?.className}</h3>}
+          <ol className="divide-y divide-border">{groups.map((g) => <li key={g.id} className={cn("flex items-start justify-between gap-3 py-2 text-sm", g.id === groupId && "font-semibold text-primary")}>
+            <span className="min-w-0 break-words">{g.tally.total > 0 ? `${g.position}º` : "—"} · {g.name}</span>
+            <span className="shrink-0">{formatPoints(g.tally.points)} pts</span>
+          </li>)}</ol>
+        </div>;
+      })}
+    </section>
+    <section className="space-y-3">
+      <h2 className="text-lg font-semibold">Liga das Turmas · placar geral</h2>
+      {pools.map((pool) => <div key={pool} className="space-y-2">
+        {pools.length > 1 && <h3 className="text-sm font-medium text-muted-foreground">{rankings.classes.filter((c) => c.poolKey === pool).map((c) => c.name).join(" · ")}</h3>}
+        <ol className="divide-y divide-border">{rankings.classes.filter((c) => c.poolKey === pool).sort((a, b) => a.position - b.position).map((c) => <li key={c.id} className={cn("flex items-start justify-between gap-3 py-2 text-sm", c.id === classId && "font-semibold text-primary")}>
+          <span className="min-w-0 break-words">{c.tally.total > 0 ? `${c.position}º` : "—"} · {c.name}</span>
+          <span className="shrink-0">{formatPoints(c.tally.points)} pts</span>
+        </li>)}</ol>
+      </div>)}
+    </section>
+  </div>;
 }

@@ -2,6 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { isAuthRetryableFetchError } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { parseSavedEvaluation } from "@/lib/ai-score";
+import { scoreboardRankings } from "@/lib/medals";
 
 export type Role = "teacher" | "student";
 
@@ -314,15 +315,25 @@ export const studentReviewQuery = (studentId: string) =>
 /* ---------------- Medals (deadline podium per class) ---------------- */
 
 /** Deadlines and every group's delivery times for one class (teacher or students of the class). */
+export const medalScoreboardQuery = (classId?: string) => queryOptions({
+  queryKey: ["medals", classId ?? "teacher", "scoreboard"],
+  queryFn: async () => {
+    const { data, error } = await supabase.rpc("medal_scoreboard", classId ? { _class_id: classId } : {});
+    fail(error);
+    return data ?? [];
+  },
+  refetchInterval: 60_000,
+});
+
 export const classMedalsQuery = (classId: string) =>
   queryOptions({
     queryKey: ["medals", classId],
     queryFn: async () => {
-      // Every group competing with this class (classes in the same medal pool), each with its own class deadline.
-      const deliveries = await supabase.rpc("medal_pool_deliveries", { _class_id: classId });
-      fail(deliveries.error);
-      return { schedules: [] as { phase_number: number; due_date: string }[], deliveries: deliveries.data ?? [] };
+      const { data, error } = await supabase.rpc("medal_scoreboard", { _class_id: classId });
+      fail(error);
+      return { rows: data ?? [], medals: scoreboardRankings(data ?? []).medals };
     },
+    refetchInterval: 60_000,
   });
 
 /* ---------------- Teacher: invites for other teachers ---------------- */

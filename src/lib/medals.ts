@@ -3,7 +3,7 @@ import { daysLate } from "./penalty";
 
 /**
  * Digital medals for meeting stage deadlines, per class:
- * the 1st, 2nd and 3rd groups to deliver a stage on time get gold, silver and bronze;
+ * the three highest-quality evaluated on-time groups get gold, silver and bronze;
  * every other group that delivers on time gets Honra ao Mérito. Late deliveries get nothing.
  * Every member of the group receives the group's medals.
  */
@@ -25,7 +25,7 @@ export const MEDAL_LABEL: Record<MedalKind, string> = {
 export const MEDAL_EMOJI: Record<MedalKind, string> = { ouro: "🥇", prata: "🥈", bronze: "🥉", honra: "🎖️" };
 
 /** `due_date` = the deadline of the group's own class (competing classes may have different dates). */
-export type Delivery = { group_id: string; phase_number: number; submitted_at: string; due_date?: string | null };
+export type Delivery = { group_id: string; phase_number: number; submitted_at: string; due_date?: string | null; quality_score?: number | null };
 export type Schedule = { phase_number: number; due_date: string };
 export type StageMedal = { groupId: string; phase: number; kind: MedalKind; at: string };
 
@@ -40,9 +40,12 @@ export function stageMedals(schedules: Schedule[], deliveries: Delivery[]): Stag
     const onTime = deliveries
       .filter((d) => {
         const due = d.due_date ?? fallback;
-        return d.phase_number === phase && !!due && daysLate(due, d.submitted_at) === 0;
+        return d.phase_number === phase && !!due && d.quality_score != null && Number.isFinite(d.quality_score) && daysLate(due, d.submitted_at) === 0;
       })
-      .sort((a, b) => new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime() || a.group_id.localeCompare(b.group_id));
+      .sort((a, b) => (b.quality_score ?? 0) - (a.quality_score ?? 0)
+        || (new Date(b.due_date ?? fallback ?? "").getTime() - new Date(b.submitted_at).getTime())
+          - (new Date(a.due_date ?? fallback ?? "").getTime() - new Date(a.submitted_at).getTime())
+        || a.group_id.localeCompare(b.group_id));
     onTime.forEach((d, i) => out.push({ groupId: d.group_id, phase, kind: PODIUM[i] ?? "honra", at: d.submitted_at }));
   }
   return out;
@@ -82,6 +85,20 @@ export function groupMedalRanking(groups: { id: string; name: string }[], medals
     groups.map((g) => ({ ...g, medals: medals.filter((m) => m.groupId === g.id), tally: tallyMedals(medals.filter((m) => m.groupId === g.id)) })),
     (r) => r.name,
   );
+}
+
+export type ScoreboardRow = { group_id: string; group_name: string; class_id: string; class_name: string; pool_key: string; phase_number: number | null; kind: string | null; submitted_at: string | null };
+
+/** Public scoreboard rows contain medals, never AI scores or private feedback. */
+export function scoreboardRankings(rows: ScoreboardRow[], classId?: string) {
+  const medals: StageMedal[] = rows.flatMap((r) =>
+    r.phase_number != null && MEDAL_KINDS.some((k) => k === r.kind)
+      ? [{ groupId: r.group_id, phase: r.phase_number, kind: r.kind as MedalKind, at: r.submitted_at ?? "" }] : []);
+  const groups = [...new Map(rows.map((r) => [r.group_id, { id: r.group_id, name: r.group_name, classId: r.class_id, className: r.class_name, poolKey: r.pool_key }])).values()];
+  const rankedGroups = rankByMedals(groups.filter((g) => !classId || g.classId === classId).map((g) => ({ ...g, medals: medals.filter((m) => m.groupId === g.id), tally: tallyMedals(medals.filter((m) => m.groupId === g.id)) })), (g) => g.name);
+  const classes = [...new Map(groups.map((g) => [g.classId, { id: g.classId, name: g.className, poolKey: g.poolKey }])).values()];
+  const rankedClasses = classes.flatMap((c) => rankByMedals(classes.filter((x) => x.poolKey === c.poolKey).map((x) => ({ ...x, tally: tallyMedals(medals.filter((m) => groups.some((g) => g.id === m.groupId && g.classId === x.id))) })), (x) => x.name).filter((x) => x.id === c.id));
+  return { medals, groups: rankedGroups, classes: rankedClasses };
 }
 
 /** Key of the competition a class is in: classes with the same pool label compete together; no label = alone. */

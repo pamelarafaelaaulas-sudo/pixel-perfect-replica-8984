@@ -1964,6 +1964,19 @@ export type Database = {
           submitted_at: string
         }[]
       }
+      medal_scoreboard: {
+        Args: { _class_id?: string }
+        Returns: {
+          class_id: string
+          class_name: string
+          group_id: string
+          group_name: string
+          kind: string
+          phase_number: number
+          pool_key: string
+          submitted_at: string
+        }[]
+      }
       normalized_text: { Args: { _t: string }; Returns: string }
       phase_rule_problem: {
         Args: {

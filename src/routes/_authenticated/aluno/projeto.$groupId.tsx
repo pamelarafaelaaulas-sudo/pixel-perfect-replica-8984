@@ -1,5 +1,5 @@
 import { classMedalsQuery } from "@/lib/queries";
-import { MEDAL_EMOJI, MEDAL_LABEL, stageMedals } from "@/lib/medals";
+import { MEDAL_EMOJI, MEDAL_LABEL } from "@/lib/medals";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -199,7 +199,10 @@ function StudentProjectPage() {
       const text = draft ? phaseText(draft, phase).trim() : "";
       if (phase !== BANNER_PHASE && text.length >= 20) {
         evaluate({ data: { projectId: project!.id, phaseNumber: phase, text: text.slice(0, 30000) } })
-          .then(() => qc.invalidateQueries({ queryKey: ["ai", "group", groupId] }))
+          .then(() => {
+            qc.invalidateQueries({ queryKey: ["ai", "group", groupId] });
+            qc.invalidateQueries({ queryKey: ["medals"] });
+          })
           .catch((e) => console.warn("Automatic AI evaluation failed", e));
       }
     },
@@ -210,8 +213,8 @@ function StudentProjectPage() {
       if (classId)
         qc.fetchQuery({ ...classMedalsQuery(classId), staleTime: 0 })
           .then((d) => {
-            const m = stageMedals(d.schedules, d.deliveries).find((x) => x.groupId === groupId && x.phase === deliveredPhase);
-            if (m) toast.success(`${MEDAL_EMOJI[m.kind]} Medalha conquistada: ${MEDAL_LABEL[m.kind]}!`, { duration: 8000 });
+            const m = d.medals.find((x) => x.groupId === groupId && x.phase === deliveredPhase);
+            if (m) toast.success(`${MEDAL_EMOJI[m.kind]} Classificação atual: ${MEDAL_LABEL[m.kind]}!`, { duration: 8000 });
           })
           .catch(() => {});
       qc.invalidateQueries({ queryKey: ["group", groupId] });
