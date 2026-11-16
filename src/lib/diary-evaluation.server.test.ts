@@ -18,7 +18,7 @@ vi.mock("@/integrations/supabase/client.server", () => ({ supabaseAdmin: {
     };
     return query;
   },
-  storage: { from: () => ({ download: async () => ({ data: new Blob([new Uint8Array(10 * 1024 * 1024)], { type: "image/jpeg" }), error: null }) }) },
+  storage: { from: () => ({ download: async () => ({ data: { type: "image/jpeg", arrayBuffer: async () => new Uint8Array(10 * 1024 * 1024).buffer }, error: null }) }) },
 } }));
 vi.mock("./gemini.server", () => ({ geminiModel: () => "mock", GEMINI_OPTIONS: {} }));
 vi.mock("ai", () => ({ Output: { object: () => ({}) }, streamText: (input: { messages: { content: { type: string; text?: string; image?: Uint8Array }[] }[] }) => {
