@@ -20,3 +20,4 @@
 
 - [x] Add Google verification file and router-derived public sitemap; two tests and preview endpoints pass; publication requested.
 - [ ] Confirm new sitemap and verification file on the published site once deployment completes.
+- [ ] Fix growing diary photo payloads and incompatible formats; test batched evaluation and uploads.
