@@ -2044,6 +2044,10 @@ export type Database = {
       teaches_class: { Args: { _class_id: string }; Returns: boolean }
       teaches_group: { Args: { _group_id: string }; Returns: boolean }
       teaches_student: { Args: { _student_id: string }; Returns: boolean }
+      transfer_group: {
+        Args: { _class_id: string; _group_id: string }
+        Returns: undefined
+      }
       word_count: { Args: { _t: string }; Returns: number }
       written_phase_text: {
         Args: {

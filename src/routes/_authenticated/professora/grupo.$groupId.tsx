@@ -44,6 +44,7 @@ import { ProjectAreaPicker, ProjectCodeTag } from "@/components/project-code";
 import { ProjectDocxButton } from "@/components/project-docx";
 import { SocialApplicationCard } from "@/components/social-application";
 import { RenameGroupButton } from "@/components/rename-group";
+import { TransferGroupButton } from "@/components/transfer-group";
 import { TeacherDiaryAI } from "@/components/diary-ai";
 
 export const Route = createFileRoute("/_authenticated/professora/grupo/$groupId")({
@@ -144,6 +145,7 @@ function TeacherGroupPage() {
           <span className="inline-flex items-center gap-2">
             {group.group_name}
             <RenameGroupButton groupId={group.id} current={group.group_name} />
+            <TransferGroupButton groupId={group.id} currentClassId={cls.id} />
           </span>
         }
         actions={
