@@ -365,6 +365,13 @@
       "when": 1795024578471,
       "tag": "0051_transfer_group_class",
       "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1795024734244,
+      "tag": "0052_delete_group_move_member",
+      "breakpoints": true
     }
   ]
 }

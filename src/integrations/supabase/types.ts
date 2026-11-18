@@ -1874,6 +1874,7 @@ export type Database = {
         }
         Returns: string
       }
+      delete_group: { Args: { _group_id: string }; Returns: undefined }
       ethics_extra_problem: {
         Args: {
           _p: Database["public"]["Tables"]["projects"]["Row"]
@@ -1976,6 +1977,10 @@ export type Database = {
           pool_key: string
           submitted_at: string
         }[]
+      }
+      move_member: {
+        Args: { _member_id: string; _target_group_id: string }
+        Returns: undefined
       }
       normalized_text: { Args: { _t: string }; Returns: string }
       phase_rule_problem: {

@@ -45,6 +45,7 @@ import { ProjectDocxButton } from "@/components/project-docx";
 import { SocialApplicationCard } from "@/components/social-application";
 import { RenameGroupButton } from "@/components/rename-group";
 import { TransferGroupButton } from "@/components/transfer-group";
+import { DeleteGroupButton, MoveMemberButton } from "@/components/group-admin";
 import { TeacherDiaryAI } from "@/components/diary-ai";
 
 export const Route = createFileRoute("/_authenticated/professora/grupo/$groupId")({
@@ -146,6 +147,7 @@ function TeacherGroupPage() {
             {group.group_name}
             <RenameGroupButton groupId={group.id} current={group.group_name} />
             <TransferGroupButton groupId={group.id} currentClassId={cls.id} />
+            <DeleteGroupButton groupId={group.id} name={group.group_name} />
           </span>
         }
         actions={
@@ -201,6 +203,8 @@ function TeacherGroupPage() {
                 <MessageCircle className="size-3.5" /> {m.whatsapp}
               </a>
             </div>
+            <div className="flex">
+            <MoveMemberButton memberId={m.id} groupId={group.id} classId={cls.id} name={m.profiles?.name ?? "Aluno"} />
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="ghost" size="icon" aria-label={`Remover ${m.profiles?.name}`}>
@@ -218,6 +222,7 @@ function TeacherGroupPage() {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+            </div>
           </div>
         ))}
       </section>
