@@ -24,3 +24,4 @@
 - [x] Rank medals by quality with relative-deadline tie breaks and private scores; 12 tests passed.
 - [x] Show internal and interclass scoreboards; teacher's 64 saved scoreboard rows verified on desktop/mobile, with no scores returned and no runtime errors.
 - [ ] Verify student scoreboards using a student's session; teacher session only available in this check.
+- [x] Group numbering by area within each class with one continuous count; 10 tests pass, 45 real projects across 6 classes saved through the teacher screen and verified after reload, desktop/mobile checked.

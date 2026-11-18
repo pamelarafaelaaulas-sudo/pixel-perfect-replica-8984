@@ -49,7 +49,7 @@ describe("numbering across the teacher's classes", () => {
     expect([n.get("c1"), n.get("a1"), n.get("a2"), n.get("b1")]).toEqual([1, 2, 3, 4]);
   });
 
-  it("groups by area (Biológicas, then Saúde) keeping one continuous count", () => {
+  it("groups areas inside each class while keeping one continuous count", () => {
     const cls = [
       { id: "A", created_at: "2026-01-01", groups: [
         { id: "a1", created_at: "2026-02-01", area_code: "SAU" },
@@ -61,6 +61,21 @@ describe("numbering across the teacher's classes", () => {
       ] },
     ];
     const n = numberProjects(cls, ["A", "B"], ["BIO", "SAU"]);
-    expect([n.get("a2"), n.get("b1"), n.get("a1"), n.get("b2")]).toEqual([1, 2, 3, 4]);
+    expect([n.get("a2"), n.get("a1"), n.get("b1"), n.get("b2")]).toEqual([1, 2, 3, 4]);
+  });
+
+  it("keeps missing areas last inside their own class, not after every class", () => {
+    const cls = [
+      { id: "A", created_at: "2026-01-01", groups: [
+        { id: "a1", created_at: "2026-02-01", area_code: "BIO" },
+      ] },
+      { id: "B", created_at: "2026-01-02", groups: [
+        { id: "b0", created_at: "2026-01-14", area_code: null },
+        { id: "b1", created_at: "2026-01-15", area_code: "BIO" },
+        { id: "b2", created_at: "2026-01-16", area_code: "SAU" },
+      ] },
+    ];
+    const n = numberProjects(cls, ["B", "A"], ["SAU", "BIO"]);
+    expect([n.get("b2"), n.get("b1"), n.get("b0"), n.get("a1")]).toEqual([1, 2, 3, 4]);
   });
 });

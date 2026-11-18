@@ -351,6 +351,13 @@
       "when": 1794866128013,
       "tag": "0049_quality_medal_scoreboard",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1795017154506,
+      "tag": "0050_number_projects_area_within_class",
+      "breakpoints": true
     }
   ]
 }

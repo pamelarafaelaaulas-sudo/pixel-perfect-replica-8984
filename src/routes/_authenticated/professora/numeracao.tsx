@@ -115,7 +115,7 @@ function NumberingPage() {
       <PageHeader
         eyebrow="Painel da professora"
         title="Numeração dos trabalhos"
-        description="Todas as suas turmas seguem uma só contagem, a partir do 01. Escolha a turma que começa e a ordem das outras; dentro de cada turma, vale a ordem de cadastro dos grupos."
+        description="Todas as suas turmas seguem uma só contagem, a partir do 01, com áreas agrupadas dentro de cada sala."
         actions={
           classes.length > 0 && (
             <div className="flex flex-wrap gap-2">
@@ -140,11 +140,10 @@ function NumberingPage() {
           <section className="card-paper space-y-4 p-5">
             <div className="flex items-center gap-3">
               <Switch id="by-area" checked={byArea} onCheckedChange={setByArea} />
-              <Label htmlFor="by-area" className="text-base font-semibold">Agrupar por área</Label>
+              <Label htmlFor="by-area" className="text-base font-semibold">Agrupar por área dentro da sala</Label>
             </div>
             <p className="text-sm text-muted-foreground">
-              A contagem continua única (01, 02, 03…), mas os trabalhos da mesma área ficam juntos, na ordem abaixo.
-              Dentro de cada área vale a ordem das turmas e, depois, a ordem de cadastro dos grupos. Grupos sem área ficam no final.
+              Contagem contínua entre turmas · áreas agrupadas em cada sala · grupos sem área no final da própria sala.
             </p>
             {byArea && (
               <ol className="grid gap-1 sm:grid-cols-2">
@@ -162,14 +161,17 @@ function NumberingPage() {
           </section>
           {byArea && flat.length > 0 && (
             <section className="card-paper p-5">
-              <h2 className="text-lg font-semibold">Ordem final por área</h2>
+              <h2 className="text-lg font-semibold">Ordem final por sala e área</h2>
               <ul className="mt-3 divide-y">
                 {flat.map(({ g, c }, i) => {
-                  const area = g.projects!.area_code;
-                  const prev = i > 0 ? flat[i - 1]!.g.projects!.area_code : undefined;
+                  const area = g.projects?.area_code;
+                  const prev = flat[i - 1];
                   return (
                     <li key={g.id} className="py-2 text-sm">
-                      {area !== prev && (
+                      {c.id !== prev?.c.id && (
+                        <h3 className="mb-2 text-base font-semibold">{c.name}</h3>
+                      )}
+                      {(c.id !== prev?.c.id || area !== prev?.g.projects?.area_code) && (
                         <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">{areaLabel(area) ?? "Sem área definida"}</p>
                       )}
                       <div className="flex flex-wrap items-center justify-between gap-2">

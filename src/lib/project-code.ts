@@ -52,8 +52,8 @@ export const DEFAULT_AREA_ORDER: string[] = ["BIO", "SAU", ...AREAS.map((a) => a
 
 /**
  * Mirrors SQL `renumber_projects`: one shared count 1, 2, 3…
- * With `areaOrder`, projects are grouped by area in that order first (no/unknown area last);
- * then classes in the chosen order (unlisted ones after, by creation), then groups by registration.
+ * Classes always come first in the chosen order (unlisted ones after, by creation).
+ * With `areaOrder`, areas are grouped inside each class (no/unknown area last), then registration.
  */
 export function numberProjects(classes: NumberingClass[], order: string[], areaOrder?: string[] | null) {
   const pos = new Map(order.map((id, i) => [id, i]));
@@ -73,7 +73,7 @@ export function numberProjects(classes: NumberingClass[], order: string[], areaO
       const i = a ? areaOrder.indexOf(a) : -1;
       return i < 0 ? Infinity : i;
     };
-    items.sort((x, y) => rank(x.g.area_code) - rank(y.g.area_code) || x.ci - y.ci || x.gi - y.gi);
+    items.sort((x, y) => x.ci - y.ci || rank(x.g.area_code) - rank(y.g.area_code) || x.gi - y.gi);
   }
   const result = new Map<string, number>();
   items.forEach(({ g }, i) => result.set(g.id, i + 1));
