@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { articleProblems, extractDoi, lookupDoi, MIN_YEAR } from "@/lib/article-check";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -267,6 +268,7 @@ function StudentProjectPage() {
           ethics_review_status: project.ethics_review_status,
           diary_video_url: cls.diary_video_url,
           diary_video_watched_at: project.diary_video_watched_at,
+          member_names: members.map((m) => m.profiles?.name ?? "").filter(Boolean),
         },
     draft.scientific_articles.length,
   )];
@@ -403,7 +405,7 @@ function StudentProjectPage() {
             {isBanner ? null : selected === 2 ? (
               <div className="space-y-5">
                 <ResearchPromptCard theme={draft.theme ?? ""} />
-                <ArticlesEditor value={draft.scientific_articles} onChange={(v) => set("scientific_articles", v)} editable={editable} />
+                <ArticlesEditor members={members.map((m) => m.profiles?.name ?? "").filter(Boolean)} value={draft.scientific_articles} onChange={(v) => set("scientific_articles", v)} editable={editable} />
               </div>
             ) : (
               (PHASE_FORM[selected] ?? []).map((f) => (
@@ -835,7 +837,9 @@ function ArticlesEditor({
   value,
   onChange,
   editable,
+  members,
 }: {
+  members: string[];
   value: Article[];
   onChange: (v: Article[]) => void;
   editable: boolean;
@@ -847,11 +851,34 @@ function ArticlesEditor({
         const n = { ...a, ...patch };
         const simple = "authors" in patch || "year" in patch || "journal" in patch || "title" in patch || "url" in patch;
         if (simple && (n.authors?.trim() || n.year?.trim())) n.abnt_citation = buildAbntReference(n);
+        if ("url" in patch) n.doi_verified = false;
         return n;
       }),
     );
+  const [checking, setChecking] = useState<number | null>(null);
+  const checkDoi = async (i: number) => {
+    const doi = extractDoi(value[i]?.url ?? "");
+    if (!doi) return;
+    setChecking(i);
+    try {
+      const w = await lookupDoi(doi);
+      if (!w) return void toast.error("Esse DOI não existe na base mundial de artigos. Confira o link.");
+      const cur = value[i]!;
+      const n: Article = { ...cur, title: w.title || cur.title, authors: w.authors || (cur.authors ?? ""), year: w.year || (cur.year ?? ""), journal: w.journal || (cur.journal ?? ""), url: `https://doi.org/${w.doi}`, doi_verified: true };
+      n.abnt_citation = buildAbntReference(n);
+      onChange(value.map((a, j) => (j === i ? n : a)));
+      toast.success("Artigo encontrado e verificado!");
+    } catch {
+      toast.error("Não foi possível consultar a base agora. Tente de novo.");
+    } finally {
+      setChecking(null);
+    }
+  };
   return (
     <div className="space-y-4">
+      <p className="rounded-md bg-accent/20 px-3 py-2 text-xs text-foreground">
+        🔒 O sistema confere se as fontes são reais: título completo, autores com nome e sobrenome (nunca alguém do grupo), ano de {MIN_YEAR} até hoje e link https://. Tem DOI? Cole o link e clique em “Verificar DOI”.
+      </p>
       <p
         className={`rounded-md px-3 py-2 text-sm font-medium ${value.length >= 5 ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"}`}
       >
@@ -884,7 +911,23 @@ function ArticlesEditor({
               </SelectContent>
             </Select>
           </div>
-          <Input placeholder="Link (https://...)" value={a.url} onChange={(e) => update(i, { url: e.target.value })} aria-label="Link" />
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Input placeholder="Link ou DOI (https://...)" value={a.url} onChange={(e) => update(i, { url: e.target.value })} aria-label="Link" />
+            {editable && extractDoi(a.url) && (
+              <Button type="button" variant="secondary" disabled={checking === i} onClick={() => checkDoi(i)}>
+                {checking === i ? "Verificando…" : "Verificar DOI"}
+              </Button>
+            )}
+          </div>
+          {a.doi_verified && <p className="text-xs font-medium text-success">✔ Encontrado na base mundial de artigos (Crossref): dados preenchidos automaticamente.</p>}
+          {(() => {
+            const pr = articleProblems(a, members);
+            return pr.length > 0 && (a.title || a.url || a.authors) ? (
+              <ul className="list-disc rounded-md bg-destructive/10 py-2 pl-6 pr-3 text-xs text-destructive">
+                {pr.map((m) => <li key={m}>{m.charAt(0).toUpperCase() + m.slice(1)}</li>)}
+              </ul>
+            ) : null;
+          })()}
           <div className="grid gap-3 sm:grid-cols-[1fr_110px]">
             <Input placeholder="Autores (ex.: Mariana Silva e Carlos Souza)" value={a.authors ?? ""} onChange={(e) => update(i, { authors: e.target.value })} aria-label="Autores" />
             <Input inputMode="numeric" maxLength={4} placeholder="Ano" value={a.year ?? ""} onChange={(e) => update(i, { year: e.target.value.replace(/\D/g, "") })} aria-label="Ano" />

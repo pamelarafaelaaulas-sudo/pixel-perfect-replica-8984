@@ -1849,6 +1849,10 @@ export type Database = {
         Args: { _at: string; _error: string; _status: string; _wa_id: string }
         Returns: boolean
       }
+      article_problem: {
+        Args: { _p: Database["public"]["Tables"]["projects"]["Row"] }
+        Returns: string
+      }
       banner_group: { Args: { _name: string }; Returns: string }
       can_edit_banner: { Args: { _group_id: string }; Returns: boolean }
       canva_design_id: { Args: { _url: string }; Returns: string }

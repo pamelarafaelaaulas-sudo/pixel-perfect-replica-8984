@@ -6,6 +6,8 @@
 import { checkCitations, citedWorks, missingReferences, workKey, type CitedWork } from "./citations";
 import { ethicsExtraProblems, ethicsProblems, type EthicsExtraValues } from "./ethics";
 import { diaryVideoProblems } from "./diary";
+import { articlesProblems } from "./article-check";
+import { parseArticles } from "./phases";
 
 /** Minimum sources the group must register to deliver stage 2 (Artigos científicos). */
 export const MIN_ARTICLES = 5;
@@ -140,6 +142,8 @@ export function phaseProblems(
   if (phase === 2) {
     if (articleCount < MIN_ARTICLES)
       problems.push(`Cadastrem pelo menos ${MIN_ARTICLES} fontes (agora: ${articleCount}).`);
+    const members = Array.isArray(values["member_names"]) ? (values["member_names"] as string[]) : [];
+    problems.push(...articlesProblems(parseArticles(values["scientific_articles"]), members));
     return problems;
   }
   const checkCitationsIn = (key: string) => {

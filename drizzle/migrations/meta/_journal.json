@@ -372,6 +372,13 @@
       "when": 1795024734244,
       "tag": "0052_delete_group_move_member",
       "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1795434385290,
+      "tag": "0053_article_authenticity_checks",
+      "breakpoints": true
     }
   ]
 }

@@ -202,6 +202,8 @@ export type Article = {
   method?: string;
   findings?: string;
   contribution?: string;
+  /** Set when the DOI was found in Crossref. */
+  doi_verified?: boolean;
 };
 
 export function parseArticles(value: unknown): Article[] {
@@ -220,6 +222,7 @@ export function parseArticles(value: unknown): Article[] {
       method: String(o["method"] ?? ""),
       findings: String(o["findings"] ?? ""),
       contribution: String(o["contribution"] ?? ""),
+      doi_verified: o["doi_verified"] === true,
     };
   });
 }
