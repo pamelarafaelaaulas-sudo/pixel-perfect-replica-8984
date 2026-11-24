@@ -13,3 +13,4 @@
 - Stage charts use structured JSON mapped by `CHART_COLUMNS`; browser-only Chart.js renders both previews and PNG figures embedded in Word, independently numbered across document sections. Chart text is excluded from word counts.
 
 - The sitemap derives static public URLs from required route decisions; the authenticated subtree is excluded and lastmod is omitted without authoritative page timestamps.
+- Stage-2 source authenticity: `article-check.ts` (tested) mirrored by SQL `article_problem` in stage 2; DOI lookup hits Crossref from the browser.
