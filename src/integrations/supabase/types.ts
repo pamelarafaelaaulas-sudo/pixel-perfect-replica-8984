@@ -1845,6 +1845,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ai_text_marker: { Args: { _t: string }; Returns: boolean }
       apply_whatsapp_status: {
         Args: { _at: string; _error: string; _status: string; _wa_id: string }
         Returns: boolean

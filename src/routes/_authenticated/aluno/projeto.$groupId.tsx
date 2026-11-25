@@ -2,7 +2,7 @@ import { classMedalsQuery } from "@/lib/queries";
 import { MEDAL_EMOJI, MEDAL_LABEL } from "@/lib/medals";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, CheckCircle2, Lock, MessageCircle, Plus, Save, Send, Star, Trash2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { ResearchPromptCard } from "@/components/research-prompt";
@@ -856,6 +856,20 @@ function ArticlesEditor({
       }),
     );
   const [checking, setChecking] = useState<number | null>(null);
+  const tried = useRef(new Set<string>());
+  useEffect(() => {
+    if (!editable) return;
+    const i = value.findIndex((a) => {
+      const d = extractDoi(a.url ?? "");
+      return d && !a.doi_verified && !tried.current.has(d.toLowerCase());
+    });
+    if (i < 0 || checking !== null) return;
+    const t = setTimeout(() => {
+      tried.current.add(extractDoi(value[i]!.url ?? "")!.toLowerCase());
+      void checkDoi(i);
+    }, 800);
+    return () => clearTimeout(t);
+  });
   const checkDoi = async (i: number) => {
     const doi = extractDoi(value[i]?.url ?? "");
     if (!doi) return;
@@ -877,7 +891,7 @@ function ArticlesEditor({
   return (
     <div className="space-y-4">
       <p className="rounded-md bg-accent/20 px-3 py-2 text-xs text-foreground">
-        🔒 O sistema confere se as fontes são reais: título completo, autores com nome e sobrenome (nunca alguém do grupo), ano de {MIN_YEAR} até hoje e link https://. Tem DOI? Cole o link e clique em “Verificar DOI”.
+        🔒 O sistema confere se as fontes são reais: título completo, autores com nome e sobrenome (nunca alguém do grupo), ano de {MIN_YEAR} até hoje e link https://. Todo link com DOI é conferido sozinho na base mundial de artigos; DOI inexistente bloqueia a entrega.
       </p>
       <p
         className={`rounded-md px-3 py-2 text-sm font-medium ${value.length >= 5 ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"}`}
@@ -913,9 +927,9 @@ function ArticlesEditor({
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
             <Input placeholder="Link ou DOI (https://...)" value={a.url} onChange={(e) => update(i, { url: e.target.value })} aria-label="Link" />
-            {editable && extractDoi(a.url) && (
+            {editable && extractDoi(a.url) && !a.doi_verified && (
               <Button type="button" variant="secondary" disabled={checking === i} onClick={() => checkDoi(i)}>
-                {checking === i ? "Verificando…" : "Verificar DOI"}
+                {checking === i ? "Verificando…" : "Verificar de novo"}
               </Button>
             )}
           </div>

@@ -13,4 +13,5 @@
 - Stage charts use structured JSON mapped by `CHART_COLUMNS`; browser-only Chart.js renders both previews and PNG figures embedded in Word, independently numbered across document sections. Chart text is excluded from word counts.
 
 - The sitemap derives static public URLs from required route decisions; the authenticated subtree is excluded and lastmod is omitted without authoritative page timestamps.
-- Stage-2 source authenticity: `article-check.ts` (tested) mirrored by SQL `article_problem` in stage 2; DOI lookup hits Crossref from the browser.
+- Stage-2 source authenticity: `article-check.ts` (tested) mirrored by SQL `article_problem`; any DOI in a link is auto-checked in Crossref from the browser and an unverified DOI blocks delivery (SQL check in `phase_rule_problem` wrapper).
+- Chatbot-text guard: `ai-text.ts` (tested, rule-based, free) mirrored by SQL `ai_text_marker` in the `phase_rule_problem` wrapper for stages 4–12 except 11.

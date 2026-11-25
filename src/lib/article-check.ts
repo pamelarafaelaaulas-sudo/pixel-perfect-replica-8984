@@ -53,6 +53,8 @@ export function articleProblems(a: Article, members: string[], currentYear = new
     p.push(`o título precisa do nome completo do estudo (pelo menos ${MIN_TITLE_CHARS} letras e 3 palavras).`);
   else if (looksFake(title)) p.push("o título parece inventado ou digitado ao acaso.");
   if (!isHttpsUrl(a.url ?? "")) p.push("cole o link completo da fonte, começando com https://.");
+  else if (extractDoi(a.url ?? "") && !a.doi_verified)
+    p.push("o DOI ainda não foi confirmado na base mundial de artigos (Crossref). Aguarde a verificação automática ou confira o link.");
   const authors = (a.authors ?? "").trim();
   if (!authors && !a.abnt_citation.trim()) p.push("informe os autores (nome e sobrenome).");
   if (authors) {

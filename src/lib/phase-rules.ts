@@ -1,3 +1,5 @@
+import { aiTextProblem } from "./ai-text";
+import { writtenPhaseText } from "./written-review";
 /**
  * Delivery rules for each stage, from the teacher's specification document.
  * A stage can only be delivered when every check passes.
@@ -170,6 +172,11 @@ export function phaseProblems(
     else if (n < lim.min) problems.push(`${label}: ${n} palavras, o mínimo é ${lim.min}.`);
     else if (lim.max !== null && n > lim.max) problems.push(`${label}: ${n} palavras, o máximo é ${lim.max}.`);
   };
+  if (phase >= 4 && phase <= 12 && phase !== 11) {
+    const text = writtenPhaseText(values as never, phase);
+    const ai = aiTextProblem("Texto", text);
+    if (ai) problems.push(ai);
+  }
   switch (phase) {
     case 1:
       checkWords("theme", "Tema");

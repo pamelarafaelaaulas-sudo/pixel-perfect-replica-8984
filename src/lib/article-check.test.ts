@@ -25,3 +25,14 @@ describe("extractDoi", () => {
   it("reads DOI from a link", () => expect(extractDoi("https://doi.org/10.1590/s0100-40422012000100001.")).toBe("10.1590/s0100-40422012000100001"));
   it("null without DOI", () => expect(extractDoi("https://site.com/x")).toBeNull());
 });
+
+import { articleProblems as ap2 } from "./article-check";
+describe("unverified DOI", () => {
+  const base = { title: "Qualidade da água em rios urbanos", url: "https://doi.org/10.1590/abc123", authors: "Mariana Silva", year: "2020", abnt_citation: "", source_type: "Artigo" } as never;
+  it("blocks a DOI not confirmed in Crossref", () => {
+    expect(ap2(base, [], 2026).some((m) => m.includes("DOI"))).toBe(true);
+  });
+  it("accepts a verified DOI", () => {
+    expect(ap2({ ...(base as object), doi_verified: true } as never, [], 2026).some((m) => m.includes("DOI"))).toBe(false);
+  });
+});
