@@ -1856,6 +1856,7 @@ export type Database = {
       }
       banner_group: { Args: { _name: string }; Returns: string }
       can_edit_banner: { Args: { _group_id: string }; Returns: boolean }
+      can_join_group_topic: { Args: { _topic: string }; Returns: boolean }
       canva_design_id: { Args: { _url: string }; Returns: string }
       cited_work_count: { Args: { _t: string }; Returns: number }
       class_medal_deliveries: {
