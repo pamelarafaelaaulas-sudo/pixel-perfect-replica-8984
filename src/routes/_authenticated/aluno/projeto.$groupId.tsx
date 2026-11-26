@@ -33,6 +33,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
+import { useLiveCollab } from "@/hooks/use-live-collab";
 import { cn } from "@/lib/utils";
 import type { Database } from "@/integrations/supabase/types";
 import { aiSuggestionsForGroupQuery, diaryGradesQuery, groupDetailQuery, meQuery } from "@/lib/queries";
@@ -226,6 +227,9 @@ function StudentProjectPage() {
   });
 
   useWrittenRoundsSync(project?.id ?? "", groupId, project?.written_reviews);
+  const live = useLiveCollab(groupId, me ? { id: me.id, name: me.name } : null, (k, v) =>
+    setDraft((d) => (d && k in d ? { ...d, [k]: v } : d)),
+  );
 
   if (!group || !group.classes || !project || !draft) return null;
   const cls = group.classes;
@@ -274,7 +278,10 @@ function StudentProjectPage() {
   )];
   const grades = [...(group.grades ?? [])].sort((a, b) => a.trimester - b.trimester);
 
-  const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => (d ? { ...d, [k]: v } : d));
+  const set = <K extends keyof Draft>(k: K, v: Draft[K]) => {
+    setDraft((d) => (d ? { ...d, [k]: v } : d));
+    live.send(k, v);
+  };
 
   async function save() {
     try {
@@ -343,6 +350,18 @@ function StudentProjectPage() {
         }
       />
 
+      {live.peers.length > 0 && (
+        <div className="mb-3 flex flex-wrap items-center gap-2 rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
+          <span className="size-2 animate-pulse rounded-full bg-primary" />
+          <span className="font-medium">Online agora:</span>
+          {live.peers.map((p) => (
+            <Badge key={p.userId} variant="secondary">
+              {p.name.split(" ")[0]}
+              {p.field ? " ✍️ digitando" : ""}
+            </Badge>
+          ))}
+        </div>
+      )}
       <PhaseTimeline phases={lateness.phases} active={selected} onSelect={setSelected} />
       <GroupResponsibilities groupId={groupId} members={members} editable />
 
@@ -429,15 +448,25 @@ function StudentProjectPage() {
                   }
                 >
                   {f.rows === 1 ? (
-                    <Input id={f.key} value={draft[f.key]} placeholder={f.placeholder} onChange={(e) => set(f.key, e.target.value)} />
+                    <>
+                    <Input id={f.key} value={draft[f.key]} placeholder={f.placeholder} readOnly={!!live.editingBy(f.key)} onFocus={() => live.focus(f.key)} onBlur={() => live.focus(null)} onChange={(e) => set(f.key, e.target.value)} />
+                    <LiveTag who={live.editingBy(f.key)?.name} />
+                    </>
                   ) : (
+                    <>
                     <Textarea
                       id={f.key}
                       rows={f.rows}
                       value={draft[f.key]}
                       placeholder={f.placeholder}
+                      readOnly={!!live.editingBy(f.key)}
+                      className={live.editingBy(f.key) ? "border-secondary ring-2 ring-secondary/40" : undefined}
+                      onFocus={() => live.focus(f.key)}
+                      onBlur={() => live.focus(null)}
                       onChange={(e) => set(f.key, e.target.value)}
                     />
+                    <LiveTag who={live.editingBy(f.key)?.name} />
+                    </>
                   )}
                   {(() => { const column = tableColumnOf(f.key); return column ? (
                     <div className="mt-3">
@@ -993,5 +1022,15 @@ function ArticlesEditor({
         </Button>
       )}
     </div>
+  );
+}
+
+function LiveTag({ who }: { who?: string | undefined }) {
+  if (!who) return null;
+  return (
+    <p className="mt-1 flex items-center gap-1 text-xs font-medium text-secondary">
+      <span className="size-1.5 animate-pulse rounded-full bg-secondary" />
+      {who.split(" ")[0]} está editando este campo — aguarde para escrever.
+    </p>
   );
 }
