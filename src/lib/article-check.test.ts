@@ -36,3 +36,13 @@ describe("unverified DOI", () => {
     expect(ap2({ ...(base as object), doi_verified: true } as never, [], 2026).some((m) => m.includes("DOI"))).toBe(false);
   });
 });
+
+import { duplicateOf as _dup } from "./article-check";
+describe("duplicate sources in the group", () => {
+  const base = { title: "Efeito da temperatura no crescimento de plantas", url: "https://scielo.br/a/1", authors: "Ana Souza", year: "2020", abnt_citation: "" } as never;
+  const mk = (o: object) => ({ ...(base as object), ...o }) as never;
+  it("blocks same link", () => expect(_dup([base, mk({ title: "Outro estudo diferente aqui" , url: "http://www.scielo.br/a/1/" })], 1)).toBe(0));
+  it("blocks same DOI from different links", () => expect(_dup([mk({ url: "https://doi.org/10.1590/abc" }), mk({ title: "Outro estudo diferente aqui", url: "https://x.org/10.1590/ABC" })], 1)).toBe(0));
+  it("blocks same title with small variations", () => expect(_dup([base, mk({ url: "https://b.org/x", title: "efeito da temperatura no crescimento de plantas." })], 1)).toBe(0));
+  it("allows different works", () => expect(_dup([base, mk({ url: "https://b.org/x", title: "Outro estudo diferente aqui" })], 1)).toBe(-1));
+});

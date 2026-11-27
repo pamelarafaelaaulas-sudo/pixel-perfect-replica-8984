@@ -70,9 +70,31 @@ export function articleProblems(a: Article, members: string[], currentYear = new
   return p;
 }
 
+const urlKey = (u: string) =>
+  u.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/[#?].*$/, "").replace(/\/+$/, "");
+const titleKey = (t: string) => norm(t).replace(/[^a-z0-9]/g, "");
+
+/** Index (0-based) of an earlier source that is the same work (same link, DOI or title), else -1. */
+export function duplicateOf(list: Article[], i: number): number {
+  const a = list[i]!;
+  const u = urlKey(a.url ?? ""), d = extractDoi(a.url ?? "")?.toLowerCase(), t = titleKey(a.title);
+  for (let j = 0; j < i; j++) {
+    const b = list[j]!;
+    if (u && u === urlKey(b.url ?? "")) return j;
+    if (d && d === extractDoi(b.url ?? "")?.toLowerCase()) return j;
+    if (t.length >= 10 && t === titleKey(b.title)) return j;
+  }
+  return -1;
+}
+
 /** Delivery-blocking list for all sources, labeled "Fonte N: ...". */
 export function articlesProblems(list: Article[], members: string[], currentYear?: number): string[] {
-  return list.flatMap((a, i) => articleProblems(a, members, currentYear).map((m) => `Fonte ${i + 1}: ${m}`));
+  return list.flatMap((a, i) => {
+    const p = articleProblems(a, members, currentYear);
+    const dup = duplicateOf(list, i);
+    if (dup >= 0) p.push(`repete o mesmo artigo já cadastrado na Fonte ${dup + 1}. As fontes do grupo devem ser diferentes entre si.`);
+    return p.map((m) => `Fonte ${i + 1}: ${m}`);
+  });
 }
 
 export type CrossrefWork = { title: string; authors: string; year: string; journal: string; doi: string };
