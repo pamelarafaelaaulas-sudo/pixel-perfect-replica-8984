@@ -2,7 +2,7 @@ import { classMedalsQuery } from "@/lib/queries";
 import { MEDAL_EMOJI, MEDAL_LABEL } from "@/lib/medals";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ArrowLeft, CheckCircle2, Lock, MessageCircle, Plus, Save, Send, Star, Trash2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { ResearchPromptCard } from "@/components/research-prompt";
@@ -363,7 +363,7 @@ function StudentProjectPage() {
         </div>
       )}
       <PhaseTimeline phases={lateness.phases} active={selected} onSelect={setSelected} />
-      <GroupResponsibilities groupId={groupId} members={members} editable />
+      <Fold title="👥 Responsabilidades do grupo (líder e diário)"><GroupResponsibilities groupId={groupId} members={members} editable /></Fold>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_300px]">
         <section className="card-paper p-6 md:p-8">
@@ -404,7 +404,7 @@ function StudentProjectPage() {
           )}
           <StudentWrittenFeedback reviews={writtenRounds} perDay={Number(cls.late_penalty_per_day)} />
           {selected === 1 && editable && (
-            <div className="mb-5">
+            <Fold title="💡 Ver banco de ideias">
               <IdeaBank groupId={groupId} classId={group!.class_id}
                 onUse={(i) => {
                   setPickedIdea(i.id);
@@ -413,12 +413,12 @@ function StudentProjectPage() {
                   );
                 }}
               />
-            </div>
+            </Fold>
           )}
           {selected === 2 && (
-            <div className="mb-5">
+            <Fold title="🔎 Ver tutorial de pesquisa">
               <ResearchTutorial theme={draft.theme ?? ""} />
-            </div>
+            </Fold>
           )}
           <fieldset disabled={!editable} className="space-y-5">
             {isBanner ? null : selected === 2 ? (
@@ -436,8 +436,8 @@ function StudentProjectPage() {
                   before={
                     CITATION_FIELDS[f.key] ? (
                       <>
-                        <CitationGuide />
-                        {f.key === "introduction" && <ArticleCitationPanel articles={draft.scientific_articles} text={draft.introduction} />}
+                        <Fold title="📖 Ver exemplos de citação ABNT"><CitationGuide /></Fold>
+                        {f.key === "introduction" && <Fold title="📚 Consultar meus artigos para citar"><ArticleCitationPanel articles={draft.scientific_articles} text={draft.introduction} /></Fold>}
                       </>
                     ) : f.key === "references_list" ? (
                       <>
@@ -454,13 +454,14 @@ function StudentProjectPage() {
                     </>
                   ) : (
                     <>
+                    <p className="mb-1 text-sm font-semibold text-primary">✍️ Escreva seu texto aqui</p>
                     <Textarea
                       id={f.key}
                       rows={f.rows}
                       value={draft[f.key]}
                       placeholder={f.placeholder}
                       readOnly={!!live.editingBy(f.key)}
-                      className={live.editingBy(f.key) ? "border-secondary ring-2 ring-secondary/40" : undefined}
+                      className={live.editingBy(f.key) ? "border-secondary ring-2 ring-secondary/40" : "border-2 border-primary/40 bg-background focus-visible:border-primary"}
                       onFocus={() => live.focus(f.key)}
                       onBlur={() => live.focus(null)}
                       onChange={(e) => set(f.key, e.target.value)}
@@ -1032,5 +1033,14 @@ function LiveTag({ who }: { who?: string | undefined }) {
       <span className="size-1.5 animate-pulse rounded-full bg-secondary" />
       {who.split(" ")[0]} está editando este campo — aguarde para escrever.
     </p>
+  );
+}
+
+function Fold({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <details className="group mb-4 rounded-lg border bg-muted/30">
+      <summary className="cursor-pointer select-none px-4 py-2.5 text-sm font-medium text-foreground">{title}</summary>
+      <div className="border-t p-4">{children}</div>
+    </details>
   );
 }
