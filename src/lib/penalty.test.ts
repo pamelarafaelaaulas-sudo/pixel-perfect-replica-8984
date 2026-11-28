@@ -95,3 +95,13 @@ describe("3º bimestre: diário de bordo vale 40%", () => {
     expect(finalGrade(bimesterBase(3, 8, 10)!, 1, 0.5)).toBe(8.3);
   });
 });
+
+describe("teto de atraso por bimestre", () => {
+  it("never takes more than 3 points from one bimestre", async () => {
+    const { bimesterPenalties } = await import("./penalty");
+    const phases = [4, 5, 6].map((phase) => ({ phase, dueDate: "", submittedAt: null, state: "late", daysLate: 4, penalty: 2 })) as never;
+    const out = bimesterPenalties(phases);
+    expect(out[1]).toBe(3);
+    expect(out[2]).toBe(0);
+  });
+});

@@ -137,12 +137,16 @@ export function projectLateness(args: {
  * Late penalty per bimestre: each stage's penalty comes off only the bimestre that stage belongs to
  * (1º = Tema a Metodologia, 2º = Introdução a Resumo, 3º = Banner, 4º = Feira, no stages).
  */
+/** Most a bimestre can lose to lateness, however many stages or days are late. */
+export const MAX_BIMESTER_PENALTY = 3;
+
 export function bimesterPenalties(phases: PhaseInfo[]): Record<number, number> {
   const out: Record<number, number> = Object.fromEntries(BIMESTER_NUMBERS.map((b) => [b, 0]));
   for (const p of phases) {
     const b = PHASES[p.phase - 1]?.bimester;
     if (b) out[b] = Math.round(((out[b] ?? 0) + p.penalty) * 100) / 100;
   }
+  for (const b of Object.keys(out)) out[+b] = Math.min(MAX_BIMESTER_PENALTY, out[+b] ?? 0);
   return out;
 }
 
